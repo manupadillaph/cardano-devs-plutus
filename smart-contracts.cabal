@@ -1,0 +1,54 @@
+Cabal-Version:      2.4
+Name:               smart-contracts
+Version:            0.1.0.0
+Author:              Manuel Padilla
+Maintainer:          manuelpad@gmail.com
+Build-Type:          Simple
+Copyright:           © 2022 Manuel Padilla
+License:             Apache-2.0
+License-files:       LICENSE
+
+library
+  hs-source-dirs:      src
+  exposed-modules:     Deploy
+                     , ValidatorLocker
+                     
+  build-depends:       aeson
+                     , base ^>=4.14.1.0
+                     , bytestring
+                     , cardano-api
+                     , containers
+                     , data-default
+                     , playground-common
+                     , plutus-contract
+                     , plutus-ledger
+                     , plutus-ledger-api
+                     , plutus-ledger-constraints
+                     , plutus-tx-plugin
+                     , plutus-tx
+                     , serialise
+                     , text
+  default-language:    Haskell2010
+  ghc-options:         -Wall -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise
+
+executable deploy-smart-contracts-manual-exe
+  main-is: Main.hs
+
+  hs-source-dirs:
+      app
+  
+  build-depends:
+      base ^>=4.14.1.0,
+      smart-contracts
+  default-language: Haskell2010
+
+executable deploy-smart-contracts-auto-exe
+  main-is: Main-auto.hs
+
+  hs-source-dirs:
+      app
+  
+  build-depends:
+      base ^>=4.14.1.0,
+      smart-contracts
+  default-language: Haskell2010
