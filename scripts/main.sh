@@ -71,19 +71,22 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                 read scriptName
             done
 
-            if ! [[ -f "files/validators/${scriptName}.plutus" && -f "files/validators/${scriptName}.hash"   && -f "files/validators/${scriptName}.addr" ]]
+            if ! [[ -f "files/validators/${scriptName}.plutus" && -f "files/validators/${scriptName}.hash" ]]
             then
                 printf "\nValidator script file ${scriptName} no existe\n"
+            else
+                $CARDANO_NODE/cardano-cli address build  \
+                --payment-script-file files/validators/${scriptName}.plutus --out-file files/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
             fi
 
-            printf "\nDesea crear files .plutus, .hash y address del actual validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
+            printf "\nDesea crear files .plutus, .hash del actual validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
             read opcion
             if [[ $opcion = "y" ]]; then 
                 printf "%s\n%s\n%s\n" "1" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
                 printf "%s\n%s\n%s\n" "2" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
-                $CARDANO_NODE/cardano-cli address build  \
-                --payment-script-file files/validators/${scriptName}.plutus --out-file files/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
+                
             fi
+
         done
 
         scriptAddr=$(cat files/validators/${scriptName}.addr)
