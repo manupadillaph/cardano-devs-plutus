@@ -37,6 +37,14 @@ Ejecutar main.sh para acceder a la aplicación principal por linea de comandos q
 Todos los archivos de wallets creados, contratos exportados, datums y redeemers se guardan en la carpeta scripts/files  
 
 *******************************************  
+### Solución de problemas
+
+*******************************************  
+
+- Problemas con git: `git config --global --add safe.directory /home/manuelpadilla/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell`
+
+
+*******************************************  
 ### **Windows Command Line**    
 *******************************************  
 
