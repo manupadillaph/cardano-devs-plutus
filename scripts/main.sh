@@ -16,7 +16,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     echo "0: Salir"
 
-    read opcionMenuPrincipal
+    read -n 1 -s opcionMenuPrincipal
 
     if [[ $opcionMenuPrincipal = "1" ]]; then 
         
@@ -34,7 +34,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             then
                 printf "\nWallet file ${walletName} no existe, desea crearla (y/n)? \nImportante: Necesita tener NODO y WALLET SERVER configurados e iniciados \n"
 
-                read opcion
+                read -n 1 -s opcion
                 if [[ $opcion = "y" ]]; then 
 
                     bash ${SCRIPTS}/create-wallet-con-cardano-wallet.sh ${walletName} ${walletName}
@@ -80,7 +80,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             fi
 
             printf "\nDesea crear files .plutus, .hash del actual validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
-            read opcion
+            read -n 1 -s opcion
             if [[ $opcion = "y" ]]; then 
                 printf "%s\n%s\n%s\n" "1" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
                 printf "%s\n%s\n%s\n" "2" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
@@ -98,7 +98,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
         if [[ $walletName = "" ||  $scriptName = "" ]]; then
              printf "\nDebe elegir wallet y script primero\n"
-             read respuesta
+             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
 
             walletTxIn=$(cat files/wallets/${walletName}.utxo)
@@ -159,7 +159,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                 fi
 
                 printf "\nDesea crear datum file (y/n): "
-                read opcion
+                read -n 1 -s opcion
                 if [[ $opcion = "y" ]]; then 
 
                     #cd PATH_CABAL
@@ -253,7 +253,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
         if [[ $walletName = "" ||  $scriptName = "" ]]; then
              printf "\nDebe elegir wallet y script primero\n"
-             read respuesta
+             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
 
             walletTxIn=$(cat files/wallets/${walletName}.utxo)
@@ -337,7 +337,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                 fi
 
                 printf "\nDesea crear datum file (y/n): "
-                read opcion
+                read -n 1 -s opcion
                 if [[ $opcion = "y" ]]; then 
 
                     printf "\nIngrese creator ($walletSig): "
@@ -393,7 +393,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                 fi
                 
                 printf "\nDesea crear Redeemer file (y/n): "
-                read opcion
+                read -n 1 -s opcion
                 if [[ $opcion = "y" ]]; then 
 
                     printf "\nIngrese redeemer (1 o 2) (1): "
@@ -459,9 +459,10 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     if [[ $opcionMenuPrincipal = "5" ]]; then 
         if [[ $scriptName = "" ]]; then
              printf "\nDebe elegir wallet y script primero\n"
-             read respuesta
+             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-
+            echo "Script Address:" $scriptAddr
+            
             result=$($CARDANO_NODE/cardano-cli query utxo\
                 --address $scriptAddr --testnet-magic $TESTNET_MAGIC)
 
@@ -469,7 +470,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
             echo "$result" 
 
-            read $espera
+            echo; read -rsn1 -p "Press any key to continue . . ."; echo 
         fi
 
     fi  
@@ -495,7 +496,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             fi
 
             printf "\nDesea crear datum file (y/n): "
-            read opcion
+            read -n 1 -s opcion
             if [[ $opcion = "y" ]]; then 
 
                 #cd PATH_CABAL
@@ -540,7 +541,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         printf "\nDatum Hash: "
         echo $datumHash   
 
-        read $espera
+        echo; read -rsn1 -p "Press any key to continue . . ."; echo
         
     fi  
 
@@ -572,9 +573,11 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         
         if ! [[ $FILE_encontrada = "" ]]; then 
 
-             printf "\nEcontrado HASH en: %s \n" "$FILE_encontrada" ; 
+            printf "\nEcontrado HASH en: %s \n" "$FILE_encontrada" ; 
 
-             cat $FILE_encontrada | jq '.'
+            cat $FILE_encontrada | jq '.'
+
+            echo; read -rsn1 -p "Press any key to continue . . ."; echo
 
         fi
 
