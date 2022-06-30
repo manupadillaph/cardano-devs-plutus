@@ -6,8 +6,8 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     printf "\nOPERACIONES CON WALLET Y SCRIPT\n"
  
-    echo "1: Elegir Wallet (${walletName})"  
-    echo "2: Elegir Scipt (${scriptName})"  
+    echo "1: Elegir o Crear Wallet (${walletName})"  
+    echo "2: Elegir o Crear Scipt (${scriptName})"  
     echo "3: Depositar Dinero"
     echo "4: Retirar Dinero"
     echo "5: Ver utxo de Script"
