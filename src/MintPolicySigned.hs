@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module Week05.Signed where
+module MintPolicySigned where
 
 import           Control.Monad          hiding (fmap)
 import           Data.Aeson             (ToJSON, FromJSON)
@@ -28,13 +28,29 @@ import           Ledger.Value           as Value
 import           Playground.Contract    (printJson, printSchemas, ensureKnownCurrencies, stage, ToSchema)
 import           Playground.TH          (mkKnownCurrencies, mkSchemaDefinitions)
 import           Playground.Types       (KnownCurrency (..))
-import           Prelude                (IO, Show (..), String)
+import           Prelude                (IO, Semigroup (..), Show (..), String)
 import           Text.Printf            (printf)
+import Text.Read
 import           Wallet.Emulator.Wallet
+
+import qualified Data.Map                    as Map
+import           Data.Maybe                  (fromJust)
+--import           Data.OpenApi.Schema         (ToSchema)
+import           Plutus.Contract.Wallet      (getUnspentOutput)
+
+import qualified Prelude
 
 {-# INLINABLE mkPolicy #-}
 mkPolicy :: PaymentPubKeyHash -> () -> ScriptContext -> Bool
-mkPolicy pkh () ctx = txSignedBy (scriptContextTxInfo ctx) $ unPaymentPubKeyHash pkh
+mkPolicy pkh () ctx = 
+    traceIfFalse ("creator's signature missing: " )  signedByCreator
+  where
+    info :: TxInfo
+    info = scriptContextTxInfo ctx
+
+    signedByCreator :: Bool
+    signedByCreator = txSignedBy info $ unPaymentPubKeyHash pkh
+
 
 policy :: PaymentPubKeyHash -> Scripts.MintingPolicy
 policy pkh = mkMintingPolicyScript $

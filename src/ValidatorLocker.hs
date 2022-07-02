@@ -31,6 +31,7 @@ module ValidatorLocker
     , printJson
     , printSchemas
     , stage
+    , test
     ) where
 
 import           Control.Monad        hiding (fmap)
@@ -55,6 +56,12 @@ import qualified Prelude              as P
 import           Schema               (ToSchema)
 import           Text.Printf          (printf)
 import Data.Typeable
+
+import          Plutus.Trace.Emulator  as Emulator
+import          Wallet.Emulator.Wallet
+import          Data.Default
+import          Ledger.TimeSlot 
+
 
 minLovelace :: Integer
 minLovelace = 2000000
@@ -283,3 +290,31 @@ endpoints = awaitPromise (start' `select` get') >> endpoints
     get' = endpoint @"get" get
 
 mkSchemaDefinitions ''ValidatorSchema
+
+
+test :: IO ()
+test = runEmulatorTraceIO $ do
+
+    let deadline = slotToEndPOSIXTime def 6
+
+    h1 <- activateContractWallet (knownWallet 1) endpoints
+    --h2 <- activateContractWallet (knownWallet 2) endpoints
+    callEndpoint @"start" h1 $ StartParams
+        {  
+            spDeadline = deadline,
+            spName = 55,
+            spAdaQty   = 3000000
+        }
+    void $ Emulator.waitNSlots 1
+    callEndpoint @"get" h1 $ GetParams
+        { 
+            gpName = 55,
+            gpAdaQty    = 3000000
+        }
+    void $ Emulator.waitNSlots 6
+    callEndpoint @"get" h1 $ GetParams
+        { 
+            gpName = 56,
+            gpAdaQty    = 3000000
+        }
+    void $ Emulator.waitNSlots 3

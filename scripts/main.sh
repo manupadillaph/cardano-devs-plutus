@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+
+
+
 opcionMenuPrincipal=""
 
 while ! [[ $opcionMenuPrincipal = "0" ]]; do
@@ -13,10 +17,16 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     echo "5: Ver utxo de Script"
     echo "6: Calcular Hash de Datum"
     echo "7: Buscar Datum de Hash"
+    
+    echo "8: Mint Tokens Free"
+    echo "9: Mint Tokens NFT"
+    echo "10: Mint Tokens Plus"
+    echo "11: Mint Tokens Signed"
 
     echo "0: Salir"
 
-    read -n 1 -s opcionMenuPrincipal
+    #read -n 1 -s opcionMenuPrincipal
+    read  opcionMenuPrincipal
 
     if [[ $opcionMenuPrincipal = "1" ]]; then 
         
@@ -82,9 +92,12 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDesea crear files .plutus, .hash del actual validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
             read -n 1 -s opcion
             if [[ $opcion = "y" ]]; then 
-                printf "%s\n%s\n%s\n" "1" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
-                printf "%s\n%s\n%s\n" "2" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
+                printf "%s\n%s\n%s\n" "3" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
+                printf "%s\n%s\n%s\n" "4" "files/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto-exe  
                 
+                $CARDANO_NODE/cardano-cli address build  \
+                --payment-script-file files/validators/${scriptName}.plutus --out-file files/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
+
             fi
 
         done
@@ -185,7 +198,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                         datumQty="3000111"
                     fi
 
-                    printf "%s\n%s\n%s\n" "4" "files/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto-exe  
+                    printf "%s\n%s\n%s\n" "1" "files/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto-exe  
                     #echo $'5\nttt\n' | cabal exec cliente-plazo-fijo-exe
                     #cat - | cabal exec cliente-plazo-fijo-exe $@ | tee testnet/files/temp-outputcat
 
@@ -361,7 +374,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                         datumQty="3000111"
                     fi
 
-                    printf "%s\n%s\n%s\n" "4" "files/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto-exe  
+                    printf "%s\n%s\n%s\n" "1" "files/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto-exe  
 
                 fi
 
@@ -401,7 +414,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                     if [[ $redeemerOpcion = "" ]]; then 
                         redeemerOpcion="1"
                     fi
-                    printf "%s\n%s\n%s\n" "5" "files/redeemers" "$redeemerFile" "$redeemerOpcion" | cabal exec deploy-smart-contracts-auto-exe 
+                    printf "%s\n%s\n%s\n" "2" "files/redeemers" "$redeemerFile" "$redeemerOpcion" | cabal exec deploy-smart-contracts-auto-exe 
 
 
                 fi
@@ -522,7 +535,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
                     datumQty="3000111"
                 fi
 
-                printf "%s\n%s\n%s\n" "4" "files/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto-exe  
+                printf "%s\n%s\n%s\n" "1" "files/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto-exe  
                 #echo $'5\nttt\n' | cabal exec cliente-plazo-fijo-exe
                 #cat - | cabal exec cliente-plazo-fijo-exe $@ | tee testnet/files/temp-outputcat
 
@@ -583,5 +596,92 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     fi
 
+
+
+    if [[ $opcionMenuPrincipal = "8" || $opcionMenuPrincipal = "9"  || $opcionMenuPrincipal = "10"  ||$opcionMenuPrincipal = "11"  ]]; then 
+        
+        if [[ $walletName = "" ]]; then
+             printf "\nDebe elegir wallet primero\n"
+             echo; read -rsn1 -p "Press any key to continue . . ."; echo
+        else
+
+            walletTxIn=$(cat files/wallets/${walletName}.utxo)
+
+            walletNroUTXO=
+            while [[ "$walletNroUTXO" = "" ]]; do
+                printf "\nUtxo At Wallet:\n"
+
+                result=$($CARDANO_NODE/cardano-cli query utxo\
+                --address $walletAddr --testnet-magic $TESTNET_MAGIC)
+
+                echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+]+" | nl
+
+                printf "\nUltima dirección utilizada: %s" $walletTxIn
+                
+                printf "\nElija utxo para parar el Minting (presione ENTER para recargar utxo o 0 para no cambiar): "
+
+                read walletNroUTXO
+            done
+
+            if [[ $walletNroUTXO != "0" ]]; then 
+                
+                #echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" 
+
+                TxHash=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" | sed -n 1p)
+                TxIx=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" | sed -n 2p)
+
+                echo $TxHash#$TxIx
+
+                echo $TxHash#$TxIx>files/wallets/${walletName}.utxo
+
+            fi
+
+            walletTxIn=$(cat files/wallets/${walletName}.utxo)
+
+            printf "\nNombre del Token: "
+            token_name=
+            while [[ $token_name = "" ]]; do
+                read token_name
+            done
+
+            printf "\nCantidad que desea acuñar: "
+            token_cantidad=
+            while [[ $token_cantidad = "" ]]; do
+                read token_cantidad
+            done
+
+
+            if [[ $opcionMenuPrincipal = "8" ]]; then 
+
+                bash mint-token-free.sh "$walletTxIn" "$token_name" "$token_cantidad" "files/wallets/${walletName}.addr" "files/wallets/${walletName}.skey" "$walletSig"
+
+            fi
+
+            if [[ $opcionMenuPrincipal = "9" ]]; then 
+                
+                bash ./mint-token-nft.sh "$walletTxIn" "$token_name" "$token_cantidad" "files/wallets/${walletName}.addr" "files/wallets/${walletName}.skey" "$walletSig"
+
+
+            fi
+
+            if [[ $opcionMenuPrincipal = "10" ]]; then 
+                
+                bash ./mint-token-plus.sh "$walletTxIn" "$token_name" "$token_cantidad" "files/wallets/${walletName}.addr" "files/wallets/${walletName}.skey" "$walletSig"
+
+
+            fi
+
+            if [[ $opcionMenuPrincipal = "11" ]]; then 
+                
+                bash ./mint-token-signed.sh "$walletTxIn" "$token_name" "$token_cantidad" "files/wallets/${walletName}.addr" "files/wallets/${walletName}.skey" "$walletSig"
+
+
+            fi
+
+        fi
+
+    fi
+
+    
 
 done

@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module Week05.Free where
+module MintPolicyFree where
 
 import           Control.Monad          hiding (fmap)
 import           Data.Aeson             (ToJSON, FromJSON)

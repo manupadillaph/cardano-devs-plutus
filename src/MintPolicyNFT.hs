@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module Week05.NFT where
+module MintPolicyNFT where
 
 import           Control.Monad          hiding (fmap)
 import           Data.Aeson             (FromJSON, ToJSON)
