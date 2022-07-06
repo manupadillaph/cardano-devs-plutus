@@ -38,28 +38,44 @@ import           Data.Maybe                  (fromJust)
 --import           Data.OpenApi.Schema         (ToSchema)
 import           Plutus.Contract.Wallet      (getUnspentOutput)
 
+
+
 import qualified Prelude
 
+
+
+
+
 {-# INLINABLE mkPolicy #-}
-mkPolicy :: PaymentPubKeyHash -> () -> ScriptContext -> Bool
-mkPolicy pkh () ctx = 
-    traceIfFalse ("creator's signature missing: " )  signedByCreator
-  where
-    info :: TxInfo
-    info = scriptContextTxInfo ctx
+mkPolicy :: Integer -> PaymentPubKeyHash -> () -> ScriptContext -> Bool
+mkPolicy str pkh () ctx =
+        traceIfFalse  "wrong secret number" checkMintedAmount &&
+        traceIfFalse  "creator's signature missing!!! " signedByCreator 
+        
+    where 
+        info :: TxInfo
+        info = scriptContextTxInfo ctx
 
-    signedByCreator :: Bool
-    signedByCreator = txSignedBy info $ unPaymentPubKeyHash pkh
+        signedByCreator :: Bool
+        signedByCreator = do 
+            txSignedBy info $ unPaymentPubKeyHash pkh
 
 
-policy :: PaymentPubKeyHash -> Scripts.MintingPolicy
-policy pkh = mkMintingPolicyScript $
-    $$(PlutusTx.compile [|| Scripts.wrapMintingPolicy . mkPolicy ||])
+        checkMintedAmount :: Bool
+        checkMintedAmount = (str == 111)
+
+
+policy :: Integer -> PaymentPubKeyHash -> Scripts.MintingPolicy
+policy tttt pkh = mkMintingPolicyScript $
+ $$(PlutusTx.compile [|| \tttt' pkh' -> Scripts.wrapMintingPolicy $ mkPolicy tttt' pkh' ||])
     `PlutusTx.applyCode`
+    PlutusTx.liftCode tttt
+     `PlutusTx.applyCode`
     PlutusTx.liftCode pkh
 
-curSymbol :: PaymentPubKeyHash -> CurrencySymbol
-curSymbol = scriptCurrencySymbol . policy
+
+curSymbol :: Integer -> PaymentPubKeyHash -> CurrencySymbol
+curSymbol str pkh = scriptCurrencySymbol (policy str pkh) 
 
 data MintParams = MintParams
     { mpTokenName :: !TokenName
@@ -71,8 +87,8 @@ type FreeSchema = Endpoint "mint" MintParams
 mint :: MintParams -> Contract w FreeSchema Text ()
 mint mp = do
     pkh <- Contract.ownPaymentPubKeyHash
-    let val     = Value.singleton (curSymbol pkh) (mpTokenName mp) (mpAmount mp)
-        lookups = Constraints.mintingPolicy $ policy pkh
+    let val     = Value.singleton (curSymbol 5555 pkh ) (mpTokenName mp) (mpAmount mp)
+        lookups = Constraints.mintingPolicy $ (policy 4444 pkh)
         tx      = Constraints.mustMintValue val
     ledgerTx <- submitTxConstraintsWith @Void lookups tx
     void $ awaitTxConfirmed $ getCardanoTxId ledgerTx

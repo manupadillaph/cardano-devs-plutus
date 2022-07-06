@@ -207,11 +207,11 @@ writeMintingPolicyPlus path file oref' tn' amt' = do
 writeMintingPolicySignedAddr ::  String -> String -> String -> IO (Either (FileError ()) ())
 writeMintingPolicySignedAddr path file addr' = do
     let pkh = unsafePaymentPubKeyHash $ unsafeReadAddress addr'
-        p    = MintPolicySigned.policy pkh
+        p    = MintPolicySigned.policy 112 pkh
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
 
 writeMintingPolicySignedPkh ::  String -> String -> String -> IO (Either (FileError ()) ())
 writeMintingPolicySignedPkh path file pkh' = do
     let pkh =  Ledger.PaymentPubKeyHash $ pkhFromStr pkh'
-        p    = MintPolicySigned.policy pkh
+        p    = MintPolicySigned.policy 111 pkh
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 

@@ -1,108 +1,166 @@
 #!/bin/bash
 
-oref=$1
-tn=$2
-amt=$3
-addrFile=$4
-skeyFile=$5
-pkh=$6
 
-echo "oref: $oref"
-echo "amt: $amt"
-echo "tn: $tn"
-echo "address file: $addrFile"
-echo "signing key file: $skeyFile"
-echo "payment key hash: $pkh"
+addrFile="files/wallets/${walletName}.addr"
+skeyFile="files/wallets/${walletName}.skey"
 
-scriptName=""
-until [[ -f "files/mintingpolicies/Plus-${scriptName}.plutus"  ]]
+
+# echo "walletTxIn: $walletTxIn"
+# echo "amt: $amt"
+# echo "tn: $tn"
+# echo "address file: $addrFile"
+# echo "signing key file: $skeyFile"
+# echo "payment key hash: $walletSig"
+
+token_name=""
+
+scriptPolicyName=""
+until [[ -f "files/mintingpolicies/Plus-${scriptPolicyName}.plutus"  ]]
 do
 
     printf "\nNombre de archivo de Minting Policy Plus: "
 
-    scriptName=
-    while [[ $scriptName = "" ]]; do
-        read scriptName
+    scriptPolicyName=
+    while [[ $scriptPolicyName = "" ]]; do
+        read scriptPolicyName
     done
 
-    if ! [[ -f "files/mintingpolicies/Plus-${scriptName}.plutus" ]]
+    if ! [[ -f "files/mintingpolicies/Plus-${scriptPolicyName}.plutus" ]]
     then
-        printf "\nMinting Policiy file Plus-${scriptName}.plutus no existe\n"
+        printf "\nMinting Policiy file Plus-${scriptPolicyName}.plutus no existe\n"
     fi
 
-    printf "\nDesea crear files .plutus de la policy en haskell (y/n)\n"
+    printf "\nDesea crear files Plus.plutus de la policy en haskell (y/n)\n"
     read -n 1 -s opcion
     if [[ $opcion = "y" ]]; then 
-    
-        printf "%s\n%s\n%s\n" "17" "files/mintingpolicies" "Plus-${scriptName}" "$oref" "$tn" "$amt" | cabal exec deploy-smart-contracts-auto-exe
+
+        printf "\nNombre del Token: "
+        token_name=
+        while [[ $token_name = "" ]]; do
+            read token_name
+        done
+
+        printf "\nCantidad máxima desea acuñar: "
+        token_cantidad=
+        while [[ $token_cantidad = "" ]]; do
+            read token_cantidad
+        done
+
+        echo "Plus en base de: $walletTxIn con el Token Name: $token_name y cantidad máxima: $token_cantidad"
+
+        printf "%s\n%s\n%s\n" "17" "files/mintingpolicies" "Plus-${scriptPolicyName}" "$walletTxIn" "$token_name" "$token_cantidad" | cabal exec deploy-smart-contracts-auto-exe
 
     fi
 
 done
 
-policyFile="files/mintingpolicies/Plus-${scriptName}.plutus"
+policyFile="files/mintingpolicies/Plus-${scriptPolicyName}.plutus"
+
+printf "\nDesea Mint Plus token ahora (y/n)?\n"
+read -n 1 -s opcion
+if [[ $opcion = "y" ]]; then 
+
+    if  [[ $token_name = "" ]];
+    then
+        printf "\nNombre del Token: "
+        token_name=
+        while [[ $token_name = "" ]]; do
+            read token_name
+        done
+    fi
+    
+    printf "\nCantidad que desea acuñar: "
+    token_cantidad=
+    while [[ $token_cantidad = "" ]]; do
+        read token_cantidad
+    done
+
+    ppFile=files/config/protocol.json
+    $CARDANO_NODE/cardano-cli query protocol-parameters \
+                    --out-file $ppFile --testnet-magic $TESTNET_MAGIC 
 
 
-ppFile=files/config/protocol.json
-$CARDANO_NODE/cardano-cli query protocol-parameters \
-                --out-file $ppFile --testnet-magic $TESTNET_MAGIC 
+    unsignedFile=files/transacciones/Plus.unsigned
+    signedFile=files/transacciones/Plus.signed
 
+    pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
-unsignedFile=files/transacciones/Plus.unsigned
-signedFile=files/transacciones/Plus.signed
+    tnHex=$(cabal exec token-name -- $token_name)
 
-pid=$(cardano-cli transaction policyid --script-file $policyFile)
+    addr=$(cat $addrFile)
 
-tnHex=$(cabal exec token-name -- $tn)
+    v="$token_cantidad $pid.$tnHex"
 
-addr=$(cat $addrFile)
+    echo "currency symbol: $pid"
 
-v="$amt $pid.$tnHex"
+    echo "token name (hex): $tnHex"
 
-echo "currency symbol: $pid"
+    echo "minted value: $v"
 
-echo "token name (hex): $tnHex"
+    # echo "address: $addr"
 
-echo "minted value: $v"
+    printf "\nRealizando transferencia...\n\n"
 
-echo "address: $addr"
+     if [[ $swChangeTokens = 1 ]]; then
 
-printf "\nRealizando transferencia...\n\n"
-
-$CARDANO_NODE/cardano-cli transaction build \
-    --testnet-magic $TESTNET_MAGIC \
-    --tx-in $oref \
-    --tx-in-collateral $oref \
-    --tx-out "$addr + 1500000 lovelace + $v" \
-    --mint "$v" \
-    --mint-script-file $policyFile \
-    --mint-redeemer-file files/redeemers/unit.json \
-    --change-address $addr \
-    --protocol-params-file $ppFile \
-    --out-file $unsignedFile 
-
-if [ "$?" == "0" ]; then   
-
-    $CARDANO_NODE/cardano-cli transaction sign \
-        --tx-body-file $unsignedFile \
-        --signing-key-file $skeyFile \
-        --testnet-magic $TESTNET_MAGIC \
-        --out-file $signedFile
-
-    if [ "$?" == "0" ]; then      
-
-        $CARDANO_NODE/cardano-cli transaction submit \
+        $CARDANO_NODE/cardano-cli transaction build \
+            --babbage-era \
             --testnet-magic $TESTNET_MAGIC \
-            --tx-file $signedFile
+            $walletTxInArray \
+            --tx-in-collateral $walletTxIn \
+            --tx-out "$addr + $minimoADA lovelace + $v" \
+            --tx-out "$walletTxOutArrayForChangeOfTokens" \
+            --mint "$v" \
+            --mint-script-file $policyFile \
+            --mint-redeemer-file files/redeemers/unit.json \
+            --change-address $addr \
+            --required-signer-hash $walletSig \
+            --required-signer=$skeyFile  \
+            --protocol-params-file $ppFile \
+            --out-file $unsignedFile 
 
-        if [ "$?" == "0" ]; then        
-            printf "\nTransferencia Realidada!\n"
+    else
+        $CARDANO_NODE/cardano-cli transaction build \
+            --babbage-era \
+            --testnet-magic $TESTNET_MAGIC \
+            $walletTxInArray \
+            --tx-in-collateral $walletTxIn \
+            --tx-out "$addr + $minimoADA lovelace + $v" \
+            --mint "$v" \
+            --mint-script-file $policyFile \
+            --mint-redeemer-file files/redeemers/unit.json \
+            --change-address $addr \
+            --required-signer-hash $walletSig \
+            --required-signer=$skeyFile  \
+            --protocol-params-file $ppFile \
+            --out-file $unsignedFile 
+    fi
+
+
+    if [ "$?" == "0" ]; then   
+
+        $CARDANO_NODE/cardano-cli transaction sign \
+            --tx-body-file $unsignedFile \
+            --signing-key-file $skeyFile \
+            --testnet-magic $TESTNET_MAGIC \
+            --out-file $signedFile
+
+        if [ "$?" == "0" ]; then      
+
+            $CARDANO_NODE/cardano-cli transaction submit \
+                --testnet-magic $TESTNET_MAGIC \
+                --tx-file $signedFile
+
+            if [ "$?" == "0" ]; then        
+                printf "\nTransferencia Realidada!\n"
+            else
+                printf "\nError en submit Transferencia\n"
+            fi
         else
-            printf "\nError en submit Transferencia\n"
+            printf "\nError en sign Transferencia\n"
         fi
     else
-        printf "\nError en sign Transferencia\n"
+        printf "\nError en build Transferencia\n"
     fi
-else
-    printf "\nError en build Transferencia\n"
+
 fi
