@@ -47,19 +47,13 @@ library
                      , prettyprinter
                      --, plutus-pab
                      --, plutus-use-cases
-                     
-              
-
-
   default-language:    Haskell2010
   ghc-options:         -Wall -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise
 
 executable deploy-smart-contracts-manual-exe
   main-is: Main.hs
-
   hs-source-dirs:
       app
-  
   build-depends:
       base ^>=4.14.1.0,
       smart-contracts
@@ -67,10 +61,8 @@ executable deploy-smart-contracts-manual-exe
 
 executable deploy-smart-contracts-auto-exe
   main-is: Main-auto.hs
-
   hs-source-dirs:
       app
-  
   build-depends:
       base ^>=4.14.1.0,
       smart-contracts
