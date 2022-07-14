@@ -3,7 +3,7 @@
 echo "Nombre Wallet:"
 read walletName
 
-walletAddr=$(cat files/${walletName}.addr)
+walletAddr=$(cat $SCRIPTS_FILES/${walletName}.addr)
 
 echo $walletAddr
 

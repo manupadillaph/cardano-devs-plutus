@@ -3,59 +3,59 @@
 echo "Nombre Wallet:"
 read walletName
 
-walletAddr=$(cat files/${walletName}.addr)
+walletAddr=$(cat $SCRIPTS_FILES/${walletName}.addr)
 
-walletTxIn=$(cat files/${walletName}.utxo)
+walletTxIn=$(cat $SCRIPTS_FILES/${walletName}.utxo)
 
-#walletSig=$(cat files/01.skey | jq -r .cborHex)
+#walletSig=$(cat $SCRIPTS_FILES/01.skey | jq -r .cborHex)
 
-walletSig=$(cat files/01.pkh)
+walletSig=$(cat $SCRIPTS_FILES/01.pkh)
 
 
 #scriptName="plazo-fijo"
 echo "Nombre Script File:"
 read scriptName
 
-scriptAddr=$(cat files/${scriptName}.addr)
+scriptAddr=$(cat $SCRIPTS_FILES/${scriptName}.addr)
 
-scriptTxIn=$(cat files/${scriptName}.utxo)
+scriptTxIn=$(cat $SCRIPTS_FILES/${scriptName}.utxo)
 
 $CARDANO_NODE/cardano-cli query protocol-parameters \
- 	--out-file files/protocol.json --testnet-magic 1097911063 
+ 	--out-file $SCRIPTS_FILES/protocol.json --testnet-magic 1097911063 
 
 
-$CARDANO_NODE/cardano-cli query tip --testnet-magic 1097911063 | jq -r .slot >files/tip.slot
+$CARDANO_NODE/cardano-cli query tip --testnet-magic 1097911063 | jq -r .slot >$SCRIPTS_FILES/tip.slot
 
-tipSlot=$(cat files/tip.slot)
+tipSlot=$(cat $SCRIPTS_FILES/tip.slot)
 
 $CARDANO_NODE/cardano-cli transaction build \
     --alonzo-era \
     --testnet-magic 1097911063 \
     --change-address $walletAddr \
     --tx-in $scriptTxIn \
-    --tx-in-script-file files/$scriptName.plutus \
-    --tx-in-datum-file  files/datum-DEF2.json \
-    --tx-in-redeemer-file files/redeemer-DEF.json  \
+    --tx-in-script-file $SCRIPTS_FILES/$scriptName.plutus \
+    --tx-in-datum-file  $SCRIPTS_FILES/datum-DEF2.json \
+    --tx-in-redeemer-file $SCRIPTS_FILES/redeemer-DEF.json  \
     --tx-in-collateral $walletTxIn \
     --required-signer-hash $walletSig \
-    --required-signer=files/${walletName}.skey \
-    --protocol-params-file files/protocol.json \
+    --required-signer=$SCRIPTS_FILES/${walletName}.skey \
+    --protocol-params-file $SCRIPTS_FILES/protocol.json \
     --invalid-before ${tipSlot} \
-    --out-file files/${scriptName}.body 
+    --out-file $SCRIPTS_FILES/${scriptName}.body 
 
 
 
 # --tx-in-redeemer-value 444 
 
 $CARDANO_NODE/cardano-cli transaction sign \
-    --tx-body-file files/${scriptName}.body \
-    --signing-key-file files/${walletName}.skey \
+    --tx-body-file $SCRIPTS_FILES/${scriptName}.body \
+    --signing-key-file $SCRIPTS_FILES/${walletName}.skey \
     --testnet-magic 1097911063 \
-    --out-file  files/${scriptName}.signed
+    --out-file  $SCRIPTS_FILES/${scriptName}.signed
 
 $CARDANO_NODE/cardano-cli transaction submit \
     --testnet-magic 1097911063 \
-    --tx-file files/${scriptName}.signed
+    --tx-file $SCRIPTS_FILES/${scriptName}.signed
 
 
 

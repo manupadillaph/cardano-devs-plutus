@@ -4,7 +4,7 @@
 echo "Nombre Script File:"
 read scriptName
 
-scriptAddr=$(cat files/${scriptName}.addr)
+scriptAddr=$(cat $SCRIPTS_FILES/${scriptName}.addr)
 
 echo $scriptAddr
 

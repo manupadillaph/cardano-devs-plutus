@@ -49,17 +49,17 @@ import Data.Char                   (chr)
 
 import  qualified        Plutus.V1.Ledger.Scripts as SC
 
-import   qualified        ValidatorLocker
-import   qualified        ValidatorAlwaysTrue
-import   qualified        ValidatorAlwaysFalse
-import   qualified        ValidatorBeneficiary
-import   qualified        ValidatorDeadline
-import   qualified        ValidatorRedeemer
+import qualified Validators.Locker
+import qualified Validators.AlwaysTrue
+import qualified Validators.AlwaysFalse
+import qualified Validators.Beneficiary
+import qualified Validators.Deadline
+import qualified Validators.Redeemer
 
-import qualified MintPolicyFree (policy)
-import qualified MintPolicyNFT (policy)
-import qualified MintPolicyPlus (policy)
-import qualified MintPolicySigned (policy)
+import qualified MintingPolicies.Free (policy)
+import qualified MintingPolicies.NFT (policy)
+import qualified MintingPolicies.Plus (policy)
+import qualified MintingPolicies.Signed (policy)
 
 import Utils         (unsafeReadTxOutRef,unsafeReadAddress, unsafePaymentPubKeyHash,pkhFromStr)
 
@@ -89,8 +89,8 @@ writeUnit path = writeJSON (path ++ "/unit.json") ()
 writeRedeemer :: String -> String -> Integer -> IO ()
 writeRedeemer path file opcion = do
     let 
-        redeemer = ValidatorLocker.ValidatorRedeemer { 
-            ValidatorLocker.rTipo = opcion
+        redeemer = Validators.Locker.ValidatorRedeemer { 
+            Validators.Locker.rTipo = opcion
         }
         opcionStr = P.show opcion
     writeJSON (path ++ "/" ++ file ++ ".json") redeemer
@@ -102,12 +102,12 @@ writeDatum path file creator deadline name qty = do
     let 
         pkh = pkhFromStr creator
     
-        datum = ValidatorLocker.ValidatorDatum {
-            ValidatorLocker.dData = ValidatorLocker.ValidatorData{
-                    ValidatorLocker.aCreator =  Ledger.PaymentPubKeyHash pkh
-                    , ValidatorLocker.aDeadline    = fromInteger  deadline
-                    , ValidatorLocker.aName = name
-                    , ValidatorLocker.aAdaQty  = qty 
+        datum = Validators.Locker.ValidatorDatum {
+            Validators.Locker.dData = Validators.Locker.ValidatorData{
+                    Validators.Locker.aCreator =  Ledger.PaymentPubKeyHash pkh
+                    , Validators.Locker.aDeadline    = fromInteger  deadline
+                    , Validators.Locker.aName = name
+                    , Validators.Locker.aAdaQty  = qty 
                 }
             }
 
@@ -119,61 +119,61 @@ writeValidator file = writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file 
 
 writeValidatorLocker :: String -> String -> IO (Either (FileError ()) ())
 writeValidatorLocker path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") ValidatorLocker.codeValidator  
+    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Locker.codeValidator  
 
 writeValidatorLockerHash :: String ->String -> IO ()
 writeValidatorLockerHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") ValidatorLocker.hashValidator
+    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Locker.hashValidator
 
 -- writeValidatorLockerAddress :: String -> String -> IO ()
 -- writeValidatorLockerAddress path file = do
---     writeJSON  (path ++ "/" ++ file ++ ".addr") (ValidatorLocker.addressValidator)
+--     writeJSON  (path ++ "/" ++ file ++ ".addr") (Validators.Locker.addressValidator)
 
 
 writeValidatorAlwaysTrue :: String -> String -> IO (Either (FileError ()) ())
 writeValidatorAlwaysTrue path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") ValidatorAlwaysTrue.codeValidator  
+    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.AlwaysTrue.codeValidator  
 
 writeValidatorAlwaysTrueHash :: String ->String -> IO ()
 writeValidatorAlwaysTrueHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") ValidatorAlwaysTrue.hashValidator
+    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.AlwaysTrue.hashValidator
 
     
 writeValidatorAlwaysFalse :: String -> String -> IO (Either (FileError ()) ())
 writeValidatorAlwaysFalse path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") ValidatorAlwaysFalse.codeValidator  
+    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.AlwaysFalse.codeValidator  
 
 writeValidatorAlwaysFalseHash :: String ->String -> IO ()
 writeValidatorAlwaysFalseHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") ValidatorAlwaysFalse.hashValidator
+    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.AlwaysFalse.hashValidator
 
 
 writeValidatorBeneficiary :: String -> String -> IO (Either (FileError ()) ())
 writeValidatorBeneficiary path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") ValidatorBeneficiary.codeValidator  
+    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Beneficiary.codeValidator  
 
 writeValidatorBeneficiaryHash :: String ->String -> IO ()
 writeValidatorBeneficiaryHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") ValidatorBeneficiary.hashValidator
+    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Beneficiary.hashValidator
 
     
 writeValidatorDeadline :: String -> String -> IO (Either (FileError ()) ())
 writeValidatorDeadline path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") ValidatorDeadline.codeValidator  
+    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Deadline.codeValidator  
 
 writeValidatorDeadlineHash :: String ->String -> IO ()
 writeValidatorDeadlineHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") ValidatorDeadline.hashValidator
+    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Deadline.hashValidator
 
 
     
 writeValidatorRedeemer :: String -> String -> IO (Either (FileError ()) ())
 writeValidatorRedeemer path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") ValidatorRedeemer.codeValidator  
+    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Redeemer.codeValidator  
 
 writeValidatorRedeemerHash :: String ->String -> IO ()
 writeValidatorRedeemerHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") ValidatorRedeemer.hashValidator
+    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Redeemer.hashValidator
 
 
 
@@ -184,14 +184,14 @@ writeMintingPolicy file = writeFileTextEnvelope @(PlutusScript PlutusScriptV1) f
 
 writeMintingPolicyFree :: String -> String -> IO (Either (FileError ()) ())
 writeMintingPolicyFree path file  = do
-    let   p    = MintPolicyFree.policy
+    let   p    = MintingPolicies.Free.policy
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
 
 writeMintingPolicyNFT :: String -> String ->  String ->  String -> IO (Either (FileError ()) ())
 writeMintingPolicyNFT path file oref' tn' = do
     let oref = unsafeReadTxOutRef oref'
         tn   = fromString tn'
-        p    = MintPolicyNFT.policy oref tn
+        p    = MintingPolicies.NFT.policy oref tn
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
 
 
@@ -200,18 +200,18 @@ writeMintingPolicyPlus path file oref' tn' amt' = do
     let oref = unsafeReadTxOutRef oref'
         tn   = fromString tn'
         amt  = read amt'
-        p    = MintPolicyPlus.policy oref tn amt
+        p    = MintingPolicies.Plus.policy oref tn amt
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
 
 
 writeMintingPolicySignedAddr ::  String -> String -> String -> IO (Either (FileError ()) ())
 writeMintingPolicySignedAddr path file addr' = do
     let pkh = unsafePaymentPubKeyHash $ unsafeReadAddress addr'
-        p    = MintPolicySigned.policy 112 pkh
+        p    = MintingPolicies.Signed.policy 112 pkh
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
 
 writeMintingPolicySignedPkh ::  String -> String -> String -> IO (Either (FileError ()) ())
 writeMintingPolicySignedPkh path file pkh' = do
     let pkh =  Ledger.PaymentPubKeyHash $ pkhFromStr pkh'
-        p    = MintPolicySigned.policy 111 pkh
+        p    = MintingPolicies.Signed.policy 111 pkh
     writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 

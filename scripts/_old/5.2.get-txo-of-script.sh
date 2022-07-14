@@ -4,7 +4,7 @@
 echo "Nombre Script File:"
 read scriptName
 
-scriptAddr=$(cat files/${scriptName}.addr)
+scriptAddr=$(cat $SCRIPTS_FILES/${scriptName}.addr)
 
 echo $scriptAddr
 
@@ -19,5 +19,5 @@ TxIx=$(echo "$result" | grep -Po "[a-zA-Z0-9]+" | sed -n 5p)
 
 echo $TxHash#$TxIx
 
-echo $TxHash#$TxIx>files/${scriptName}.utxo
+echo $TxHash#$TxIx>$SCRIPTS_FILES/${scriptName}.utxo
 
