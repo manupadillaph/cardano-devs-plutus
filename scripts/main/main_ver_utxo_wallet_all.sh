@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.addrs"  ]]
+if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.addrs"  ]]
 then
     printf "\nNo existe el archivo addrs\n"
 
@@ -16,7 +16,7 @@ else
 
         echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl
 
-    done < "$SCRIPTS_FILES/wallets/${walletName}.addrs"
+    done < "$HASKELL_FILES/wallets/${walletName}.addrs"
 
     echo; read -rsn1 -p "Press any key to continue . . ."; echo 
 

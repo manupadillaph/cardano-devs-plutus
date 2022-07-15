@@ -20,11 +20,15 @@ while ! [[ $opcionMenuMint = "0" ]]; do
     
     echo "0: Regresar al Menu Principal"
 
+    echo "--"
+
+    echo "Opcion: "
+
     #read -n 1 -s opcionMenuMint
     read  opcionMenuMint
 
     if [[ $opcionMenuMint = "1" ]]; then 
-        source "$SCRIPTS/main_elegir_crear_wallet.sh"    
+        source "$SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
     if [[ $opcionMenuMint = "2" || $opcionMenuMint = "3" || $opcionMenuMint = "4" || $opcionMenuMint = "5" ]]; 
@@ -41,7 +45,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
             tokensTotal=()
             lovelaceTotal=0
 
-            source "$SCRIPTS/main_elegir_utxo_wallet.sh"
+            source "$SCRIPTS/main/main_elegir_utxo_wallet.sh"
             
             if [[ $lovelaceTotal = 0 ]]; then
 
@@ -55,7 +59,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 do
                     results="$results\n$($CARDANO_NODE/cardano-cli query utxo\
                     --tx-in $txin --testnet-magic $TESTNET_MAGIC)"
-                done < "$SCRIPTS_FILES/wallets/${walletName}.utxo"
+                done < "$HASKELL_FILES/wallets/${walletName}.utxo"
 
                 echo "$results" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl 
                     
@@ -63,7 +67,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 echo "Elija cual desea usar para collateral y como parametro de la mint: "
                 read collateralIx
 
-                walletTxIn=$(cat "$SCRIPTS_FILES/wallets/${walletName}.utxo" | sed -n ${collateralIx}p)
+                walletTxIn=$(cat "$HASKELL_FILES/wallets/${walletName}.utxo" | sed -n ${collateralIx}p)
 
                 echo "walletTxIn: "$walletTxIn
                 echo "walletTxInArray: "$walletTxInArray

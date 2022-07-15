@@ -2,7 +2,7 @@
 
 
 scriptName=""
-until [[ -f "$SCRIPTS_FILES/validators/${scriptName}.plutus" && -f "$SCRIPTS_FILES/validators/${scriptName}.hash"   && -f "$SCRIPTS_FILES/validators/${scriptName}.addr" ]]
+until [[ -f "$HASKELL_FILES/validators/${scriptName}.plutus" && -f "$HASKELL_FILES/validators/${scriptName}.hash"   && -f "$HASKELL_FILES/validators/${scriptName}.addr" ]]
 do
 
     printf "\nNombre del Script: "
@@ -12,12 +12,12 @@ do
         read scriptName
     done
 
-    if ! [[ -f "$SCRIPTS_FILES/validators/${scriptName}.plutus" && -f "$SCRIPTS_FILES/validators/${scriptName}.hash" ]]
+    if ! [[ -f "$HASKELL_FILES/validators/${scriptName}.plutus" && -f "$HASKELL_FILES/validators/${scriptName}.hash" ]]
     then
         printf "\nValidator script file ${scriptName} no existe\n"
     else
         $CARDANO_NODE/cardano-cli address build  \
-        --payment-script-file $SCRIPTS_FILES/validators/${scriptName}.plutus --out-file $SCRIPTS_FILES/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
+        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
     fi
 
     printf "\nDesea crear files .plutus, .hash del validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
@@ -80,18 +80,18 @@ do
         CWD=$(pwd)
         cd $HASKELL
         
-        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportCBOR" "$SCRIPTS_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
-        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportHash" "$SCRIPTS_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
+        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportCBOR" "$HASKELL_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
+        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportHash" "$HASKELL_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
         
         cd $CWD
 
         $CARDANO_NODE/cardano-cli address build  \
-        --payment-script-file $SCRIPTS_FILES/validators/${scriptName}.plutus --out-file $SCRIPTS_FILES/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
+        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
 
     fi
 
 done
 
-scriptAddr=$(cat $SCRIPTS_FILES/validators/${scriptName}.addr)
+scriptAddr=$(cat $HASKELL_FILES/validators/${scriptName}.addr)
 
 echo "Script Address:" $scriptAddr

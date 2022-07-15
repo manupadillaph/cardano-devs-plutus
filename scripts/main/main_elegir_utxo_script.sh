@@ -3,21 +3,21 @@
 
 
 
-#scriptTxIn=$(cat $SCRIPTS_FILES/validators/${scriptName}.utxo)
+#scriptTxIn=$(cat $HASKELL_FILES/validators/${scriptName}.utxo)
 
 #printf "\nUltima dirección utilizada: %s" $scriptTxIn
 
 printf "\nUltimas direcciones utilizadas:\n"
 
-if [[ -f "$SCRIPTS_FILES/wallets/${walletName}.utxo"  ]]
+if [[ -f "$HASKELL_FILES/wallets/${walletName}.utxo"  ]]
 then
 
-    if [[ -f "$SCRIPTS_FILES/validators/${scriptName}.utxo"  ]]
+    if [[ -f "$HASKELL_FILES/validators/${scriptName}.utxo"  ]]
     then
         while IFS= read -r line
         do
             echo "$line"
-        done < "$SCRIPTS_FILES/validators/${scriptName}.utxo"
+        done < "$HASKELL_FILES/validators/${scriptName}.utxo"
     fi
 
 fi
@@ -67,10 +67,10 @@ if [[ $opcion = "y" ]]; then
                         echo "Agregando:" $TxHash#$TxIx
 
                         if [ $swPrimero = 1 ]; then
-                            echo $TxHash#$TxIx>$SCRIPTS_FILES/validators/${scriptName}.utxo
+                            echo $TxHash#$TxIx>$HASKELL_FILES/validators/${scriptName}.utxo
                             swPrimero=0
                         else
-                            echo $TxHash#$TxIx>>$SCRIPTS_FILES/validators/${scriptName}.utxo
+                            echo $TxHash#$TxIx>>$HASKELL_FILES/validators/${scriptName}.utxo
                         fi
                     fi
 
@@ -81,19 +81,19 @@ if [[ $opcion = "y" ]]; then
 
     done
 
-    #scriptTxIn=$(cat $SCRIPTS_FILES/validators/${scriptName}.utxo)
+    #scriptTxIn=$(cat $HASKELL_FILES/validators/${scriptName}.utxo)
 
 fi
 
 echo ""
 
-#read -r scriptTxIn  < $SCRIPTS_FILES/validators/${scriptName}.utxo
+#read -r scriptTxIn  < $HASKELL_FILES/validators/${scriptName}.utxo
 
 scriptTxInArray=""
 
 echo "Tx Elegidas:" 
 
-if [[ -f "$SCRIPTS_FILES/wallets/${walletName}.utxo"  ]]
+if [[ -f "$HASKELL_FILES/wallets/${walletName}.utxo"  ]]
 then
 
     while IFS= read -r txin
@@ -182,7 +182,7 @@ then
             # fi
         fi
 
-    done < "$SCRIPTS_FILES/validators/${scriptName}.utxo"
+    done < "$HASKELL_FILES/validators/${scriptName}.utxo"
 
 fi
 

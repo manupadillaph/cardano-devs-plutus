@@ -1,15 +1,15 @@
 #!/bin/bash
 
-if ! [[ -f "$SCRIPTS_FILES/pab/plutus-pab-$scriptName.db" ]]
+if ! [[ -f "$HASKELL_FILES/pab/plutus-pab-$scriptName.db" ]]
 then
-    printf "\nDatabase $SCRIPTS_FILES/pab/plutus-pab-$scriptName.db no existe, creandola...\n"
+    printf "\nDatabase $HASKELL_FILES/pab/plutus-pab-$scriptName.db no existe, creandola...\n"
 else
     source "$SCRIPTS/pab/pab_init_database.sh"
 fi
 
 printf "\nIniciando Server con Wallet:\n"
 
-WALLET_ID=$(cat $SCRIPTS_FILES/wallets/$walletName.id)
+WALLET_ID=$(cat $HASKELL_FILES/wallets/$walletName.id)
 echo "WALLET ID:" $WALLET_ID
 echo "Passphrase:" $walletPassphrase
 
@@ -17,7 +17,7 @@ echo "Passphrase:" $walletPassphrase
 CWD=$(pwd)
 cd $HASKELL
 
-printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $SCRIPTS_FILES/pab/pab-config-$scriptName.yml webserver --passphrase $walletPassphrase
+printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $HASKELL_FILES/config/pab/pab-config-$scriptName.yml webserver --passphrase $walletPassphrase
 
 cd $CWD
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-addrFile="$SCRIPTS_FILES/wallets/${walletName}.addr"
-skeyFile="$SCRIPTS_FILES/wallets/${walletName}.skey"
+addrFile="$HASKELL_FILES/wallets/${walletName}.addr"
+skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
 
 
 # echo "walletTxIn: $walletTxIn"
@@ -15,7 +15,7 @@ skeyFile="$SCRIPTS_FILES/wallets/${walletName}.skey"
 token_name=""
 
 scriptPolicyName=""
-until [[ -f "$SCRIPTS_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"  ]]
+until [[ -f "$HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"  ]]
 do
 
     printf "\nNombre de archivo de Minting Policy NFT: "
@@ -25,7 +25,7 @@ do
         read scriptPolicyName
     done
 
-    if ! [[ -f "$SCRIPTS_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus" ]]
+    if ! [[ -f "$HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus" ]]
     then
         printf "\nMinting Policiy file NFT-${scriptPolicyName}.plutus no existe\n"
     fi
@@ -41,13 +41,13 @@ do
         done
 
         echo "NFT en base de: $walletTxIn con el Token Name: $token_name"
-        printf "%s\n%s\n%s\n" "16" "$SCRIPTS_FILES/mintingpolicies" "NFT-${scriptPolicyName}" "$walletTxIn" "$token_name" | cabal exec deploy-smart-contracts-auto
+        printf "%s\n%s\n%s\n" "16" "$HASKELL_FILES/mintingpolicies" "NFT-${scriptPolicyName}" "$walletTxIn" "$token_name" | cabal exec deploy-smart-contracts-auto
 
     fi
 
 done
 
-policyFile="$SCRIPTS_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"
+policyFile="$HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"
 
 printf "\nDesea Mint NFT token ahora (y/n)?\n"
 read -n 1 -s opcion
@@ -68,13 +68,13 @@ if [[ $opcion = "y" ]]; then
         read token_cantidad
     done
 
-    ppFile=$SCRIPTS_FILES/config/protocol.json
+    ppFile=$HASKELL_FILES/config/tx/protocol.json
     $CARDANO_NODE/cardano-cli query protocol-parameters \
                     --out-file $ppFile --testnet-magic $TESTNET_MAGIC 
 
 
-    unsignedFile=$SCRIPTS_FILES/transacciones/NFT.unsigned
-    signedFile=$SCRIPTS_FILES/transacciones/NFT.signed
+    unsignedFile=$HASKELL_FILES/transacciones/NFT.unsigned
+    signedFile=$HASKELL_FILES/transacciones/NFT.signed
 
     pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
@@ -105,7 +105,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $SCRIPTS_FILES/redeemers/unit.json \
+            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \
@@ -121,7 +121,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$addr + $minimoADA lovelace + $v" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $SCRIPTS_FILES/redeemers/unit.json \
+            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \

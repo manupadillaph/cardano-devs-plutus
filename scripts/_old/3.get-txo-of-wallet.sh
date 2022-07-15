@@ -3,7 +3,7 @@
 echo "Nombre Wallet:"
 read walletName
 
-walletAddr=$(cat $SCRIPTS_FILES/${walletName}.addr)
+walletAddr=$(cat $HASKELL_FILES/${walletName}.addr)
 
 echo $walletAddr
 
@@ -16,5 +16,5 @@ TxIx=$(echo "$result" | grep -Po "[a-zA-Z0-9]+" | sed -n 5p)
 
 echo $TxHash#$TxIx
 
-echo $TxHash#$TxIx>$SCRIPTS_FILES/${walletName}.utxo
+echo $TxHash#$TxIx>$HASKELL_FILES/${walletName}.utxo
 

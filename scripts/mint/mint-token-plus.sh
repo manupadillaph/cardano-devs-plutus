@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-addrFile="$SCRIPTS_FILES/wallets/${walletName}.addr"
-skeyFile="$SCRIPTS_FILES/wallets/${walletName}.skey"
+addrFile="$HASKELL_FILES/wallets/${walletName}.addr"
+skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
 
 
 # echo "walletTxIn: $walletTxIn"
@@ -15,7 +15,7 @@ skeyFile="$SCRIPTS_FILES/wallets/${walletName}.skey"
 token_name=""
 
 scriptPolicyName=""
-until [[ -f "$SCRIPTS_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"  ]]
+until [[ -f "$HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"  ]]
 do
 
     printf "\nNombre de archivo de Minting Policy Plus: "
@@ -25,7 +25,7 @@ do
         read scriptPolicyName
     done
 
-    if ! [[ -f "$SCRIPTS_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus" ]]
+    if ! [[ -f "$HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus" ]]
     then
         printf "\nMinting Policiy file Plus-${scriptPolicyName}.plutus no existe\n"
     fi
@@ -52,7 +52,7 @@ do
         CWD=$(pwd)
         cd $HASKELL
 
-        printf "%s\n%s\n%s\n" "17" "$SCRIPTS_FILES/mintingpolicies" "Plus-${scriptPolicyName}" "$walletTxIn" "$token_name" "$token_cantidad" | cabal exec deploy-smart-contracts-auto
+        printf "%s\n%s\n%s\n" "17" "$HASKELL_FILES/mintingpolicies" "Plus-${scriptPolicyName}" "$walletTxIn" "$token_name" "$token_cantidad" | cabal exec deploy-smart-contracts-auto
 
         cd $CWD
         
@@ -60,7 +60,7 @@ do
 
 done
 
-policyFile="$SCRIPTS_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"
+policyFile="$HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"
 
 printf "\nDesea Mint Plus token ahora (y/n)?\n"
 read -n 1 -s opcion
@@ -81,13 +81,13 @@ if [[ $opcion = "y" ]]; then
         read token_cantidad
     done
 
-    ppFile=$SCRIPTS_FILES/config/protocol.json
+    ppFile=$HASKELL_FILES/config/tx/protocol.json
     $CARDANO_NODE/cardano-cli query protocol-parameters \
                     --out-file $ppFile --testnet-magic $TESTNET_MAGIC 
 
 
-    unsignedFile=$SCRIPTS_FILES/transacciones/Plus.unsigned
-    signedFile=$SCRIPTS_FILES/transacciones/Plus.signed
+    unsignedFile=$HASKELL_FILES/transacciones/Plus.unsigned
+    signedFile=$HASKELL_FILES/transacciones/Plus.signed
 
     pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
@@ -124,7 +124,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $SCRIPTS_FILES/redeemers/unit.json \
+            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \
@@ -140,7 +140,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$addr + $minimoADA lovelace + $v" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $SCRIPTS_FILES/redeemers/unit.json \
+            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \

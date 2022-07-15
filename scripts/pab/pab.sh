@@ -23,11 +23,15 @@ while ! [[ $opcionMenuPab = "0" ]]; do
 
     echo "0: Regresar al Menu Principal"
 
+    echo "--"
+
+    echo "Opcion: "
+
     #read -n 1 -s opcionMenuPab
     read  opcionMenuPab
 
     if [[ $opcionMenuPab = "1" ]]; then 
-        source "$SCRIPTS/main_elegir_crear_wallet.sh"    
+        source "$SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
     if [[ $opcionMenuPab = "2" ]]; then 
@@ -49,7 +53,7 @@ while ! [[ $opcionMenuPab = "0" ]]; do
              printf "\nDebe elegir wallet y validador primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json" && -f "$SCRIPTS_FILES/wallets/${walletName}.id"  ]]
+            if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.json" && -f "$HASKELL_FILES/wallets/${walletName}.id"  ]]
             then
                 printf "\nWallet ${walletName} JSON o id files no existen. No se pueden inicicar los servicios de PAB con esta wallet.\n"
                 echo; read -rsn1 -p "Press any key to continue . . ."; echo

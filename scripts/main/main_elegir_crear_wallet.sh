@@ -3,7 +3,7 @@
 walletLoadedInServerWallet=0
 
 walletName=""
-until [[ -f "$SCRIPTS_FILES/wallets/${walletName}.pkh" && -f "$SCRIPTS_FILES/wallets/${walletName}.skey"  && -f "$SCRIPTS_FILES/wallets/${walletName}.vkey"  ]]
+until [[ -f "$HASKELL_FILES/wallets/${walletName}.pkh" && -f "$HASKELL_FILES/wallets/${walletName}.skey"  && -f "$HASKELL_FILES/wallets/${walletName}.vkey"  ]]
 do
     printf "\nNombre Wallet (01): "
     read walletName
@@ -12,11 +12,11 @@ do
         walletName="01"
     fi
 
-    if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.pkh" && -f "$SCRIPTS_FILES/wallets/${walletName}.skey"  && -f "$SCRIPTS_FILES/wallets/${walletName}.vkey"  ]]
+    if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.pkh" && -f "$HASKELL_FILES/wallets/${walletName}.skey"  && -f "$HASKELL_FILES/wallets/${walletName}.vkey"  ]]
     then
         printf "\nWallet pkh, skey, vkey files no existen\n"
 
-        if [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json"   ]]
+        if [[ -f "$HASKELL_FILES/wallets/${walletName}.json"   ]]
         then
             printf "\nSe encontró ${walletName} JSON file, desea crearla desde allí (y/n)? \nImportante: Necesita tener NODO y WALLET SERVER configurados e iniciados \n"
             read -n 1 -s opcion
@@ -46,52 +46,52 @@ done
 
 if [[ $walletLoadedInServerWallet = 0 ]]; then
 
-    if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json" && -f "$SCRIPTS_FILES/wallets/${walletName}.id"  ]]
+    if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.json" && -f "$HASKELL_FILES/wallets/${walletName}.id"  ]]
     then
         printf "\nWallet ${walletName} JSON o id files no existen. No se puede cargar en la Wallet en el Wallet Server, algunas funciones estarán limitadas (como los servicios de PAB)\n"
     fi
 
-    if [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json"  ]]
+    if [[ -f "$HASKELL_FILES/wallets/${walletName}.json"  ]]
     then
         bash $SCRIPTS/tools/wallet-load-con-cardano-wallet-desde-json.sh ${walletName}
 
-        if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.addrs" ]];
+        if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.addrs" ]];
         then
 
-            if  [[ -f "$SCRIPTS_FILES/wallets/${walletName}.id"  ]];
+            if  [[ -f "$HASKELL_FILES/wallets/${walletName}.id"  ]];
             then
 
-                WALLET_ID=$(cat $SCRIPTS_FILES/wallets/$walletName.id)
+                WALLET_ID=$(cat $HASKELL_FILES/wallets/$walletName.id)
 
                 DIRECCIONES=$(curl -H "content-type: application/json" \
                     -XGET localhost:8090/v2/wallets/$WALLET_ID/addresses | jq -r '.[]' )
 
-                echo $DIRECCIONES | jq -r '.id' >$SCRIPTS_FILES/wallets/${walletName}.addrs
+                echo $DIRECCIONES | jq -r '.id' >$HASKELL_FILES/wallets/${walletName}.addrs
 
             fi
             
         fi
     fi
 
-    if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.addr" ]]
+    if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.addr" ]]
     then
         $CARDANO_NODE/cardano-cli address build \
-	        --payment-verification-key-file $SCRIPTS_FILES/wallets/${walletName}.vkey --out-file $SCRIPTS_FILES/wallets/${walletName}.addr --testnet-magic $TESTNET_MAGIC 
+	        --payment-verification-key-file $HASKELL_FILES/wallets/${walletName}.vkey --out-file $HASKELL_FILES/wallets/${walletName}.addr --testnet-magic $TESTNET_MAGIC 
     fi
 fi
 
 
-walletAddr=$(cat $SCRIPTS_FILES/wallets/${walletName}.addr)
+walletAddr=$(cat $HASKELL_FILES/wallets/${walletName}.addr)
 
 echo "Wallet Address:" $walletAddr
 
-walletSig=$(cat $SCRIPTS_FILES/wallets/${walletName}.pkh)
+walletSig=$(cat $HASKELL_FILES/wallets/${walletName}.pkh)
 
 echo "Payment Key HASH:" $walletSig
 
-if [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json"  ]]
+if [[ -f "$HASKELL_FILES/wallets/${walletName}.json"  ]]
 then
-    walletPassphrase=$(cat $SCRIPTS_FILES/wallets/${walletName}.json | jq -r '.passphrase')
+    walletPassphrase=$(cat $HASKELL_FILES/wallets/${walletName}.json | jq -r '.passphrase')
     echo "Passphrase:" $walletPassphrase
 fi
 

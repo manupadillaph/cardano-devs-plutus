@@ -4,7 +4,7 @@ printf "\nDatum: \n"
 
 datumFile=""
 
-until [[ -f "$SCRIPTS_FILES/datums/$datumFile.json"  ]]
+until [[ -f "$HASKELL_FILES/datums/$datumFile.json"  ]]
 do
 
     printf "\nIngrese nombre del archivo Datum (DEF): "
@@ -13,7 +13,7 @@ do
         datumFile="DEF"
     fi
     
-    if ! [[ -f "$SCRIPTS_FILES/datums/$datumFile.json"  ]]
+    if ! [[ -f "$HASKELL_FILES/datums/$datumFile.json"  ]]
     then
         printf "\nDatum file ${datumFile}.json no existe\n"
     fi
@@ -49,7 +49,7 @@ do
         CWD=$(pwd)
         cd $HASKELL
 
-        printf "%s\n%s\n%s\n" "1" "$SCRIPTS_FILES/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto 
+        printf "%s\n%s\n%s\n" "1" "$HASKELL_FILES/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto 
         
         cd $CWD
 
@@ -60,9 +60,9 @@ done
 
    
 printf "\nDatum JSON: "
-cat $SCRIPTS_FILES/datums/$datumFile.json | jq '.'
+cat $HASKELL_FILES/datums/$datumFile.json | jq '.'
 
-datumHash=$($CARDANO_NODE/cardano-cli transaction hash-script-data --script-data-file "$SCRIPTS_FILES/datums/$datumFile.json")
+datumHash=$($CARDANO_NODE/cardano-cli transaction hash-script-data --script-data-file "$HASKELL_FILES/datums/$datumFile.json")
 
 printf "\nDatum Hash: "
 echo $datumHash

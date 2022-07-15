@@ -1,6 +1,6 @@
 #!/bin/bash
 
-WALLET_ID=$(cat $SCRIPTS_FILES/wallets/$walletName.id)
+WALLET_ID=$(cat $HASKELL_FILES/wallets/$walletName.id)
 echo "WALLET ID:" $WALLET_ID
 
 #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build

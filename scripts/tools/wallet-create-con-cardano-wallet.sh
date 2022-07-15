@@ -27,7 +27,7 @@ fi
 # echo "file:"
 # read file
 
-echo "creating wallet with name $name passphrase $passphrase in $SCRIPTS_FILES/wallets/$file.json "
+echo "creating wallet with name $name passphrase $passphrase in $HASKELL_FILES/wallets/$file.json "
 
 phrase=$($CARDANO_WALLET/cardano-wallet recovery-phrase generate)
 
@@ -39,7 +39,7 @@ do
     sep=', '
 done
 
-cat > $SCRIPTS_FILES/wallets/$file.json <<- EOM
+cat > $HASKELL_FILES/wallets/$file.json <<- EOM
 { "name": "$name"
 , "mnemonic_sentence": [$x]
 , "passphrase": "$passphrase"

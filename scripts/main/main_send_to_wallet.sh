@@ -14,7 +14,7 @@ tokens=()
 tokensTotal=()
 lovelaceTotal=0
 
-source "$SCRIPTS/main_elegir_utxo_wallet.sh"
+source "$SCRIPTS/main/main_elegir_utxo_wallet.sh"
 
 if [[ $lovelaceTotal = 0 ]]; then
 
@@ -75,7 +75,7 @@ else
             --change-address $walletAddr \
             $walletTxInArray \
             --tx-out "$walletTxOutMultiAssets" \
-            --out-file $SCRIPTS_FILES/transacciones/sendTo.body 
+            --out-file $HASKELL_FILES/transacciones/sendTo.body 
     else
 
         $CARDANO_NODE/cardano-cli transaction build \
@@ -85,22 +85,22 @@ else
             $walletTxInArray \
             --tx-out "$walletTxOutMultiAssets" \
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
-            --out-file $SCRIPTS_FILES/transacciones/sendTo.body 
+            --out-file $HASKELL_FILES/transacciones/sendTo.body 
     fi
 
     if [ "$?" == "0" ]; then
 
         $CARDANO_NODE/cardano-cli transaction sign \
-            --tx-body-file $SCRIPTS_FILES/transacciones/sendTo.body \
-            --signing-key-file $SCRIPTS_FILES/wallets/${walletName}.skey \
+            --tx-body-file $HASKELL_FILES/transacciones/sendTo.body \
+            --signing-key-file $HASKELL_FILES/wallets/${walletName}.skey \
             --testnet-magic $TESTNET_MAGIC \
-            --out-file $SCRIPTS_FILES/transacciones/sendTo.signed
+            --out-file $HASKELL_FILES/transacciones/sendTo.signed
 
         if [ "$?" == "0" ]; then
 
             $CARDANO_NODE/cardano-cli transaction submit \
                 --testnet-magic $TESTNET_MAGIC \
-                --tx-file $SCRIPTS_FILES/transacciones/sendTo.signed
+                --tx-file $HASKELL_FILES/transacciones/sendTo.signed
 
             if [ "$?" == "0" ]; then
                  printf "\nTransferencia Realidada!\n"

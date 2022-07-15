@@ -8,7 +8,7 @@ opcionMenuPrincipal=""
 
 while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
-    printf "\nOPERACIONES CON WALLET Y SCRIPT\n"
+    printf "\nOPERACIONES CON WALLET Y SCRIPT:\n"
 
     echo "--"
 
@@ -51,6 +51,10 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     echo "--"
 
+    echo "9: TOOLS"
+
+    echo "--"
+
     echo "99: Set minimo ADA en tx ($minimoADA)"
 
     echo "--"
@@ -59,15 +63,15 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     echo "--"
 
-    #read -n 1 -s opcionMenuPrincipal
-    read  opcionMenuPrincipal
+    echo "Opcion: "
+    read opcionMenuPrincipal
 
     if [[ $opcionMenuPrincipal = "1" ]]; then 
-        source "$SCRIPTS/main_elegir_crear_wallet.sh"    
+        source "$SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
     if [[ $opcionMenuPrincipal = "2" ]]; then 
-        source "$SCRIPTS/main_elegir_crear_script.sh"
+        source "$SCRIPTS/main/main_elegir_crear_script.sh"
     fi
 
     if [[ $opcionMenuPrincipal = "31" ]]; then 
@@ -75,7 +79,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_send_to_wallet.sh"
+            source "$SCRIPTS/main/main_send_to_wallet.sh"
         fi
     fi
 
@@ -84,7 +88,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet y script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_send_to_script.sh"
+            source "$SCRIPTS/main/main_send_to_script.sh"
         fi
     fi
 
@@ -94,7 +98,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet y script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_redeem_from_script.sh"
+            source "$SCRIPTS/main/main_redeem_from_script.sh"
         fi 
     fi  
     
@@ -103,7 +107,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_ver_utxo_wallet.sh"
+            source "$SCRIPTS/main/main_ver_utxo_wallet.sh"
         fi
     fi  
 
@@ -112,7 +116,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_ver_utxo_wallet_all.sh"
+            source "$SCRIPTS/main/main_ver_utxo_wallet_all.sh"
         fi
 
     fi  
@@ -122,7 +126,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_elegir_addr_wallet.sh"
+            source "$SCRIPTS/main/main_elegir_addr_wallet.sh"
         fi
     fi  
 
@@ -131,7 +135,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_ver_utxo_script.sh"
+            source "$SCRIPTS/main/main_ver_utxo_script.sh"
         fi
     fi  
 
@@ -141,7 +145,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_ver_balance_wallet.sh"
+            source "$SCRIPTS/main/main_ver_balance_wallet.sh"
         fi
     fi
 
@@ -150,20 +154,20 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
              printf "\nDebe elegir script primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main_ver_balance_script.sh"
+            source "$SCRIPTS/main/main_ver_balance_script.sh"
         fi
     fi
 
 
     if [[ $opcionMenuPrincipal = "61" ]]; then 
         
-        source "$SCRIPTS/main_datum_calcular_hash.sh"
+        source "$SCRIPTS/main/main_datum_calcular_hash.sh"
         
     fi  
 
     if [[ $opcionMenuPrincipal = "62" ]]; then 
         
-        source "$SCRIPTS/main_datum_buscar_hash.sh"
+        source "$SCRIPTS/main/main_datum_buscar_hash.sh"
 
     fi
 
@@ -175,6 +179,11 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     
     if [[ $opcionMenuPrincipal = "8" ]]; then 
         source "$SCRIPTS/pab/pab.sh"  
+        opcionMenuPrincipal=""
+    fi
+
+    if [[ $opcionMenuPrincipal = "9"    ]]; then 
+        source "$SCRIPTS/tools/tools.sh"
         opcionMenuPrincipal=""
     fi
 

@@ -8,7 +8,7 @@ tokens=()
 tokensTotal=()
 lovelaceTotal=0
 
-source "$SCRIPTS/main_elegir_utxo_wallet.sh"
+source "$SCRIPTS/main/main_elegir_utxo_wallet.sh"
 
 if [[ $lovelaceTotal = 0 ]]; then
 
@@ -23,7 +23,7 @@ else
     do
         results="$results\n$($CARDANO_NODE/cardano-cli query utxo\
         --tx-in $txin --testnet-magic $TESTNET_MAGIC)"
-    done < "$SCRIPTS_FILES/wallets/${walletName}.utxo"
+    done < "$HASKELL_FILES/wallets/${walletName}.utxo"
 
     echo "$results" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl 
         
@@ -31,7 +31,7 @@ else
     echo "Elija cual desea usar para collateral: "
     read collateralIx
 
-    walletTxIn=$(cat "$SCRIPTS_FILES/wallets/${walletName}.utxo" | sed -n ${collateralIx}p)
+    walletTxIn=$(cat "$HASKELL_FILES/wallets/${walletName}.utxo" | sed -n ${collateralIx}p)
 
     echo "walletTxIn: "$walletTxIn
     echo "walletTxInArray: "$walletTxInArray
@@ -45,7 +45,7 @@ else
     echo " "
     echo "Elija tx para redeem: "
 
-    source "$SCRIPTS/main_elegir_utxo_script.sh"
+    source "$SCRIPTS/main/main_elegir_utxo_script.sh"
 
     if [[ $lovelaceTotal = 0 ]]; then
 
@@ -53,7 +53,7 @@ else
         echo; read -rsn1 -p "Press any key to continue . . ."; echo
     else
 
-        read -r scriptTxIn  < $SCRIPTS_FILES/validators/${scriptName}.utxo
+        read -r scriptTxIn  < $HASKELL_FILES/validators/${scriptName}.utxo
         echo "scriptTxIn: "$scriptTxIn
         echo "scriptTxInArray: "$scriptTxInArray
 
@@ -74,20 +74,20 @@ else
         fi 
 
         $CARDANO_NODE/cardano-cli query protocol-parameters \
-            --out-file $SCRIPTS_FILES/config/protocol.json --testnet-magic $TESTNET_MAGIC 
+            --out-file $HASKELL_FILES/config/tx/protocol.json --testnet-magic $TESTNET_MAGIC 
 
-        $CARDANO_NODE/cardano-cli query tip --testnet-magic $TESTNET_MAGIC | jq -r .slot >$SCRIPTS_FILES/config/tip.slot
+        $CARDANO_NODE/cardano-cli query tip --testnet-magic $TESTNET_MAGIC | jq -r .slot >$HASKELL_FILES/config/tx/tip.slot
 
-        tipSlot=$(cat $SCRIPTS_FILES/config/tip.slot)
+        tipSlot=$(cat $HASKELL_FILES/config/tx/tip.slot)
 
-        source "$SCRIPTS/main_datum_elegir_crear.sh"
+        source "$SCRIPTS/main/main_datum_elegir_crear.sh"
 
 
         printf "\nRedeemer ---- \n"
 
         redeemerFile=""
 
-        until [[ -f "$SCRIPTS_FILES/redeemers/$redeemerFile.json"  ]]
+        until [[ -f "$HASKELL_FILES/redeemers/$redeemerFile.json"  ]]
         do
             printf "\nIngrese nombre para el archivo Redeemer (DEF): "
             read redeemerFile
@@ -95,7 +95,7 @@ else
                 redeemerFile="DEF"
             fi
 
-            if ! [[ -f "$SCRIPTS_FILES/redeemers/$redeemerFile.json"  ]]
+            if ! [[ -f "$HASKELL_FILES/redeemers/$redeemerFile.json"  ]]
             then
                 printf "\nRedeemer file $redeemerFile.json no existe\n"
             fi
@@ -114,7 +114,7 @@ else
                 CWD=$(pwd)
                 cd $HASKELL
 
-                printf "%s\n%s\n%s\n" "2" "$SCRIPTS_FILES/redeemers" "$redeemerFile" "$redeemerOpcion" | cabal exec deploy-smart-contracts-auto
+                printf "%s\n%s\n%s\n" "2" "$HASKELL_FILES/redeemers" "$redeemerFile" "$redeemerOpcion" | cabal exec deploy-smart-contracts-auto
                 
                 cd $CWD
 
@@ -132,16 +132,16 @@ else
                 --change-address $walletAddr \
                 $walletTxInArray \
                 --tx-in $scriptTxIn \
-                --tx-in-script-file $SCRIPTS_FILES/validators/$scriptName.plutus \
-                --tx-in-datum-file  $SCRIPTS_FILES/datums/$datumFile.json \
-                --tx-in-redeemer-file $SCRIPTS_FILES/redeemers/$redeemerFile.json  \
+                --tx-in-script-file $HASKELL_FILES/validators/$scriptName.plutus \
+                --tx-in-datum-file  $HASKELL_FILES/datums/$datumFile.json \
+                --tx-in-redeemer-file $HASKELL_FILES/redeemers/$redeemerFile.json  \
                 --tx-in-collateral $walletTxIn \
                 --tx-out "$walletTxOutArrayForChangeOfTokens" \
                 --required-signer-hash $walletSig \
-                --required-signer=$SCRIPTS_FILES/wallets/${walletName}.skey \
-                --protocol-params-file $SCRIPTS_FILES/config/protocol.json \
+                --required-signer=$HASKELL_FILES/wallets/${walletName}.skey \
+                --protocol-params-file $HASKELL_FILES/config/tx/protocol.json \
                 --invalid-before ${tipSlot} \
-                --out-file $SCRIPTS_FILES/transacciones/${scriptName}.body 
+                --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
         else
             $CARDANO_NODE/cardano-cli transaction build \
                 --babbage-era \
@@ -149,30 +149,30 @@ else
                 --change-address $walletAddr \
                 $walletTxInArray \
                 --tx-in $scriptTxIn \
-                --tx-in-script-file $SCRIPTS_FILES/validators/$scriptName.plutus \
-                --tx-in-datum-file  $SCRIPTS_FILES/datums/$datumFile.json \
-                --tx-in-redeemer-file $SCRIPTS_FILES/redeemers/$redeemerFile.json  \
+                --tx-in-script-file $HASKELL_FILES/validators/$scriptName.plutus \
+                --tx-in-datum-file  $HASKELL_FILES/datums/$datumFile.json \
+                --tx-in-redeemer-file $HASKELL_FILES/redeemers/$redeemerFile.json  \
                 --tx-in-collateral $walletTxIn \
                 --required-signer-hash $walletSig \
-                --required-signer=$SCRIPTS_FILES/wallets/${walletName}.skey \
-                --protocol-params-file $SCRIPTS_FILES/config/protocol.json \
+                --required-signer=$HASKELL_FILES/wallets/${walletName}.skey \
+                --protocol-params-file $HASKELL_FILES/config/tx/protocol.json \
                 --invalid-before ${tipSlot} \
-                --out-file $SCRIPTS_FILES/transacciones/${scriptName}.body 
+                --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
         fi
 
         if [ "$?" == "0" ]; then
 
             $CARDANO_NODE/cardano-cli transaction sign \
-                --tx-body-file $SCRIPTS_FILES/transacciones/${scriptName}.body \
-                --signing-key-file $SCRIPTS_FILES/wallets/${walletName}.skey \
+                --tx-body-file $HASKELL_FILES/transacciones/${scriptName}.body \
+                --signing-key-file $HASKELL_FILES/wallets/${walletName}.skey \
                 --testnet-magic $TESTNET_MAGIC \
-                --out-file  $SCRIPTS_FILES/transacciones/${scriptName}.signed
+                --out-file  $HASKELL_FILES/transacciones/${scriptName}.signed
 
             if [ "$?" == "0" ]; then
 
                 $CARDANO_NODE/cardano-cli transaction submit \
                     --testnet-magic $TESTNET_MAGIC \
-                    --tx-file $SCRIPTS_FILES/transacciones/${scriptName}.signed
+                    --tx-file $HASKELL_FILES/transacciones/${scriptName}.signed
 
 
                 if [ "$?" == "0" ]; then

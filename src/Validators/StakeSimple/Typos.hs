@@ -162,10 +162,61 @@ PlutusTx.unstableMakeIsData ''ValidatorDatum
 
 --Types for Redeemers
 
+data RedeemMasterFundPoolTypo  = RedeemMasterFundPoolTypo { 
+        rmfpPoolNFT :: !PoolNFT ,
+        rmfpPoolNFTTokenName :: !TokenName ,
+        rmfpPoolNFTTxOutRef :: !TxOutRef ,
+        rmfpMaster :: !Master ,
+        rmfpFund :: !Fund
+    } 
+  deriving (P.Eq, P.Show, Generic)
+  deriving anyclass (FromJSON, ToJSON)
+
+instance Eq RedeemMasterFundPoolTypo where
+    {-# INLINABLE (==) #-}
+    rmf1 == rmf2 =  rmfpPoolNFT rmf1 ==          rmfpPoolNFT  rmf2 && 
+                    rmfpPoolNFTTokenName rmf1 == rmfpPoolNFTTokenName  rmf2 && 
+                    rmfpPoolNFTTxOutRef rmf1 ==  rmfpPoolNFTTxOutRef  rmf2 && 
+                    rmfpMaster rmf1 ==           rmfpMaster  rmf2 && 
+                    rmfpFund rmf1 ==    	     rmfpFund  rmf2
+
+
+PlutusTx.unstableMakeIsData ''RedeemMasterFundPoolTypo
+PlutusTx.makeLift ''RedeemMasterFundPoolTypo
+
+data RedeemUserInvestTypo  = RedeemUserInvestTypo { 
+        ruiPoolNFT :: !PoolNFT ,
+        ruiUserNFT :: !UserNFT ,
+        ruiUserNFTTokenName :: !TokenName ,
+        ruiUserNFTTxOutRef :: !TxOutRef ,
+        ruiUser :: !User ,
+        ruiInvest :: !Invest,
+        ruiCreatedAt :: !POSIXTime,
+        ruiDeadline :: !Deadline
+    }  
+  deriving (P.Eq, P.Show, Generic)
+  deriving anyclass (FromJSON, ToJSON)
+
+instance Eq RedeemUserInvestTypo where
+    {-# INLINABLE (==) #-}
+    rmf1 == rmf2 =  ruiPoolNFT rmf1 ==              ruiPoolNFT  rmf2 && 
+                    ruiUserNFT rmf1 ==              ruiUserNFT  rmf2 && 
+                    ruiUserNFTTokenName rmf1 ==     ruiUserNFTTokenName  rmf2 && 
+                    ruiUserNFTTxOutRef rmf1 ==      ruiUserNFTTxOutRef  rmf2 && 
+                    ruiUser rmf1 ==                 ruiUser  rmf2 && 
+                    ruiInvest rmf1 ==               ruiInvest  rmf2 && 
+                    ruiCreatedAt rmf1 ==            ruiCreatedAt  rmf2 && 
+                    ruiDeadline rmf1 ==             ruiDeadline  rmf2
+
+PlutusTx.unstableMakeIsData ''RedeemUserInvestTypo
+PlutusTx.makeLift ''RedeemUserInvestTypo
+
+
 data ValidatorRedeemer = 
-    RedeemMasterFundPool !PoolNFT !TokenName !TxOutRef !Master !Fund | 
+    --RedeemMasterFundPool !PoolNFT !TokenName !TxOutRef !Master !Fund | 
+    RedeemMasterFundPool !RedeemMasterFundPoolTypo | 
     RedeemMasterGetPool |
-    RedeemUserInvest !PoolNFT !UserNFT !TokenName !TxOutRef !User !Invest  !POSIXTime !Deadline |   
+    RedeemUserInvest !RedeemUserInvestTypo |   
     RedeemUserGetInvest | 
     RedeemUserGetRewards | 
     RedeemUserInvestRewards  
@@ -175,9 +226,11 @@ data ValidatorRedeemer =
 
 instance Eq ValidatorRedeemer where
     {-# INLINABLE (==) #-}
-    RedeemMasterFundPool nft1 tk1 txout1 m1  am1  == RedeemMasterFundPool nft2 tk2 txout2 m2 am2   =  nft1 == nft2 &&  tk1 == tk2 &&  txout1 == txout2 && m1 == m2 && am1 == am2
+    --RedeemMasterFundPool nft1 tk1 txout1 m1  am1  == RedeemMasterFundPool nft2 tk2 txout2 m2 am2   =  nft1 == nft2 &&  tk1 == tk2 &&  txout1 == txout2 && m1 == m2 && am1 == am2
+    RedeemMasterFundPool rmfp1  == RedeemMasterFundPool rmfp2   =  rmfp1 == rmfp2
+    
     RedeemMasterGetPool == RedeemMasterGetPool = True
-    RedeemUserInvest poolNft1 nft1  tk1 txout1 u1 iv1 c1 d1 == RedeemUserInvest poolNFT2 nft2  tk2 txout2 u2 iv2 c2 d2 =  poolNft1 == poolNFT2 && nft1 == nft2 &&  tk1 == tk2 &&  txout1 == txout2 && u1 == u2 && iv1 == iv2 &&c1 == c2  && d1 == d1 
+    RedeemUserInvest rui1 == RedeemUserInvest rui2 =  rui1 == rui2
     RedeemUserGetInvest  == RedeemUserGetInvest = True
     RedeemUserGetRewards  == RedeemUserGetRewards = True 
     RedeemUserInvestRewards  == RedeemUserInvestRewards = True 
@@ -271,14 +324,35 @@ data UserInvestRewardsParams = UserInvestRewardsParams
 --Redeemers Definitions
 
 redeemMasterFundPool :: PoolNFT -> TokenName -> TxOutRef -> Master -> Fund -> Redeemer
-redeemMasterFundPool poolNFT tn txoutref master fund = Redeemer $ PlutusTx.toBuiltinData (RedeemMasterFundPool poolNFT tn txoutref master fund  )
+redeemMasterFundPool poolNFT tn txoutref master fund = Redeemer $ PlutusTx.toBuiltinData (RedeemMasterFundPool $ mkRedeemMasterFundPoolTypo poolNFT tn txoutref master fund  )
+
+mkRedeemMasterFundPoolTypo ::  PoolNFT -> TokenName -> TxOutRef -> Master -> Fund ->  RedeemMasterFundPoolTypo
+mkRedeemMasterFundPoolTypo   poolNFT tn txoutref master fund  = RedeemMasterFundPoolTypo {
+        rmfpPoolNFT = poolNFT  ,
+        rmfpPoolNFTTokenName = tn , 
+        rmfpPoolNFTTxOutRef = txoutref, 
+        rmfpMaster = master, 
+        rmfpFund = fund
+    }
 
 redeemMasterGetPool :: Redeemer
 redeemMasterGetPool = Redeemer $ PlutusTx.toBuiltinData RedeemMasterGetPool
 
 
 redeemUserInvest :: PoolNFT -> UserNFT -> TokenName -> TxOutRef -> User -> Invest ->  POSIXTime ->  Deadline -> Redeemer 
-redeemUserInvest poolNFT userNFT tn txoutref user invest createdAt deadline = Redeemer $  PlutusTx.toBuiltinData (RedeemUserInvest poolNFT userNFT tn txoutref user invest  createdAt deadline)
+redeemUserInvest poolNFT userNFT tn txoutref user invest createdAt deadline = Redeemer $  PlutusTx.toBuiltinData (RedeemUserInvest  $ mkRedeemUserInvestTypo poolNFT userNFT tn txoutref user invest  createdAt deadline)
+
+mkRedeemUserInvestTypo ::  PoolNFT -> UserNFT -> TokenName -> TxOutRef -> User -> Invest ->  POSIXTime ->  Deadline ->  RedeemUserInvestTypo
+mkRedeemUserInvestTypo  poolNFT userNFT tn txoutref user invest createdAt deadline = RedeemUserInvestTypo { 
+        ruiPoolNFT =  poolNFT,
+        ruiUserNFT =  userNFT ,
+        ruiUserNFTTokenName =  tn ,
+        ruiUserNFTTxOutRef =  txoutref ,
+        ruiUser =  user ,
+        ruiInvest = invest,
+        ruiCreatedAt =  createdAt,
+        ruiDeadline = deadline
+    }  
 
 redeemUserGetInvest :: Redeemer
 redeemUserGetInvest = Redeemer $  PlutusTx.toBuiltinData RedeemUserGetInvest

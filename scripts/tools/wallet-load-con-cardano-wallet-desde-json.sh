@@ -8,13 +8,13 @@ else
   file=$1
 fi
 
-echo "JSON:"  $SCRIPTS_FILES/wallets/$file.json
+echo "JSON:"  $HASKELL_FILES/wallets/$file.json
 
 
 echo ""
 
 curl -H "content-type: application/json" -XPOST \
-  -d @$SCRIPTS_FILES/wallets/$file.json \
+  -d @$HASKELL_FILES/wallets/$file.json \
   localhost:8090/v2/wallets
 
 echo ""

@@ -4,11 +4,11 @@
 CWD=$(pwd)
 cd $HASKELL
 
-printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $SCRIPTS_FILES/pab/pab-config-$scriptName.yml migrate
+printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $HASKELL_FILES/config/pab/pab-config-$scriptName.yml migrate
 
 cd $CWD
 
-printf "\nDatabase $SCRIPTS_FILES/pab/plutus-pab-$scriptName.db created and migrated\n"
+printf "\nDatabase $HASKELL_FILES/pab/plutus-pab-$scriptName.db created and migrated\n"
 
 
 
