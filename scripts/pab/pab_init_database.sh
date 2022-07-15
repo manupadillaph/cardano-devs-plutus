@@ -8,3 +8,7 @@ printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $SCR
 
 cd $CWD
 
+printf "\nDatabase $SCRIPTS_FILES/pab/plutus-pab-$scriptName.db created and migrated\n"
+
+
+

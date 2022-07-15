@@ -16,6 +16,8 @@ while ! [[ $opcionMenuMint = "0" ]]; do
     echo "4: Mint Tokens Plus"
     echo "5: Mint Tokens Signed"
 
+    echo "--"
+    
     echo "0: Regresar al Menu Principal"
 
     #read -n 1 -s opcionMenuMint

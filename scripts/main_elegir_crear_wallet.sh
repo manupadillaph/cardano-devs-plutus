@@ -50,9 +50,27 @@ if [[ $walletLoadedInServerWallet = 0 ]]; then
     then
         printf "\nWallet ${walletName} JSON o id files no existen. No se puede cargar en la Wallet en el Wallet Server, algunas funciones estarán limitadas (como los servicios de PAB)\n"
     fi
+
     if [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json"  ]]
     then
         bash $SCRIPTS/tools/wallet-load-con-cardano-wallet-desde-json.sh ${walletName}
+
+        if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.addrs" ]];
+        then
+
+            if  [[ -f "$SCRIPTS_FILES/wallets/${walletName}.id"  ]];
+            then
+
+                WALLET_ID=$(cat $SCRIPTS_FILES/wallets/$walletName.id)
+
+                DIRECCIONES=$(curl -H "content-type: application/json" \
+                    -XGET localhost:8090/v2/wallets/$WALLET_ID/addresses | jq -r '.[]' )
+
+                echo $DIRECCIONES | jq -r '.id' >$SCRIPTS_FILES/wallets/${walletName}.addrs
+
+            fi
+            
+        fi
     fi
 
     if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.addr" ]]
@@ -61,8 +79,6 @@ if [[ $walletLoadedInServerWallet = 0 ]]; then
 	        --payment-verification-key-file $SCRIPTS_FILES/wallets/${walletName}.vkey --out-file $SCRIPTS_FILES/wallets/${walletName}.addr --testnet-magic $TESTNET_MAGIC 
     fi
 fi
-
-
 
 
 walletAddr=$(cat $SCRIPTS_FILES/wallets/${walletName}.addr)

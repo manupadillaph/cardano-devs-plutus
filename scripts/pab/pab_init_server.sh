@@ -7,6 +7,12 @@ else
     source "$SCRIPTS/pab/pab_init_database.sh"
 fi
 
+printf "\nIniciando Server con Wallet:\n"
+
+WALLET_ID=$(cat $SCRIPTS_FILES/wallets/$walletName.id)
+echo "WALLET ID:" $WALLET_ID
+echo "Passphrase:" $walletPassphrase
+
 #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
 CWD=$(pwd)
 cd $HASKELL

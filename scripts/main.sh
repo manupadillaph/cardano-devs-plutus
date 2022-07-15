@@ -17,41 +17,41 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     echo "--"
 
-    echo "3: Enviar ADA o Tokens a Wallet"
+    echo "31: Enviar ADA o Tokens a Wallet"
 
-    echo "4: Enviar ADA o Tokens a Script"
-    echo "5: Redeem ADA o Tokens de Script"
-
-    echo "--"
-
-    echo "6: Ver utxo de Wallet"
-
-    echo "61: Ver utxo de todas las Addresses de Wallet"
-    echo "62: Elegir otra Address de Wallet"
-
-    echo "7: Ver utxo de Script"
+    echo "32: Enviar ADA o Tokens a Script"
+    echo "33: Redeem ADA o Tokens de Script"
 
     echo "--"
 
-    echo "8: Balance de Wallet"
-    echo "9: Balance de Script"
+    echo "41: Ver utxo de Wallet"
+
+    echo "42: Ver utxo de todas las Addresses de Wallet"
+    echo "43: Elegir otra Address de Wallet"
+
+    echo "44: Ver utxo de Script"
 
     echo "--"
 
-    echo "10: Calcular Hash de Datum"
-    echo "11: Buscar Datum de Hash"
+    echo "51: Balance de Wallet"
+    echo "52: Balance de Script"
 
     echo "--"
 
-    echo "12: Mint Tokens"
+    echo "61: Calcular Hash de Datum"
+    echo "62: Buscar Datum de Hash"
+
+    echo "--"
+
+    echo "7: Mint Tokens"
 
     echo "--"
     
-    echo "17: usar PAB de Locker Validator"
+    echo "8: PAB"
 
     echo "--"
 
-    echo "16: Set minimo ADA en tx ($minimoADA)"
+    echo "99: Set minimo ADA en tx ($minimoADA)"
 
     echo "--"
 
@@ -70,7 +70,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         source "$SCRIPTS/main_elegir_crear_script.sh"
     fi
 
-    if [[ $opcionMenuPrincipal = "3" ]]; then 
+    if [[ $opcionMenuPrincipal = "31" ]]; then 
         if [[ $walletName = ""  ]]; then
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -79,7 +79,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         fi
     fi
 
-    if [[ $opcionMenuPrincipal = "4" ]]; then 
+    if [[ $opcionMenuPrincipal = "32" ]]; then 
         if [[ $walletName = "" ||  $scriptName = "" ]]; then
             printf "\nDebe elegir wallet y script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -89,7 +89,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     fi
 
 
-    if [[ $opcionMenuPrincipal = "5" ]]; then 
+    if [[ $opcionMenuPrincipal = "33" ]]; then 
         if [[ $walletName = "" ||  $scriptName = "" ]]; then
             printf "\nDebe elegir wallet y script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -98,7 +98,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         fi 
     fi  
     
-    if [[ $opcionMenuPrincipal = "6" ]]; then 
+    if [[ $opcionMenuPrincipal = "41" ]]; then 
         if [[ $walletAddr = "" ]]; then
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -107,7 +107,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         fi
     fi  
 
-    if [[ $opcionMenuPrincipal = "61" ]]; then 
+    if [[ $opcionMenuPrincipal = "42" ]]; then 
         if [[ $walletAddr = "" ]]; then
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -117,7 +117,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
 
     fi  
 
-    if [[ $opcionMenuPrincipal = "62" ]]; then 
+    if [[ $opcionMenuPrincipal = "43" ]]; then 
         if [[ $walletAddr = "" ]]; then
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -126,7 +126,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         fi
     fi  
 
-    if [[ $opcionMenuPrincipal = "7" ]]; then 
+    if [[ $opcionMenuPrincipal = "44" ]]; then 
         if [[ $scriptName = "" ]]; then
             printf "\nDebe elegir script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -136,7 +136,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     fi  
 
 
-    if [[ $opcionMenuPrincipal = "8" ]]; then 
+    if [[ $opcionMenuPrincipal = "51" ]]; then 
         if [[ $walletName = ""  ]]; then
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -145,7 +145,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         fi
     fi
 
-    if [[ $opcionMenuPrincipal = "9" ]]; then 
+    if [[ $opcionMenuPrincipal = "52" ]]; then 
         if [[  $scriptName = "" ]]; then
              printf "\nDebe elegir script primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
@@ -155,24 +155,30 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     fi
 
 
-    if [[ $opcionMenuPrincipal = "10" ]]; then 
+    if [[ $opcionMenuPrincipal = "61" ]]; then 
         
         source "$SCRIPTS/main_datum_calcular_hash.sh"
         
     fi  
 
-    if [[ $opcionMenuPrincipal = "11" ]]; then 
+    if [[ $opcionMenuPrincipal = "62" ]]; then 
         
         source "$SCRIPTS/main_datum_buscar_hash.sh"
 
     fi
 
-    if [[ $opcionMenuPrincipal = "12"    ]]; then 
+    if [[ $opcionMenuPrincipal = "7"    ]]; then 
         source "$SCRIPTS/mint/mint.sh"
         opcionMenuPrincipal=""
     fi
 
-    if [[ $opcionMenuPrincipal = "16" ]]; then 
+    
+    if [[ $opcionMenuPrincipal = "8" ]]; then 
+        source "$SCRIPTS/pab/pab.sh"  
+        opcionMenuPrincipal=""
+    fi
+
+    if [[ $opcionMenuPrincipal = "99" ]]; then 
         printf "\nIngrese mínimo ADA por transacción:\n"
         minimoADA=
         while [[ $minimoADA = "" ]]; do
@@ -180,10 +186,6 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
         done
     fi
 
-    if [[ $opcionMenuPrincipal = "17" ]]; then 
-        source "$SCRIPTS/pab/pab.sh"  
-        opcionMenuPrincipal=""
-    fi
 
 
 done

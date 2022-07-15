@@ -19,6 +19,8 @@ while ! [[ $opcionMenuPab = "0" ]]; do
     echo "5: Enviar ADA o Tokens a Script"
     echo "6: Redeem ADA o Tokens de Script"
 
+    echo "--"
+
     echo "0: Regresar al Menu Principal"
 
     #read -n 1 -s opcionMenuPab
@@ -38,6 +40,7 @@ while ! [[ $opcionMenuPab = "0" ]]; do
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
             source "$SCRIPTS/pab/pab_init_database.sh"
+            echo; read -rsn1 -p "Press any key to continue . . ."; echo
         fi
     fi
 
@@ -46,7 +49,13 @@ while ! [[ $opcionMenuPab = "0" ]]; do
              printf "\nDebe elegir wallet y validador primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/pab/pab_init_server.sh"
+            if ! [[ -f "$SCRIPTS_FILES/wallets/${walletName}.json" && -f "$SCRIPTS_FILES/wallets/${walletName}.id"  ]]
+            then
+                printf "\nWallet ${walletName} JSON o id files no existen. No se pueden inicicar los servicios de PAB con esta wallet.\n"
+                echo; read -rsn1 -p "Press any key to continue . . ."; echo
+            else
+                source "$SCRIPTS/pab/pab_init_server.sh"
+            fi
         fi
     fi
 

@@ -36,39 +36,6 @@ else
     echo "walletTxIn: "$walletTxIn
     echo "walletTxInArray: "$walletTxInArray
 
-    # walletTxIn=$(cat $SCRIPTS_FILES/wallets/${walletName}.utxo)
-
-    # walletNroUTXO=
-    # while [[ "$walletNroUTXO" = "" ]]; do
-    #     printf "\nUtxo At Wallet:\n"
-
-    #     result=$($CARDANO_NODE/cardano-cli query utxo\
-    #     --address $walletAddr --testnet-magic $TESTNET_MAGIC)
-
-    #     echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl
-
-    #     printf "\nUltima dirección utilizada: %s" $walletTxIn
-        
-    #     printf "\nElija utxo para pagar collateral (presione ENTER para recargar utxo o 0 para no cambiar): "
-
-    #     read walletNroUTXO
-    # done
-
-    # if [[ $walletNroUTXO != "0" ]]; then 
-        
-    #     #echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" 
-
-    #     TxHash=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" | sed -n 1p)
-    #     TxIx=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" | sed -n 2p)
-
-    #     echo $TxHash#$TxIx
-
-    #     echo $TxHash#$TxIx>$SCRIPTS_FILES/wallets/${walletName}.utxo
-
-    # fi
-
-    # walletTxIn=$(cat $SCRIPTS_FILES/wallets/${walletName}.utxo)
-    
     # tokens=()
     # tokensTotal=()
     # NO INICIO LOS TOTALES DE TOKENS POR QUE SE SUMAN CON LOS INPUTS DE LA BILETERA Y LOS NECESITO ABAJO PARA LA walletTxOutArrayForChangeOfTokens
@@ -105,31 +72,6 @@ else
             echo $walletTxOutArrayForChangeOfTokens
 
         fi 
-
-        # result=$($CARDANO_NODE/cardano-cli query utxo\
-        #     --address $scriptAddr --testnet-magic $TESTNET_MAGIC)
-
-        # printf "\nUtxo at Scritp:\n"
-
-        # echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl
-
-        # printf "\nElija utxo que desea redeem (1): "
-        # read scriptNroUTXO
-        # if [[ $scriptNroUTXO = "" ]]; then 
-        #     scriptNroUTXO="1"
-        # fi
-        # #echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | sed -n ${walletNroUTXO}p | grep -Po "[a-zA-Z0-9]+" 
-
-        # TxHash=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | sed -n ${scriptNroUTXO}p | grep -Po "[a-zA-Z0-9]+" | sed -n 1p)
-        # TxIx=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | sed -n ${scriptNroUTXO}p | grep -Po "[a-zA-Z0-9]+" | sed -n 2p)
-
-        # echo $TxHash#$TxIx
-
-        # echo $TxHash#$TxIx>$SCRIPTS_FILES/validators/${scriptName}.utxo
-
-        # scriptTxIn=$(cat $SCRIPTS_FILES/validators/${scriptName}.utxo)
-
-
 
         $CARDANO_NODE/cardano-cli query protocol-parameters \
             --out-file $SCRIPTS_FILES/config/protocol.json --testnet-magic $TESTNET_MAGIC 
