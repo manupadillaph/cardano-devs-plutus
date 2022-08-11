@@ -63,13 +63,13 @@ test = runEmulatorTraceIO $ do
     --h2 <- activateContractWallet (knownWallet 2) endpoints
 
     callEndpoint @"start" h1 $ ValidatorOffChain.StartParams{  
-            spDeadline = deadline,
+            ppDeadline = deadline,
             spName = 55,
             spAdaQty   = 3000000
         }
     void $ Emulator.waitNSlots 1
     callEndpoint @"start" h1 $ ValidatorOffChain.StartParams{  
-            spDeadline = deadline,
+            ppDeadline = deadline,
             spName = 55,
             spAdaQty   = 3000000
         }

@@ -22,7 +22,7 @@ else
     while IFS= read -r txin
     do
         results="$results\n$($CARDANO_NODE/cardano-cli query utxo\
-        --tx-in $txin --testnet-magic $TESTNET_MAGIC)"
+        --tx-in $txin --$TESTNET_MAGIC)"
     done < "$HASKELL_FILES/wallets/${walletName}.utxo"
 
     echo "$results" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl 
@@ -74,9 +74,9 @@ else
         fi 
 
         $CARDANO_NODE/cardano-cli query protocol-parameters \
-            --out-file $HASKELL_FILES/config/tx/protocol.json --testnet-magic $TESTNET_MAGIC 
+            --out-file $HASKELL_FILES/config/tx/protocol.json --$TESTNET_MAGIC 
 
-        $CARDANO_NODE/cardano-cli query tip --testnet-magic $TESTNET_MAGIC | jq -r .slot >$HASKELL_FILES/config/tx/tip.slot
+        $CARDANO_NODE/cardano-cli query tip --$TESTNET_MAGIC | jq -r .slot >$HASKELL_FILES/config/tx/tip.slot
 
         tipSlot=$(cat $HASKELL_FILES/config/tx/tip.slot)
 
@@ -126,9 +126,28 @@ else
 
 
         if [[ $swChangeTokens = 1 ]]; then
+
+            echo --babbage-era \
+                --$TESTNET_MAGIC \
+                --change-address $walletAddr \
+                $walletTxInArray \
+                --tx-in $scriptTxIn \
+                --tx-in-script-file $HASKELL_FILES/validators/$scriptName.plutus \
+                --tx-in-datum-file  $HASKELL_FILES/datums/$datumFile.json \
+                --tx-in-redeemer-file $HASKELL_FILES/redeemers/$redeemerFile.json  \
+                --tx-in-collateral $walletTxIn \
+                --tx-out "$walletTxOutArrayForChangeOfTokens" \
+                --required-signer-hash $walletSig \
+                --required-signer=$HASKELL_FILES/wallets/${walletName}.skey \
+                --protocol-params-file $HASKELL_FILES/config/tx/protocol.json \
+                --invalid-before ${tipSlot} \
+                --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
+       
+            echo ""
+
             $CARDANO_NODE/cardano-cli transaction build \
                 --babbage-era \
-                --testnet-magic $TESTNET_MAGIC \
+                --$TESTNET_MAGIC \
                 --change-address $walletAddr \
                 $walletTxInArray \
                 --tx-in $scriptTxIn \
@@ -143,9 +162,26 @@ else
                 --invalid-before ${tipSlot} \
                 --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
         else
+            echo --babbage-era \
+                --$TESTNET_MAGIC \
+                --change-address $walletAddr \
+                $walletTxInArray \
+                --tx-in $scriptTxIn \
+                --tx-in-script-file $HASKELL_FILES/validators/$scriptName.plutus \
+                --tx-in-datum-file  $HASKELL_FILES/datums/$datumFile.json \
+                --tx-in-redeemer-file $HASKELL_FILES/redeemers/$redeemerFile.json  \
+                --tx-in-collateral $walletTxIn \
+                --required-signer-hash $walletSig \
+                --required-signer=$HASKELL_FILES/wallets/${walletName}.skey \
+                --protocol-params-file $HASKELL_FILES/config/tx/protocol.json \
+                --invalid-before ${tipSlot} \
+                --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
+
+            echo ""
+            
             $CARDANO_NODE/cardano-cli transaction build \
                 --babbage-era \
-                --testnet-magic $TESTNET_MAGIC \
+                --$TESTNET_MAGIC \
                 --change-address $walletAddr \
                 $walletTxInArray \
                 --tx-in $scriptTxIn \
@@ -165,13 +201,13 @@ else
             $CARDANO_NODE/cardano-cli transaction sign \
                 --tx-body-file $HASKELL_FILES/transacciones/${scriptName}.body \
                 --signing-key-file $HASKELL_FILES/wallets/${walletName}.skey \
-                --testnet-magic $TESTNET_MAGIC \
+                --$TESTNET_MAGIC \
                 --out-file  $HASKELL_FILES/transacciones/${scriptName}.signed
 
             if [ "$?" == "0" ]; then
 
                 $CARDANO_NODE/cardano-cli transaction submit \
-                    --testnet-magic $TESTNET_MAGIC \
+                    --$TESTNET_MAGIC \
                     --tx-file $HASKELL_FILES/transacciones/${scriptName}.signed
 
 

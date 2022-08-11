@@ -39,14 +39,14 @@ import           Utils
 
 {-# INLINABLE mkTokenPolicy #-}
 mkTokenPolicy :: TxOutRef -> TokenName -> Integer -> () -> ScriptContext -> Bool
-mkTokenPolicy oref tn amt () ctx = traceIfFalse "UTxO not consumed"   hasUTxO           &&
+mkTokenPolicy oref tn amt () ctx = traceIfFalse "UTxO not consumed"   hasInputUTxO           &&
                                    traceIfFalse "wrong amount minted" checkMintedAmount
   where
     info :: TxInfo
     info = scriptContextTxInfo ctx
 
-    hasUTxO :: Bool
-    hasUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
+    hasInputUTxO :: Bool
+    hasInputUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
 
     checkMintedAmount :: Bool
     checkMintedAmount = case flattenValue (txInfoMint info) of
@@ -109,7 +109,7 @@ mintToken tp = do
         Nothing      -> Contract.throwError $ pack $ printf "expected pubkey address, but got %s" $ show addr
         Just (x, my) -> do
             oref <- getUnspentOutput
-            o    <- fromJust <$> Contract.txOutFromRef oref
+            o    <- fromJust <$> Contract.unspentTxOutFromRef oref
             Contract.logDebug @String $ printf "picked UTxO at %s with value %s" (show oref) (show $ _ciTxOutValue o)
 
             let tn          = tpToken tp

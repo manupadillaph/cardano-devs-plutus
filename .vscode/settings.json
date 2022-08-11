@@ -1,0 +1,5 @@
+{
+    "haskell.manageHLS": "GHCup",
+    "haskell.ghcupExecutablePath": "/home/manuelpadilla/.ghcup/bin/ghcup"
+   
+}

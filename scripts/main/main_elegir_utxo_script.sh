@@ -34,7 +34,7 @@ if [[ $opcion = "y" ]]; then
         printf "\nUtxo At Script:\n"
 
         result=$($CARDANO_NODE/cardano-cli query utxo\
-        --address $scriptAddr --testnet-magic $TESTNET_MAGIC)
+        --address $scriptAddr --$TESTNET_MAGIC)
 
         echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl
 
@@ -108,7 +108,7 @@ then
             sep=" "
 
             result=$($CARDANO_NODE/cardano-cli query utxo\
-                --tx-in $txin --testnet-magic $TESTNET_MAGIC)
+                --tx-in $txin --$TESTNET_MAGIC)
 
             lovelace=$(echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | grep -Po "[0-9]+ lovelace" | grep -Po "[0-9]+")
 

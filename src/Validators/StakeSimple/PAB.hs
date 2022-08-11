@@ -3,10 +3,21 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeApplications  #-}
 
+
+--Para poder usar varios deriving en lugar de uno solo largo
+    -- deriving (Eq, Ord, Show, Generic)
+    -- deriving anyclass ToSchema
+    -- deriving anyclass (FromJSON, ToJSON)
+-- en cambio de:
+ -- deriving (Eq, Ord, Show, Generic, ToSchema, FromJSON, ToJSON)
+
+{-# LANGUAGE DerivingStrategies  #-} 
+
+
 module Validators.StakeSimple.PAB
-    -- ( 
-    --     ValidatorContracts (..)
-    -- ) 
+    ( 
+        ValidatorContracts (..)
+    ) 
     where
 
 import           Data.Aeson                          (FromJSON, ToJSON)
@@ -21,34 +32,43 @@ import           Wallet.Emulator.Wallet              (knownWallet, mockWalletAdd
 
 --Import Internos
 import  Validators.StakeSimple.OffChain   
+import  Validators.StakeSimple.Typos   
 
--- data ValidatorContracts = Start StartParams | Get GetParams
---     deriving (Eq, Ord, Show, Generic, FromJSON, ToJSON, ToSchema)
+data ValidatorContracts = 
+    MasterCreatePool MasterCreatePoolParams |
+    MasterFundPool MasterFundPoolParams |
+    MasterGetBackFund MasterGetBackFundParams |
+    UserInvest UserInvestParams |
+    UserGetBackInvest UserGetBackInvestParams |
+    UserGetRewards UserGetRewardsParams |
+    UserInvestRewards UserInvestRewardsParams
+    deriving (Eq, Ord, Show, Generic)
+    deriving anyclass ToSchema
+    deriving anyclass (FromJSON, ToJSON)
 
--- instance Pretty ValidatorContracts where
---     pretty = viaShow
+instance Pretty ValidatorContracts where
+    pretty = viaShow
 
--- instance HasDefinitions ValidatorContracts where
+instance HasDefinitions ValidatorContracts where
 
---     getDefinitions        = [Start exampleStartParams, Get exampleGetParams]
+    getDefinitions        = [
+            MasterCreatePool exampleMasterCreatePoolParams ,
+            MasterFundPool exampleMasterFundPoolParams ,
+            MasterGetBackFund exampleMasterGetBackFundParams ,
+            UserInvest exampleUserInvestParams ,
+            UserGetBackInvest exampleUserGetBackInvestParams ,
+            UserGetRewards exampleUserGetRewardsParams ,
+            UserInvestRewards exampleUserInvestRewardsParams
 
---     getContract (Start sp)= SomeBuiltin $ start @() @Empty sp
---     getContract (Get gp) =  SomeBuiltin $ get @() @Empty gp
+        ]
 
---     getSchema = const $ endpointsToSchemas @Empty
+    getContract (MasterCreatePool mcpParams)=   SomeBuiltin $ masterCreatePool @() @Empty mcpParams
+    getContract (MasterFundPool mfpParams) =    SomeBuiltin $ masterFundPool @() @Empty mfpParams
+    getContract (MasterGetBackFund mgbfParams)= SomeBuiltin $ masterGetBackFund @() @Empty mgbfParams
+    getContract (UserInvest uiParams)=          SomeBuiltin $ userInvest @() @Empty uiParams
+    getContract (UserGetBackInvest ugbiParams)= SomeBuiltin $ userGetBackInvest @() @Empty ugbiParams
+    getContract (UserGetRewards ugrParams)=     SomeBuiltin $ userGetRewards @() @Empty ugrParams
+    getContract (UserInvestRewards uirParams)=  SomeBuiltin $ userInvestRewards @() @Empty uirParams
 
--- exampleStartParams :: StartParams
--- exampleStartParams = StartParams
---     { 
---         spDeadline = 1657143764000,
---         spName = 0,
---         spAdaQty  = 0
---     }
-
--- exampleGetParams :: GetParams
--- exampleGetParams = GetParams
---     { 
---         gpName = 0,
---         gpAdaQty  = 0
---     }
-
+    getSchema = const $ endpointsToSchemas @Empty
+    

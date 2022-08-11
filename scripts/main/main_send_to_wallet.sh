@@ -71,7 +71,7 @@ else
     if [[ $swChangeTokens = 0 ]]; then
         $CARDANO_NODE/cardano-cli transaction build \
             --babbage-era \
-            --testnet-magic $TESTNET_MAGIC \
+            --$TESTNET_MAGIC \
             --change-address $walletAddr \
             $walletTxInArray \
             --tx-out "$walletTxOutMultiAssets" \
@@ -80,7 +80,7 @@ else
 
         $CARDANO_NODE/cardano-cli transaction build \
             --babbage-era \
-            --testnet-magic $TESTNET_MAGIC \
+            --$TESTNET_MAGIC \
             --change-address $walletAddr \
             $walletTxInArray \
             --tx-out "$walletTxOutMultiAssets" \
@@ -93,13 +93,13 @@ else
         $CARDANO_NODE/cardano-cli transaction sign \
             --tx-body-file $HASKELL_FILES/transacciones/sendTo.body \
             --signing-key-file $HASKELL_FILES/wallets/${walletName}.skey \
-            --testnet-magic $TESTNET_MAGIC \
+            --$TESTNET_MAGIC \
             --out-file $HASKELL_FILES/transacciones/sendTo.signed
 
         if [ "$?" == "0" ]; then
 
             $CARDANO_NODE/cardano-cli transaction submit \
-                --testnet-magic $TESTNET_MAGIC \
+                --$TESTNET_MAGIC \
                 --tx-file $HASKELL_FILES/transacciones/sendTo.signed
 
             if [ "$?" == "0" ]; then

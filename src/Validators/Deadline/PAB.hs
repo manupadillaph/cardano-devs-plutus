@@ -38,7 +38,7 @@ instance HasDefinitions ValidatorContracts where
 exampleStartParams :: ValidatorOffChain.StartParams
 exampleStartParams = ValidatorOffChain.StartParams
     { 
-        ValidatorOffChain.spDeadline = 1657143764000,
+        ValidatorOffChain.ppDeadline = 1657143764000,
         ValidatorOffChain.spName = 0,
         ValidatorOffChain.spAdaQty  = 0
     }

@@ -70,7 +70,7 @@ minLovelace = 2000000
 
 data StartParams = StartParams
     { 
-        spDeadline :: !POSIXTime
+        ppDeadline :: !POSIXTime
         , spName :: !Integer
         , spAdaQty   :: !Integer
     } deriving (P.Eq, P.Ord, Generic, FromJSON, ToJSON,ToSchema, Data.OpenApi.Schema.ToSchema,  P.Show)
@@ -94,7 +94,7 @@ start StartParams{..} = do
             let a = ValidatorData
                     { 
                     aCreator   = pkh
-                    , aDeadline = spDeadline
+                    , aDeadline = ppDeadline
                     , aName = spName
                     , aAdaQty   = spAdaQty
                     }

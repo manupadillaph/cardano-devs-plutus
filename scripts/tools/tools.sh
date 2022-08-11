@@ -1,9 +1,14 @@
 #!/bin/bash
 
+CWD=$(pwd)
 
 opcionMenuTools=""
 
 while ! [[ $opcionMenuTools = "0" ]]; do
+
+    
+
+
 
     printf "\nOPERACIONES:\n"
     
@@ -23,7 +28,18 @@ while ! [[ $opcionMenuTools = "0" ]]; do
 
     echo "--"
 
-    echo "3: Iniciar Nix Shell"  
+    user=whoami
+    if [[ $user = "root" ]]; then
+
+        echo "31: Cambiar a usuario normal"
+        echo "    No puede Iniciar NIX desde root"
+        echo " "
+    
+    else
+
+        echo "32: Iniciar Nix Shell"  
+
+    fi
 
     echo "--"
 
@@ -41,6 +57,15 @@ while ! [[ $opcionMenuTools = "0" ]]; do
     echo "--"
 
     echo "7: Exportar variables ENV"
+
+    echo "Para set env en esta sesion ejecute en promt:"
+    echo "source \"$SCRIPTS/tools/write-env-list.sh\""
+
+    echo "--"
+
+    echo "9: Arreglar Permisos de esta carpeta"
+    echo "   Carpeta: "$CWD
+    echo " "
 
     echo "--"
 
@@ -67,7 +92,11 @@ while ! [[ $opcionMenuTools = "0" ]]; do
         bash "$INIT_WALLET"
     fi
 
-    if [[ $opcionMenuTools = "3" ]]; then 
+    if [[ $opcionMenuTools = "31" ]]; then 
+        sudo -su $USUARIO
+    fi
+
+    if [[ $opcionMenuTools = "32" ]]; then 
         bash "$NIX_SHELL"
     fi
 
@@ -91,6 +120,13 @@ while ! [[ $opcionMenuTools = "0" ]]; do
         bash "$WRITE_ENV"
         echo; read -rsn1 -p "Press any key to continue . . ."; echo
         
+    fi
+
+    if [[ $opcionMenuTools = "9" ]]; then 
+        echo $FIX_PERMISOS
+
+        bash "$FIX_PERMISOS"
+
     fi
 
 done

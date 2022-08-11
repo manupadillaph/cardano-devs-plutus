@@ -5,7 +5,7 @@
   },
   "cicPort": 9083,
   "cicSecurityParam": 2160,
-  "cicSocketPath": "/home/manuelpadilla/source/tools/cardano-node-1.35.0-linux2/db/node.socket",
+  "cicSocketPath": "/home/manuelpadilla/source/tools/cardano-node-1.35.2/db/node.socket",
   "cicDbPath": "/home/manuelpadilla/source/tools/cardano-chain-index/chain-index.db",
   "cicNetworkId": {
     "contents": {
@@ -14,7 +14,7 @@
     "tag": "Testnet"
   },
   "cicStoreFrom": {
-    "unBlockNo": 0
+    "unBlockNo": 3773054
   },
-  "cicAppendTransactionQueueSize": 500
+  "cicAppendTransactionQueueSize": 1000
 }

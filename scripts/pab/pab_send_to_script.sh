@@ -19,7 +19,7 @@ echo "stake key hash: $skh"
 
 # data StartParams = StartParams
 #     { 
-#         spDeadline :: !POSIXTime
+#         ppDeadline :: !POSIXTime
 #         , spName :: !Integer
 #         , spAdaQty   :: !Integer
 #     } deriving (P.Eq, P.Ord, Generic, FromJSON, ToJSON,ToSchema, Data.OpenApi.Schema.ToSchema,  P.Show)
@@ -39,7 +39,7 @@ curl -X 'POST' \
     "caWallet": {"getWalletId": "'"$WALLETID"'"},
     "caID": {
         "contents": {
-            "spDeadline": 1657143764000,
+            "ppDeadline": 1657143764000,
             "spName": 0,
             "spAdaQty": 0
         },

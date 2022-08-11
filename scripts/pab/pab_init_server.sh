@@ -1,23 +1,34 @@
 #!/bin/bash
 
-if ! [[ -f "$HASKELL_FILES/pab/plutus-pab-$scriptName.db" ]]
+
+CARDANO_PAB_SERVER_CONFIG="${CARDANO_PAB_SERVER_CONFIG/VALIDATOR_SCRIPT_NAME/"$scriptName"}"
+CARDANO_PAB_DATABASE="${CARDANO_PAB_DATABASE/VALIDATOR_SCRIPT_NAME/"$scriptName"}"
+
+
+if ! [[ -f "$CARDANO_PAB_DATABASE" && -f "$CARDANO_PAB_SERVER_CONFIG" ]]
 then
-    printf "\nDatabase $HASKELL_FILES/pab/plutus-pab-$scriptName.db no existe, creandola...\n"
-else
+    printf "\nDatabase $CARDANO_PAB_DATABASE o Config $CARDANO_PAB_SERVER_CONFIG no existen, creandolos...\n"
     source "$SCRIPTS/pab/pab_init_database.sh"
+ 
 fi
 
-printf "\nIniciando Server con Wallet:\n"
+printf "\nIniciando Pab con:\n"
 
 WALLET_ID=$(cat $HASKELL_FILES/wallets/$walletName.id)
 echo "WALLET ID:" $WALLET_ID
 echo "Passphrase:" $walletPassphrase
+echo " "
+echo "--Config: "$CARDANO_PAB_SERVER_CONFIG
+echo " "
+echo "--Database: "$CARDANO_PAB_DATABASE
+
+echo " "
 
 #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
 CWD=$(pwd)
 cd $HASKELL
 
-printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $HASKELL_FILES/config/pab/pab-config-$scriptName.yml webserver --passphrase $walletPassphrase
+printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $CARDANO_PAB_SERVER_CONFIG webserver --passphrase $walletPassphrase
 
 cd $CWD
 

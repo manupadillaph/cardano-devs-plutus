@@ -131,5 +131,5 @@ if [[ $opcion = "y" ]]; then
   echo "utxo:"
 
   $CARDANO_NODE/cardano-cli query utxo\
-    --address $walletAddr --testnet-magic $TESTNET_MAGIC 
+    --address $walletAddr --$TESTNET_MAGIC 
 fi

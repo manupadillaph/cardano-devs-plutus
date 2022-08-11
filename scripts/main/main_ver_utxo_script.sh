@@ -3,7 +3,7 @@
 echo "Script Address:" $scriptAddr
             
 result=$($CARDANO_NODE/cardano-cli query utxo\
-    --address $scriptAddr --testnet-magic $TESTNET_MAGIC)
+    --address $scriptAddr --$TESTNET_MAGIC)
 
 printf "\nUtxo at Scritp:\n"
 

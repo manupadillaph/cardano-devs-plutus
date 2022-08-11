@@ -64,7 +64,7 @@ test2 = runEmulatorTraceIO $ do
     --h2 <- activateContractWallet (knownWallet 2) endpoints
 
     callEndpoint @"start" h1 $ ValidatorOffChain.StartParams{  
-            spDeadline = deadline,
+            ppDeadline = deadline,
             spName = 55,
             spAdaQty   = 3000000
         }
@@ -101,7 +101,7 @@ test :: IO ()
 test = runEmulatorTraceIO' def emCfg myTrace
 
 emCfg :: EmulatorConfig
-emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 1]]) def def
+emCfg = EmulatorConfig (Left $ Map.fromList [(knownWallet w, v) | w <- [1 .. 1]]) def 
   where
     v :: Value
     v = Ada.lovelaceValueOf 2000_000_000 
@@ -118,7 +118,7 @@ myTrace = do
     --h2 <- activateContractWallet (knownWallet 2) endpoints
 
     callEndpoint @"start" h1 $ ValidatorOffChain.StartParams{  
-            spDeadline = deadline,
+            ppDeadline = deadline,
             spName = 55,
             spAdaQty   = 3000000
         }

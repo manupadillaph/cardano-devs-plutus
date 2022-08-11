@@ -17,7 +17,7 @@ do
         printf "\nValidator script file ${scriptName} no existe\n"
     else
         $CARDANO_NODE/cardano-cli address build  \
-        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
+        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --$TESTNET_MAGIC
     fi
 
     printf "\nDesea crear files .plutus, .hash del validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
@@ -86,7 +86,7 @@ do
         cd $CWD
 
         $CARDANO_NODE/cardano-cli address build  \
-        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --testnet-magic $TESTNET_MAGIC
+        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --$TESTNET_MAGIC
 
     fi
 

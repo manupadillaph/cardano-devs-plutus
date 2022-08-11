@@ -3,7 +3,7 @@
 echo "Wallet Address:" $walletAddr
             
 result=$($CARDANO_NODE/cardano-cli query utxo\
-    --address $walletAddr --testnet-magic $TESTNET_MAGIC)
+    --address $walletAddr --$TESTNET_MAGIC)
 
 printf "\nUtxo at Wallet:\n"
 

@@ -12,7 +12,7 @@ else
         printf "\nUtxo At Wallet address $address:\n"
 
         result=$($CARDANO_NODE/cardano-cli query utxo\
-        --address $address --testnet-magic $TESTNET_MAGIC)
+        --address $address --$TESTNET_MAGIC)
 
         echo "$result" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl
 

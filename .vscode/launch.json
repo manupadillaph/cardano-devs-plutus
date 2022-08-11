@@ -4,47 +4,24 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "ghc",
             "request": "launch",
-            "name": "haskell(stack)",
+            "name": "haskell-debug-adapter",
             "internalConsoleOptions": "openOnSessionStart",
             "workspace": "${workspaceFolder}",
-            "startup": "${workspaceFolder}/test/Spec.hs",
-            "startupFunc": "",
+            "startup": "/home/manuelpadilla/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell/app/utils-token-name.hs",
+            "startupFunc": "main",
             "startupArgs": "",
             "stopOnEntry": false,
             "mainArgs": "",
             "ghciPrompt": "H>>= ",
-            "ghciInitialPrompt": "> ",
-            "ghciCmd": "stack ghci --test --no-load --no-build --main-is TARGET",
+            "ghciInitialPrompt": "Prelude>",
+            "ghciCmd": "cabal exec -- /home/manuelpadilla/.cabal/bin/ghci-dap --interactive -i -i${workspaceFolder}",
             "ghciEnv": {},
             "logFile": "${workspaceFolder}/.vscode/phoityne.log",
             "logLevel": "WARNING",
-            "forceInspect": false,
-            "haskell.hlint.executablePath": "/nix/store/vdq97kiwjrd4sjggv2br00j536ny9qsf-hlint-exe-hlint-3.2.7/bin/hlint"
-            
-        },
-        {
-            "type": "ghc",
-            "request": "launch",
-            "name": "haskell(cabal)",
-            "internalConsoleOptions": "openOnSessionStart",
-            "workspace": "${workspaceFolder}",
-            "startup": "${workspaceFolder}/app/Main.hs",
-            "startupFunc": "",
-            "startupArgs": "",
-            "stopOnEntry": false,
-            "mainArgs": "",
-            "ghciPrompt": "H>>= ",
-            "ghciInitialPrompt": "> ",
-            "ghciCmd": "cabal exec -- ghci-dap --interactive -i -i${workspaceFolder}",
-            "ghciEnv": {},
-            "logFile": "${workspaceFolder}/.vscode/phoityne.log",
-            "logLevel": "WARNING",
-            "forceInspect": false,
-            "haskell.hlint.executablePath": "/nix/store/vdq97kiwjrd4sjggv2br00j536ny9qsf-hlint-exe-hlint-3.2.7/bin/hlint"
+            "forceInspect": false
         }
     ]
 }

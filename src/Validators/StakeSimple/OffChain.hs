@@ -38,7 +38,7 @@ import           Playground.Types     (KnownCurrency (..))
 import           Plutus.Contract
 import qualified PlutusTx
 import           PlutusTx.Prelude     hiding (unless)
-import qualified Prelude              as P 
+import qualified Prelude              as HASKELL 
 import           Schema               (ToSchema)
 import     qualified      Data.OpenApi.Schema         (ToSchema)
 import           Text.Printf          (printf)
@@ -67,132 +67,179 @@ minLovelace = 2000000
 
 masterCreatePool ::  MasterCreatePoolParams -> Contract w s Text ()
 masterCreatePool MasterCreatePoolParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- Master Create Pool ---------------------------------------------"  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"   
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- Master Create Pool ---------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"   
     
+
     master <- ownPaymentPubKeyHash
+
+    now   <- currentTime
+    logInfo @HASKELL.String $ printf "Time: %s" (HASKELL.show now)
 
     let 
         masterAdds = Ledger.pubKeyHashAddress master Nothing
-
+    
     utxosMaster <- utxosAt masterAdds
-    logInfo @P.String $ printf "utxosMaster List: %s" (P.show utxosMaster)
+
+    logInfo @HASKELL.String $ printf "utxosMaster List: %s" (HASKELL.show utxosMaster)
+
     let 
 
         poolNFTTxOutRef = mcpPoolNFTTxOutRef
-        --poolNFTTokenName    = TokenName $ clearString mcpPoolNFTTokenName
         poolNFTTokenName    =  mcpPoolNFTTokenName
-        --poolNFTTokenName = "PoolNFT"
-        --valuePoolNFT     = Value.singleton (curSymbol (mintingNFTPolicy poolNFT poolNFTTokenName)) poolNFTTokenName 1
-        valuePoolNFT     = assetClassValue (spPoolNFT mcpPoolParam) 1
+        valuePoolNFT     = assetClassValue (ppPoolNFT mcpPoolParam) 1
        
-        value = Ada.lovelaceValueOf mcpFund <> valuePoolNFT
+        valueForPoolState = Ada.lovelaceValueOf mcpFund <> valuePoolNFT
 
-        masterFunders_others = [mkMasterFunder masterParam 0 | masterParam <- spMasters mcpPoolParam ,  masterParam /= master] 
+        masterFunders_others = [mkMasterFunder masterParam 0 | masterParam <- ppMasters mcpPoolParam ,  masterParam /= master] 
         masterFundersNew = mkMasterFunder master mcpFund
         masterFunders = masterFundersNew:masterFunders_others
 
         userNFTs = []
 
-        dPoolState = mkPoolState (spPoolNFT mcpPoolParam) masterFunders userNFTs
+        dPoolState = mkPoolState (ppPoolNFT mcpPoolParam) masterFunders userNFTs
 
         redeemerMinting   = Redeemer $ PlutusTx.toBuiltinData $ MintingRedeemer { mrTokenName = poolNFTTokenName, mrTxOutRef = poolNFTTxOutRef} 
         
+        ---
+
+        validityRange        = Ledger.interval now (now + ppValidTimeRange mcpPoolParam)
+
+        ---
+
         lookupsInit = 
-            Constraints.typedValidatorLookups (typedValidator mcpPoolParam) P.<> 
-            Constraints.unspentOutputs utxosMaster P.<> 
-            --Constraints.mintingPolicy (mintingNFTPolicy poolNFTTxOutRef poolNFTTokenName)  
+            -- This script is goint to use all the uxto from the user
+            Constraints.unspentOutputs utxosMaster HASKELL.<> 
+            -- Is sending value to script, it needs the typedValidatorLookups
+            Constraints.typedValidatorLookups (typedValidator mcpPoolParam) HASKELL.<> 
+             -- Is going to Mint the User NFT:
             Constraints.mintingPolicy mintingNFTPolicy 
         tx = 
-            Constraints.mustPayToTheScript dPoolState value P.<> 
-            Constraints.mustSpendPubKeyOutput poolNFTTxOutRef P.<> 
-            --Constraints.mustMintValue valuePoolNFT 
-            Constraints.mustMintValueWithRedeemer redeemerMinting valuePoolNFT
+            -- Is going to create an utxo at the script with the PoolState 
+            Constraints.mustPayToTheScript dPoolState valueForPoolState HASKELL.<> 
+            -- Is going to spend the master uxto assinged to the NFT
+            Constraints.mustSpendPubKeyOutput poolNFTTxOutRef HASKELL.<> 
+            -- Is going to Mint the Pool NFT
+            Constraints.mustMintValueWithRedeemer redeemerMinting valuePoolNFT HASKELL.<> 
+            -- Is goint create the valid range based in ppValidTimeRange Pool Param
+            Constraints.mustValidateIn validityRange
 
     submittedTx <- submitTxConstraintsWith lookupsInit tx
     void $ awaitTxConfirmed $ getCardanoTxId submittedTx
 
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- Master Create Pool ---------------------------------------------"  
-    logInfo @P.String $ printf "Param: %s" (P.show mcpPoolParam)
-    logInfo @P.String $ printf "Datum: %s" (P.show dPoolState)
-    logInfo @P.String $ printf "Value: %s" (P.show value)
-    --logInfo @P.String $ printf "SubmittedTx: %s" (P.show submittedTx)    
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------" 
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- Master Create Pool ---------------------------------------------"  
+    logInfo @HASKELL.String $ printf "Param: %s" (HASKELL.show mcpPoolParam)
+
+    logInfo @HASKELL.String $ printf "PoolState Datum: %s" (HASKELL.show dPoolState)
+
+    logInfo @HASKELL.String $ printf "PoolState Value: %s" (HASKELL.show valueForPoolState)
+
+    --logInfo @HASKELL.String $ printf "SubmittedTx: %s" (HASKELL.show submittedTx)    
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------" 
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
 
 
 masterFundPool ::  MasterFundPoolParams -> Contract w s Text ()
 masterFundPool MasterFundPoolParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- Master Fund Pool ----------------------------------------------"  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- Master Fund Pool ----------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"  
     
     master <- ownPaymentPubKeyHash
+
     now   <- currentTime
+    logInfo @HASKELL.String $ printf "Time: %s" (HASKELL.show now)
 
-    utxosPoolStateList <- getUtxoListWithValidPoolStateInScript (addressValidator mspPoolParam)
+    let 
+        masterAdds = Ledger.pubKeyHashAddress master Nothing
 
-    -- logInfo @P.String $ printf "utxosPoolStateList List: %s" (P.show utxosPoolStateList)
+    utxosAtMaster <- utxosAt masterAdds
 
-    -- let 
-    --     utxosPoolStateList = []
+    utxosListAtScriptWithPoolState <- getUtxoListWithValidPoolStateInScript (addressValidator mspPoolParam)
 
-    case utxosPoolStateList of
+    -- logInfo @HASKELL.String $ printf "utxosListAtScriptWithPoolState List: %s" (HASKELL.show utxosListAtScriptWithPoolState)
+
+    case utxosListAtScriptWithPoolState of
         [] -> do
-            logInfo @P.String $ printf "Cant' Fund Pool because can't find any utxo with PoolState Datum at the Script Address"
+            logInfo @HASKELL.String $ printf "Cant' Fund Pool because can't find any utxo with PoolState Datum at the Script Address"
             return ()
         _ -> do
 
             let
 
-                listValuesEnUtxosPoolStateList = [ getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosPoolStateList] 
+                listValuesEnUtxosPoolStateList = [ getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosListAtScriptWithPoolState] 
                 
-                valueFund  = Ada.lovelaceValueOf mspFund
+                valueFundForPoolState  = Ada.lovelaceValueOf mspFund
 
-                valueTotal = P.foldl (<>) valueFund listValuesEnUtxosPoolStateList 
+                valueTotalForPoolState = HASKELL.foldl (<>) valueFundForPoolState listValuesEnUtxosPoolStateList 
 
-                dPoolState = mkPoolStateWithNewFundFromUtxoList utxosPoolStateList (spPoolNFT mspPoolParam) master mspFund 
+                dPoolState = mkPoolStateWithNewFundFromUtxoList utxosListAtScriptWithPoolState (ppPoolNFT mspPoolParam) master mspFund 
 
-                redeemerValidator = Redeemer $ PlutusTx.toBuiltinData (redeemMasterFundPool (spPoolNFT mspPoolParam) mspPoolNFTTokenName mspPoolNFTTxOutRef master mspFund )
+
+
+                redeemerValidator = Redeemer $ PlutusTx.toBuiltinData (mkRedeemMasterFundPool (ppPoolNFT mspPoolParam)  master mspFund )
                 
-                txOutRefsPoolState   = fst <$> utxosPoolStateList
+                txOutRefsPoolState   = fst <$> utxosListAtScriptWithPoolState
                 
+                ---
+
+                validityRange        = Ledger.interval now (now + ppValidTimeRange mspPoolParam)
+
+                ---
+
                 lookupsInit = 
-                    Constraints.unspentOutputs (Map.fromList utxosPoolStateList)      P.<>
-                    Constraints.typedValidatorLookups (typedValidator mspPoolParam) P.<>
+                    -- This script is goint to use all the uxto from the user
+                    -- TODO: no es necesario poner esto, se hace automaticamente
+                    --       se necesita poner cuando uso mustSpendPubKeyOutput
+                    Constraints.unspentOutputs utxosAtMaster HASKELL.<> 
+                    -- Is also going to use the utxos at the script with PoolState    
+                    Constraints.unspentOutputs (Map.fromList utxosListAtScriptWithPoolState)      HASKELL.<>
+                    -- Is sending value to script, it needs the typedValidatorLookups
+                    Constraints.typedValidatorLookups (typedValidator mspPoolParam) HASKELL.<>
+                    -- Is going to spend the uxto at the script with PoolState Datums, because is creating a new PoolState Datum
+                    -- for speending it needs the code of the validator
                     Constraints.otherScript (codeValidator mspPoolParam)
 
                 tx      = 
-                    mconcat [Constraints.mustSpendScriptOutput txOutRef redeemerValidator | txOutRef <- txOutRefsPoolState] P.<> 
-                    Constraints.mustValidateIn (from now) P.<> 
-                    Constraints.mustPayToTheScript dPoolState valueTotal
+                    -- Is going to spend the uxto at the script with PoolState Datums, because is creating a new PoolState Datum with the new fund
+                    mconcat [Constraints.mustSpendScriptOutput txOutRef redeemerValidator | txOutRef <- txOutRefsPoolState] HASKELL.<> 
+                    -- Is going to create an utxo at the script with the new PoolState and the new value
+                    Constraints.mustPayToTheScript dPoolState valueTotalForPoolState HASKELL.<> 
+                    -- Is goint create the valid range based in ppValidTimeRange Pool Param
+                    Constraints.mustValidateIn validityRange    
+
 
             submittedTx <- submitTxConstraintsWith lookupsInit tx
             void $ awaitTxConfirmed $ getCardanoTxId submittedTx
 
-            logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-            logInfo @P.String $ printf "--------------------------- Master Fund Pool -- -------------------------------------------" 
-            logInfo @P.String $ printf "Param: %s" (P.show mspPoolParam)
-            logInfo @P.String $ printf "Datum: %s" (P.show dPoolState)
-            logInfo @P.String $ printf "Value Fund: %s" (P.show valueFund)
-            logInfo @P.String $ printf "Value Total: %s" (P.show valueTotal)
-            --logInfo @P.String $ printf "SubmittedTx: %s" (P.show submittedTx)    
-            logInfo @P.String $ printf "--------------------------------------------------------------------------------------------" 
-            logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"  
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+            logInfo @HASKELL.String $ printf "--------------------------- Master Fund Pool -- -------------------------------------------" 
+
+            logInfo @HASKELL.String $ printf "Param: %s" (HASKELL.show mspPoolParam)
+
+            logInfo @HASKELL.String $ printf "PoolState Datum: %s" (HASKELL.show dPoolState)
+
+            logInfo @HASKELL.String $ printf "PoolState Value Fund: %s" (HASKELL.show valueFundForPoolState)
+
+            logInfo @HASKELL.String $ printf "PoolState Value: %s" (HASKELL.show valueTotalForPoolState)
+
+            --logInfo @HASKELL.String $ printf "SubmittedTx: %s" (HASKELL.show submittedTx)    
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------" 
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"  
 
 masterGetBackFund ::  MasterGetBackFundParams -> Contract w s Text ()
 masterGetBackFund MasterGetBackFundParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- Master GetBack Fund -------------------------------------------"  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"     
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- Master GetBack Fund -------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"     
 
     -- master <- ownPaymentPubKeyHash
     -- now   <- currentTime
     -- utxosFromMaster <- findUtxosFromMasters (addressValidator mgpPoolParam) master 
 
-    -- logInfo @P.String $ printf "findUtxoFromMaster: %s" (P.show utxosFromMaster)
+    -- logInfo @HASKELL.String $ printf "findUtxoFromMaster: %s" (HASKELL.show utxosFromMaster)
 
     -- case utxosFromMaster of
 
@@ -201,53 +248,52 @@ masterGetBackFund MasterGetBackFundParams{..} = do
     --     _  -> do
 
     --         let 
-    --             redeemer      = Redeemer $ PlutusTx.toBuiltinData redeemMasterGetPool
+    --             redeemer      = Redeemer $ PlutusTx.toBuiltinData mkRedeemMasterGetPool
 
     --             txOutRefs   = fst <$> utxosFromMaster
                 
-    --             lookupsInit = Constraints.unspentOutputs (Map.fromList utxosFromMaster)      P.<>
-    --                     Constraints.typedValidatorLookups (typedValidator mgpPoolParam) P.<>
+    --             lookupsInit = Constraints.unspentOutputs (Map.fromList utxosFromMaster)      HASKELL.<>
+    --                     Constraints.typedValidatorLookups (typedValidator mgpPoolParam) HASKELL.<>
     --                     Constraints.otherScript (codeValidator mgpPoolParam)
 
                 
     --             tx      = mconcat [Constraints.mustSpendScriptOutput txOutRef redeemer | txOutRef <- txOutRefs]
-    --                 P.<> Constraints.mustValidateIn (from now)
+    --                 HASKELL.<> Constraints.mustValidateIn (from now)
     --             -- Constraints.mustPayToPubKey master vGetADA  
 
     --         submittedTx <- submitTxConstraintsWith lookupsInit tx
     --         void $ awaitTxConfirmed $ getCardanoTxId submittedTx
 
-    --         logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    --         logInfo @P.String $ printf "--------------------------- Master GetBack Fund -------------------------------------------" 
-    --         logInfo @P.String $ printf "Param: %s " (P.show mgpPoolParam) 
-    --         logInfo @P.String $ printf "submittedTx: %s" (P.show submittedTx)    
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------" 
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"  
+    --         logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    --         logInfo @HASKELL.String $ printf "--------------------------- Master GetBack Fund -------------------------------------------" 
+    --         logInfo @HASKELL.String $ printf "Param: %s " (HASKELL.show mgpPoolParam) 
+    --         logInfo @HASKELL.String $ printf "submittedTx: %s" (HASKELL.show submittedTx)    
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------" 
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"  
 
 userInvest ::  UserInvestParams -> Contract w s Text ()
 userInvest UserInvestParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- User Invest ----------------------------------------------------"  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- User Invest ----------------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
 
     user <- ownPaymentPubKeyHash
+
     now   <- currentTime
+    logInfo @HASKELL.String $ printf "Time: %s" (HASKELL.show now)
 
     let 
         userAdds = Ledger.pubKeyHashAddress user Nothing
 
-    utxosUser <- utxosAt userAdds
+    utxosAtUser <- utxosAt userAdds
 
-    utxosPoolStateList <- getUtxoListWithValidPoolStateInScript (addressValidator uipPoolParam) 
+    utxosListAtScriptWithPoolState <- getUtxoListWithValidPoolStateInScript (addressValidator uipPoolParam) 
 
-    -- logInfo @P.String $ printf "utxosPoolStateList List: %s" (P.show utxosPoolStateList)
+    -- logInfo @HASKELL.String $ printf "utxosListAtScriptWithPoolState List: %s" (HASKELL.show utxosListAtScriptWithPoolState)
 
-    -- let :r
-    --     utxosPoolStateList = []
-
-    case utxosPoolStateList of
+    case utxosListAtScriptWithPoolState of
         [] -> do
-            logInfo @P.String $ printf "Cant' Invest in Pool because can't find any utxo with PoolState Datum at the Script Address"
+            logInfo @HASKELL.String $ printf "Cant' Invest in Pool because can't find any utxo with PoolState Datum at the Script Address"
             return ()
         _ -> do
             let 
@@ -256,90 +302,99 @@ userInvest UserInvestParams{..} = do
 
                 userNFTTxOutRef  = uiUserNFTTxOutRef
                 userNFTTokenName  = uiUserNFTTokenName
-                --userNFTTokenName  = TokenName $ clearString uiUserNFTTokenName
-                --userNFTTokenName = "UserNFT"
-                --userNFT = assetClass (curSymbol (mintingNFTPolicy userNFTTxOutRef userNFTTokenName)) userNFTTokenName
                 userNFT = assetClass (curSymbol mintingNFTPolicy) userNFTTokenName
-                --valueUserNFT     = Value.singleton (curSymbol (mintingNFTPolicy userNFTTxOutRef userNFTTokenName)) userNFTTokenName 1
-        
-                valueUserNFT     = assetClassValue userNFT 1
-                valueUserNFTPlusMinimunAda = valueUserNFT <>  Ada.lovelaceValueOf minLovelace
 
-                valueUser = Ada.lovelaceValueOf uipInvest 
+                valueNFTForUser     = assetClassValue userNFT 1
+                valueNFTPlusMinimunAdaForUser = valueNFTForUser <>  Ada.lovelaceValueOf minLovelace
+
+                valueForUserState = Ada.lovelaceValueOf uipInvest 
 
                 -- Creates UserState Datum
-                dUserState = mkUserState user userNFT uipInvest now uipDeadline 0 0 Nothing
+
+                dUserState = mkUserState user userNFT uipInvest uipCreatedAt uipDeadline 0 0 Nothing
 
                 -- Creates PoolState Datum with the New User
 
-                poolNFT = spPoolNFT uipPoolParam    
+                poolNFT = ppPoolNFT uipPoolParam    
 
-                listValuesEnUtxosPoolStateList = [ getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosPoolStateList] 
+                listValuesEnUtxosPoolStateList = [ getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosListAtScriptWithPoolState] 
     
-                valuePool = P.foldl (<>) (Ada.lovelaceValueOf 0) listValuesEnUtxosPoolStateList 
+                valueForPoolState = HASKELL.foldl (<>) (Ada.lovelaceValueOf 0) listValuesEnUtxosPoolStateList 
 
-                dPoolState = mkPoolStateWithNewUserInvestFromUtxoList utxosPoolStateList poolNFT userNFT
+                dPoolState = mkPoolStateWithNewUserInvestFromUtxoList utxosListAtScriptWithPoolState poolNFT userNFT
 
-                txOutRefsPoolState   = fst <$> utxosPoolStateList
+                txOutRefsPoolState   = fst <$> utxosListAtScriptWithPoolState
                 
                 -- Creates Redeemer
-                redeemerValidator = Redeemer $ PlutusTx.toBuiltinData (redeemUserInvest poolNFT userNFT  userNFTTokenName userNFTTxOutRef  user uipInvest now uipDeadline )
+
+                redeemerValidator = Redeemer $ PlutusTx.toBuiltinData (mkRedeemUserInvest poolNFT userNFT  userNFTTokenName userNFTTxOutRef  user uipInvest uipCreatedAt uipDeadline )
                 redeemerMinting   = Redeemer $ PlutusTx.toBuiltinData $ MintingRedeemer { mrTokenName = userNFTTokenName, mrTxOutRef = userNFTTxOutRef} 
-        
+
+                ---
+
+                validityRange        = Ledger.interval uipCreatedAt (uipCreatedAt + ppValidTimeRange uipPoolParam)
+
+                ---
+
                 lookupsInit = 
-                    -- This script is goint to use all the uxto from the user and the script with PoolState Datums:
-                    Constraints.unspentOutputs utxosUser P.<> 
-                    Constraints.unspentOutputs (Map.fromList utxosPoolStateList)  P.<> 
-                     -- Is going to Mint the User NFT: Constraints.mustMintValue valueUserNFT  
-                    --Constraints.mintingPolicy (mintingNFTPolicy userNFTTxOutRef userNFTTokenName)  P.<> 
-                    Constraints.mintingPolicy mintingNFTPolicy    P.<> 
+                    -- This script is goint to use all the uxto from the user
+                    Constraints.unspentOutputs utxosAtUser HASKELL.<> 
+                    -- Is also going to use the utxo at the script with PoolState    
+                    Constraints.unspentOutputs (Map.fromList utxosListAtScriptWithPoolState)  HASKELL.<> 
+                     -- Is going to Mint the User NFT: 
+                    Constraints.mintingPolicy mintingNFTPolicy    HASKELL.<> 
                     -- Is sending value to script, it needs the typedValidatorLookups
-                    Constraints.typedValidatorLookups (typedValidator uipPoolParam) P.<> 
+                    Constraints.typedValidatorLookups (typedValidator uipPoolParam) HASKELL.<> 
                     -- Is going to spend the uxto at the script with PoolState Datums, because is creating a new PoolState Datum
                     -- for speending it needs the code of the validator
                     Constraints.otherScript (codeValidator uipPoolParam)
 
                 tx = 
                     -- Is going to spend the uxto at the script with PoolState Datums, because is creating a new PoolState Datum
-                    mconcat [Constraints.mustSpendScriptOutput txOutRef redeemerValidator | txOutRef <- txOutRefsPoolState] P.<> 
+                    mconcat [Constraints.mustSpendScriptOutput txOutRef redeemerValidator | txOutRef <- txOutRefsPoolState] HASKELL.<> 
                     -- Is going to create an utxo at the script with the new UserState and the value of the New Invest
-                    Constraints.mustPayToTheScript dUserState valueUser P.<> 
+                    Constraints.mustPayToTheScript dUserState valueForUserState HASKELL.<> 
                     -- Is going to create an utxo at the script with the new PoolState with the New UserNFT and the value is the actual value at the Script
-                    Constraints.mustPayToTheScript dPoolState valuePool  P.<> 
+                    Constraints.mustPayToTheScript dPoolState valueForPoolState  HASKELL.<> 
                     -- Is goint to send the mint userNFT to the user wallet 
-                    Constraints.mustPayToPubKey user valueUserNFTPlusMinimunAda  P.<> 
+                    Constraints.mustPayToPubKey user valueNFTPlusMinimunAdaForUser  HASKELL.<> 
                     -- Is going to spend the user uxto assinged to the NFT
-                    Constraints.mustSpendPubKeyOutput userNFTTxOutRef P.<> 
-                    -- Is going to Mint the User NFT: Constraints.mustMintValue valueUserNFT  
-                    --Constraints.mustMintValue valueUserNFT 
-                    Constraints.mustMintValueWithRedeemer redeemerMinting valueUserNFT
+                    Constraints.mustSpendPubKeyOutput userNFTTxOutRef HASKELL.<> 
+                    -- Is going to Mint the User NFT:
+                    Constraints.mustMintValueWithRedeemer redeemerMinting valueNFTForUser HASKELL.<> 
+                    -- Is goint create the valid range based in ppValidTimeRange Pool Param
+                    Constraints.mustValidateIn validityRange
 
             submittedTx <- submitTxConstraintsWith lookupsInit tx
             void $ awaitTxConfirmed $ getCardanoTxId submittedTx
 
-            logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-            logInfo @P.String $ printf "--------------------------- User Invest ----------------------------------------------------"  
-            -- logInfo @P.String $ printf "Param: %s Datum: %s Value: %s" (P.show uipPoolParam) (P.show datumUser) (P.show value)
-            logInfo @P.String $ printf "Param: %s" (P.show uipPoolParam)
-            logInfo @P.String $ printf "UserState Datum: %s" (P.show dUserState)
-            logInfo @P.String $ printf "PoolState Datum: %s" (P.show dPoolState)
-            logInfo @P.String $ printf "UserState Value: %s" (P.show valueUser)
-            logInfo @P.String $ printf "PoolState Value: %s" (P.show valuePool)
-            -- logInfo @P.String $ printf "SubmittedTx: %s" (P.show submittedTx)   
-            logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
-            logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+            logInfo @HASKELL.String $ printf "--------------------------- User Invest ----------------------------------------------------"  
+            logInfo @HASKELL.String $ printf "Param: %s" (HASKELL.show uipPoolParam)
+
+            logInfo @HASKELL.String $ printf "PoolState Datum: %s" (HASKELL.show dPoolState)
+            logInfo @HASKELL.String $ printf "UserState Datum: %s" (HASKELL.show dUserState)
+
+            logInfo @HASKELL.String $ printf "PoolState Value: %s" (HASKELL.show valueForPoolState)
+            logInfo @HASKELL.String $ printf "UserState Value: %s" (HASKELL.show valueForUserState)
+            
+            logInfo @HASKELL.String $ printf "User Wallet NFT Value: %s" (HASKELL.show valueNFTPlusMinimunAdaForUser)    
+
+            -- logInfo @HASKELL.String $ printf "SubmittedTx: %s" (HASKELL.show submittedTx)   
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
 
 userGetBackInvest ::  UserGetBackInvestParams -> Contract w s Text ()
 userGetBackInvest UserGetBackInvestParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- User GetBack Invest --------------------------------------------" 
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- User GetBack Invest --------------------------------------------" 
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
 
     -- user <- ownPaymentPubKeyHash
     -- now   <- currentTime
     -- utxosFromUserWithDeadline <- findUtxosFromUserWithDeadline (addressValidator ugipPoolParam) user ugipDeadline 
 
-    -- logInfo @P.String $ printf "findUtxosFromUserWithDeadline: %s" (P.show utxosFromUserWithDeadline)
+    -- logInfo @HASKELL.String $ printf "findUtxosFromUserWithDeadline: %s" (HASKELL.show utxosFromUserWithDeadline)
 
     -- case utxosFromUserWithDeadline of
 
@@ -348,80 +403,193 @@ userGetBackInvest UserGetBackInvestParams{..} = do
     --     _  -> do
 
     --         let 
-    --             redeemer      = Redeemer $ PlutusTx.toBuiltinData redeemUserGetInvest
+    --             redeemer      = Redeemer $ PlutusTx.toBuiltinData mkRedeemUserGetInvest
 
     --             txOutRefs   = fst <$> utxosFromUserWithDeadline
                 
-    --             lookupsInit = Constraints.unspentOutputs (Map.fromList utxosFromUserWithDeadline)      P.<>
-    --                     Constraints.typedValidatorLookups (typedValidator ugipPoolParam) P.<>
+    --             lookupsInit = Constraints.unspentOutputs (Map.fromList utxosFromUserWithDeadline)      HASKELL.<>
+    --                     Constraints.typedValidatorLookups (typedValidator ugipPoolParam) HASKELL.<>
     --                     Constraints.otherScript (codeValidator ugipPoolParam)
 
     --             tx      = mconcat [Constraints.mustSpendScriptOutput txOutRef redeemer | txOutRef <- txOutRefs]
-    --                 P.<> Constraints.mustValidateIn (from now)
+    --                 HASKELL.<> Constraints.mustValidateIn (from now)
     --             -- Constraints.mustPayToPubKey user vGetADA  
 
     --         submittedTx <- submitTxConstraintsWith lookupsInit tx
     --         void $ awaitTxConfirmed $ getCardanoTxId submittedTx
 
-    --         logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    --         logInfo @P.String $ printf "--------------------------- User GetBack Invest --------------------------------------------"  
-    --         logInfo @P.String $ printf "Param: %s " (P.show ugipPoolParam) 
-    --         logInfo @P.String $ printf "submittedTx: %s" (P.show submittedTx)   
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+    --         logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    --         logInfo @HASKELL.String $ printf "--------------------------- User GetBack Invest --------------------------------------------"  
+    --         logInfo @HASKELL.String $ printf "Param: %s " (HASKELL.show ugipPoolParam) 
+    --         logInfo @HASKELL.String $ printf "submittedTx: %s" (HASKELL.show submittedTx)   
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
 
 userGetRewards ::  UserGetRewardsParams -> Contract w s Text ()
 userGetRewards UserGetRewardsParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- User Get Rewards -----------------------------------------------"  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"    
 
-    -- user <- ownPaymentPubKeyHash
-    -- now   <- currentTime
-    -- utxosFromUserWithDeadline <- findUtxosFromUserWithDeadline (addressValidator ugrpPoolParam) user ugipDeadline 
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- User Get Rewards -----------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"    
 
-    -- logInfo @P.String $ printf "findUtxosFromUserWithDeadline: %s" (P.show utxosFromUserWithDeadline)
+    user <- ownPaymentPubKeyHash
+    
+    now   <- currentTime
+    logInfo @HASKELL.String $ printf "Time: %s" (HASKELL.show now)
+    
+    let 
+        userAdds = Ledger.pubKeyHashAddress user Nothing
 
-    -- case utxosFromUserWithDeadline of
+        userNFTTxOutRef  = ugrpUserNFTTxOutRef
+        userNFTTokenName  = ugrpUserNFTTokenName
+        userNFT = assetClass (curSymbol mintingNFTPolicy) userNFTTokenName
+        
+    utxosAtUser <- utxosAt userAdds
 
-    --     [] -> Plutus.Contract.throwError "User Invest Not Found" 
+    utxosListAtScriptWithPoolState <- getUtxoListWithValidPoolStateInScript (addressValidator ugrpPoolParam) 
+    -- logInfo @HASKELL.String $ printf "utxosListAtScriptWithPoolState List: %s" (HASKELL.show utxosListAtScriptWithPoolState)
 
-    --     _  -> do
+    utxosListAtScriptWithUserState <- getUtxoListWithValidUserStateInScript (addressValidator ugrpPoolParam) userNFT 
+    -- logInfo @HASKELL.String $ printf "utxosListAtScriptWithUserState List: %s" (HASKELL.show utxosListAtScriptWithPoolState)
 
-    --         let 
-    --             redeemer      = Redeemer $ PlutusTx.toBuiltinData redeemUserGetInvest
-
-    --             txOutRefs   = fst <$> utxosFromUserWithDeadline
+    case (utxosListAtScriptWithPoolState,utxosListAtScriptWithUserState) of
+        ([], _) -> do
+            logInfo @HASKELL.String $ printf "Cant' Get Rewards from Pool because can't find any utxo with PoolState Datum at the Script Address"
+            return ()
+        (_, []) -> do
+            logInfo @HASKELL.String $ printf "Cant' Get Rewards from because can't find any utxo with UserState Datum with this UserNFT at the Script Address"
+            return ()
+        (_, x:[y]) -> do
+            logInfo @HASKELL.String $ printf "Cant' Get Rewards from because can't find unic single utxo with UserState Datum with this UserNFT at the Script Address"
+            return ()
+        (_, [utxoAtScriptWithUserState]) -> do
+            let 
                 
-    --             lookupsInit = Constraints.unspentOutputs (Map.fromList utxosFromUserWithDeadline)      P.<>
-    --                     Constraints.typedValidatorLookups (typedValidator ugrpPoolParam) P.<>
-    --                     Constraints.otherScript (codeValidator ugrpPoolParam)
+                valueNFTForUser    = assetClassValue userNFT 1
+                valueNFTPlusMinimunAdaForUser  = valueNFTForUser <>  Ada.lovelaceValueOf minLovelace
 
-    --             tx      = mconcat [Constraints.mustSpendScriptOutput txOutRef redeemer | txOutRef <- txOutRefs]
-    --                 P.<> Constraints.mustValidateIn (from now)
-    --             -- Constraints.mustPayToPubKey user vGetADA  
+                valueClaimRewardsForUser = Ada.lovelaceValueOf ugrpClaim
 
-    --         submittedTx <- submitTxConstraintsWith lookupsInit tx
-    --         void $ awaitTxConfirmed $ getCardanoTxId submittedTx
+                dUserStateOLD = getUserStateFromUtxo utxoAtScriptWithUserState
 
-    --         logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    --         logInfo @P.String $ printf "--------------------------- User GetBack Invest --------------------------------------------"  
-    --         logInfo @P.String $ printf "Param: %s " (P.show ugrpPoolParam) 
-    --         logInfo @P.String $ printf "submittedTx: %s" (P.show submittedTx)  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"    
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+                valueForUserState =  getValueFromChainIndexTxOut $ snd utxoAtScriptWithUserState 
+
+                -- Creates UserState Datum
+
+                rewards = getRewardsPerInvest (usLastClaimAt dUserStateOLD) now  (usCreatedAt  dUserStateOLD )  (usInvest dUserStateOLD ) 
+                totalNewRewards = rewards  + usRewardsNotClaimed dUserStateOLD
+                rewardsNotClaimed = totalNewRewards - ugrpClaim
+                totalRewardsCashedOut = usChashedOut dUserStateOLD + ugrpClaim 
+
+            logInfo @HASKELL.String $ printf "CALCULATED Claiming " ++ HASKELL.show ugrpClaim
+            logInfo @HASKELL.String $ printf "CALCULATED New Rewards " ++ HASKELL.show rewards
+            logInfo @HASKELL.String $ printf "CALCULATED usRewardsNotClaimed OLD " ++ HASKELL.show (usRewardsNotClaimed dUserStateOLD)
+            logInfo @HASKELL.String $ printf "CALCULATED totalNewRewards " ++ HASKELL.show totalNewRewards
+            logInfo @HASKELL.String $ printf "CALCULATED rewardsNotClaimed " ++ HASKELL.show rewardsNotClaimed
+            logInfo @HASKELL.String $ printf "CALCULATED totalRewardsCashedOut " ++ HASKELL.show totalRewardsCashedOut
+
+            let
+
+                -- TODO: throwError "ERROR " si es menor que cero
+
+                dUserState = mkUserState user userNFT 
+                    (usInvest dUserStateOLD)
+                    (usCreatedAt dUserStateOLD)
+                    (usDeadline dUserStateOLD)
+                    (totalRewardsCashedOut)
+                    (rewardsNotClaimed)
+                    (Just now)
+
+                txOutRefUserState   = fst utxoAtScriptWithUserState
+
+                -- Creates PoolState Datum
+
+                poolNFT = ppPoolNFT ugrpPoolParam    
+
+                listValuesEnUtxosPoolStateList = [ getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosListAtScriptWithPoolState] 
+
+                poolStateDatums = getPoolStateListFromUtxoList utxosListAtScriptWithPoolState 
+
+                valueForPoolState = HASKELL.foldl (<>) (negate (Ada.lovelaceValueOf ugrpClaim)) listValuesEnUtxosPoolStateList 
+
+    
+                dPoolState = mkPoolStateFromPoolStateList poolStateDatums poolNFT   
+
+                txOutRefsPoolState   = fst <$> utxosListAtScriptWithPoolState
+                
+                -- Creates Redeemer
+
+                redeemerValidator = Redeemer $ PlutusTx.toBuiltinData (mkRedeemUserGetRewards poolNFT userNFT  user ugrpClaim now )
+                
+                ---
+
+                validityRange        = Ledger.interval now (now + ppValidTimeRange ugrpPoolParam)
+
+                ---
+
+                lookupsInit = 
+                    -- This script is goint to use all the uxto from the user 
+                    Constraints.unspentOutputs utxosAtUser HASKELL.<> 
+                    -- Is also going to use the utxo at the script with PoolState 
+                    Constraints.unspentOutputs (Map.fromList utxosListAtScriptWithPoolState)  HASKELL.<> 
+                    -- Is also going to use the utxo at the script with UserState  
+                    Constraints.unspentOutputs (Map.fromList [utxoAtScriptWithUserState])  HASKELL.<> 
+                    -- Is sending value to script, it needs the typedValidatorLookups
+                    Constraints.typedValidatorLookups (typedValidator ugrpPoolParam) HASKELL.<> 
+                    -- Is going to spend the uxto at the script with PoolState Datums and UserState Datums
+                    -- for speending it needs the code of the validator
+                    Constraints.otherScript (codeValidator ugrpPoolParam)
+
+                tx = 
+                    -- Is going to spend the uxto at the script with PoolState Datums, because is taking the rewards from there
+                    mconcat [Constraints.mustSpendScriptOutput txOutRef redeemerValidator | txOutRef <- txOutRefsPoolState] HASKELL.<> 
+                    -- Is going to spend the uxto at the script with UserState Datums, because creating a new UserState with the new Claim
+                    mconcat [Constraints.mustSpendScriptOutput txOutRefUserState redeemerValidator | txOutRef <- [txOutRefUserState]] HASKELL.<> 
+
+                    -- Is going to create an utxo at the script with the new UserState and the value of the New Invest
+                    Constraints.mustPayToTheScript dUserState valueForUserState HASKELL.<> 
+                    -- Is going to create an utxo at the script with the new PoolState with the New UserNFT and the value is the actual value at the Script
+                    Constraints.mustPayToTheScript dPoolState valueForPoolState  HASKELL.<> 
+                    -- Is goint to send the NFT back again to the user wallet
+                    Constraints.mustPayToPubKey user valueNFTPlusMinimunAdaForUser  HASKELL.<> 
+                    -- Is goint to send the claimed rewards to the user wallet
+                    Constraints.mustPayToPubKey user valueClaimRewardsForUser  HASKELL.<> 
+                    -- Is goint create the valid range based in ppValidTimeRange Pool Param
+                    Constraints.mustValidateIn validityRange
+
+            submittedTx <- submitTxConstraintsWith lookupsInit tx
+            void $ awaitTxConfirmed $ getCardanoTxId submittedTx
+
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+            logInfo @HASKELL.String $ printf "--------------------------- User Get Rewards ----------------------------------------------------"  
+            logInfo @HASKELL.String $ printf "Param: %s" (HASKELL.show ugrpPoolParam)
+
+            logInfo @HASKELL.String $ printf "PoolState Datum: %s" (HASKELL.show dPoolState)
+            logInfo @HASKELL.String $ printf "UserState Datum: %s" (HASKELL.show dUserState)
+
+            logInfo @HASKELL.String $ printf "PoolState Value: %s" (HASKELL.show valueForPoolState)
+
+            logInfo @HASKELL.String $ printf "UserState Value: %s" (HASKELL.show valueForUserState)
+
+            logInfo @HASKELL.String $ printf "User Wallet NFT Value: %s" (HASKELL.show valueNFTPlusMinimunAdaForUser)    
+
+            logInfo @HASKELL.String $ printf "User Wallet Claimed Rewards Value: %s" (HASKELL.show valueClaimRewardsForUser)    
+            
+            -- logInfo @HASKELL.String $ printf "SubmittedTx: %s" (HASKELL.show submittedTx)   
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
+            logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"        
 
 userInvestRewards ::  UserInvestRewardsParams -> Contract w s Text ()
 userInvestRewards UserInvestRewardsParams{..} = do
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- User Invest Rewards --------------------------------------------"  
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- User Invest Rewards --------------------------------------------"  
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
 
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"
-    logInfo @P.String $ printf "--------------------------- User Invest Rewards --------------------------------------------" 
-    -- logInfo @P.String $ printf "Param: %s Datum: %s Value: %s" (P.show mcpPoolParam) (P.show dPoolState) (P.show value) 
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
-    logInfo @P.String $ printf "--------------------------------------------------------------------------------------------"      
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"
+    logInfo @HASKELL.String $ printf "--------------------------- User Invest Rewards --------------------------------------------" 
+    -- logInfo @HASKELL.String $ printf "Param: %s Datum: %s Value: %s" (HASKELL.show mcpPoolParam) (HASKELL.show dPoolState) (HASKELL.show value) 
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
+    logInfo @HASKELL.String $ printf "--------------------------------------------------------------------------------------------"      
 
 
 
@@ -447,93 +615,3 @@ endpoints = awaitPromise (masterCreatePool' `select` masterFundPool' `select` ma
 
 mkSchemaDefinitions ''ValidatorSchema
 
-
-
--- start ::  StartParams -> Contract w s Text ()
--- start StartParams{..} = do
---     pkh <- ownPaymentPubKeyHash
---     oref <- findUtxoInValidator pkh spName
---     case oref of
---         Nothing -> do
---             let a = ValidatorData
---                     { 
---                     aCreator   = pkh
---                     , aDeadline = spDeadline
---                     , aName = spName
---                     , aAdaQty   = spAdaQty
---                     }
---                 d = ValidatorDatum
---                     { dData    = a
---                     }
---                 v = Ada.lovelaceValueOf spAdaQty
---                 tx = Constraints.mustPayToTheScript d v
---             ledgerTx <- submitTxConstraints typedValidator tx
---             void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
---             logInfo @P.String $ printf  "--------------------------- Started plazo fijo %s for token %s" (P.show a) (P.show v)
---         _ -> logInfo @P.String $ printf "--------------------------- Plazo fijo con ese nombre ya existe" 
-
--- get :: forall w s. GetParams ->  Contract w s Text ()
--- get GetParams{..} = do
---     pkh <- ownPaymentPubKeyHash
---     now   <- currentTime
---     oref <- findUtxoInValidator pkh gpName
---     --logInfo @P.String $ printf "findUtxoInValidator 222222222222222222 plazo fijo utxo with datum %s" (P.show out)
---     case oref of
---         Nothing ->logInfo @P.String $ printf "--------------------------- Plazo Fijo NOT FOUND"
---         --TxOutRef ->logInfo @P.String $ printf "FOUND 222222222222222222 plazo fijo utxo with datum %s" (P.show oref)
---         Just oref -> do
---             logInfo @P.String $ printf "--------------------------- Plazo Fijo FOUND utxo %s" (P.show oref)
---             (oref2,o) <- getFromValidator oref
---             let 
---                 vGet       = gpAdaQty
-                
---                 Just dOld = getDatumm (oref2,o) 
-
---                 redeemerGet = RedeemGet
-
---                 r      = Redeemer $ PlutusTx.toBuiltinData redeemerGet
-
---                 vChange       = aAdaQty (dData dOld) - vGet
-                
-                
---                 a = ValidatorData
---                     { 
---                     aCreator   = pkh
---                     , aDeadline = aDeadline $ dData dOld
---                     , aName = aName $ dData dOld
---                     , aAdaQty   = vChange
---                     }
---                 d = ValidatorDatum
---                     { 
---                     dData    = a
---                     }
-
---                 seller = pkh
-
---                 vGetADA       = Ada.lovelaceValueOf vGet
---                 vChangeADA       = Ada.lovelaceValueOf vChange
-
---                 lookups = Constraints.typedValidatorLookups typedValidator P.<>
---                   Constraints.otherScript codeValidator                P.<>
---                   Constraints.unspentOutputs (Map.singleton oref2 o)
-
---                 tx
---                  |  vChange >= minLovelace = Constraints.mustPayToPubKey pkh vGetADA  <>
---                                     --Constraints.mustValidateIn (from $ aDeadline adAuction)                    <>
---                                    -- Constraints.mustValidateIn (from $ aDeadline $ dData dOld)<>
---                                     Constraints.mustValidateIn (from now)<>
---                                     Constraints.mustSpendScriptOutput oref2 r <>
---                                     Constraints.mustPayToTheScript d vChangeADA
---                  | otherwise = Constraints.mustPayToPubKey pkh vGetADA  <>
---                                     --Constraints.mustValidateIn (from $ aDeadline $ dData dOld)<>
---                                    Constraints.mustValidateIn (from now)<>
---                                     Constraints.mustSpendScriptOutput oref2 r 
-
---             logInfo @P.String $ printf "--------------------------- Monto Anterior: %s - Get: %s - Cambio: %s " (P.show (aAdaQty (dData dOld))) (P.show vGet) (P.show vChange)
-
---             ledgerTx <- submitTxConstraintsWith lookups tx
---             void $ awaitTxConfirmed $ getCardanoTxId ledgerTx
---             logInfo @P.String $ printf "--------------------------- Get Plazo Fijo "
-   
-
-        

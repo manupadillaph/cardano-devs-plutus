@@ -76,7 +76,7 @@ if [[ $walletLoadedInServerWallet = 0 ]]; then
     if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.addr" ]]
     then
         $CARDANO_NODE/cardano-cli address build \
-	        --payment-verification-key-file $HASKELL_FILES/wallets/${walletName}.vkey --out-file $HASKELL_FILES/wallets/${walletName}.addr --testnet-magic $TESTNET_MAGIC 
+	        --payment-verification-key-file $HASKELL_FILES/wallets/${walletName}.vkey --out-file $HASKELL_FILES/wallets/${walletName}.addr --$TESTNET_MAGIC 
     fi
 fi
 
