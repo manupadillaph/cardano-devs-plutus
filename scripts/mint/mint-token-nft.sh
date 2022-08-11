@@ -83,8 +83,14 @@ if [[ $opcion = "y" ]]; then
 
     pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
+    #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
+    CWD=$(pwd)
+    cd $FALCON_DEVS_HASKELL
+
     tnHex=$(cabal exec utils-token-name -- $token_name)
 
+    cd $CWD
+    
     addr=$(cat $addrFile)
 
     v="$token_cantidad $pid.$tnHex"
