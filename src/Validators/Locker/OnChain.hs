@@ -45,7 +45,7 @@ import qualified PlutusTx
 import           PlutusTx.Prelude     hiding (unless)
 import qualified Prelude              as P 
 import           Schema               (ToSchema)
-import     qualified      Data.OpenApi.Schema         (ToSchema)
+import qualified Data.OpenApi.Schema         (ToSchema)
 import           Text.Printf          (printf)
 import Data.Typeable
 
@@ -53,6 +53,18 @@ import          Plutus.Trace.Emulator  as Emulator
 import          Wallet.Emulator.Wallet
 import          Data.Default
 import          Ledger.TimeSlot 
+
+-- TODO: para hacer V2 scripts
+
+-- import           Cardano.Api                    (PlutusScriptV1, PlutusScriptV2,
+--                                                  writeFileTextEnvelope)
+-- import           Cardano.Api.Shelley            (PlutusScript (..))
+-- import qualified Plutus.Script.Utils.V1.Scripts as PSU.V1
+-- import qualified Plutus.Script.Utils.V2.Scripts as PSU.V2
+-- import qualified Plutus.V1.Ledger.Api           as PlutusV1
+-- import qualified Plutus.V1.Ledger.Contexts      as PlutusV1
+-- import qualified Plutus.V2.Ledger.Api           as PlutusV2
+--import qualified Plutus.V2.Ledger.Contexts      as PlutusV2
 
 --Import Internos
 import  Validators.Locker.Typos        (ValidatorDatum (..) , ValidatorData (..) , ValidatorRedeemer (..))

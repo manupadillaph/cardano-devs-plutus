@@ -4,39 +4,129 @@ echo "Actualizando ENV en esta sesion ..."
 
 source "$SCRIPTS/tools/write-env-list.sh"
 
-swDentro=0
+#antes copiaba todo el contenido de esa lista dentro de .bashrc, pero ahora solo pongo la linea de source
 
-echo "">~/.bashrc2
+CWD=$(pwd)
+cd ~
 
+swPrimero=1
+
+#aqui me encargo de buscar si existe la linea ya y comentarla
 while IFS= read -r line
 do
-    if [[ $line = "#INIT PLUTUS ENVS ~/.bashrc - DONT DELETE THIS LINE" ]]; 
-    then
-        swDentro=1
-    fi
-    if [[ $swDentro = 0 ]]; 
-    then
-        echo $line>>~/.bashrc2
-    fi
-    if [[ $line = "#END PLUTUS ENVS ~/.bashrc - DONT DELETE THIS LINE" ]]; 
-    then
-        swDentro=0
+
+    if [[ "$line" == *"# falcon-devs-env"* ]]; then
+        if [ $swPrimero = 1 ]; then
+            echo "# $line">.bashrc.temp
+            swPrimero=0
+        else
+            echo "# $line">>.bashrc.temp
+        fi
+    else
+         if [ $swPrimero = 1 ]; then
+            echo $line>.bashrc.temp
+            swPrimero=0
+        else
+            echo $line>>.bashrc.temp
+        fi
     fi
 
-done < ~/.bashrc
+done < .bashrc
 
-while IFS= read -r line
+#esta es la linea que voy a agregar
+lineNew="[ -f \"$SCRIPTS/tools/write-env-list.sh\" ] && source \"$SCRIPTS/tools/write-env-list.sh\" # falcon-devs-env"
+
+echo $lineNew>>.bashrc.temp
+
+#aqui me encargo de buscar un nombre para guardar la copia de bk
+extension=1
+base=".bashrc.old"
+file="${base}${extension}"
+
+echo "FILE1: $file"
+
+until ! [[ -f "$file"  ]]
 do
-    echo $line>>~/.bashrc2
-done < "$SCRIPTS/tools/write-env-list.sh"
+    extension=$(($extension+1))
+    file=${base}${extension}
 
-# cat ~/.bashrc2
+    echo "FILE2: $file"
 
-sudo cp ~/.bashrc2 ~/.bashrc
+done
+
+#aqui reemplazo el original por el temporal creado arriba
+
+cp .bashrc "$file"
+
+cp .bashrc.temp .bashrc
+
+cd $CWD
 
 
-echo "ENV var exported and writed down in ~/.bashrc"
+echo "Para set env en esta sesion ejecute en promt:"
+echo "source \"$SCRIPTS/tools/write-env-list.sh\""
 
+#de antes:
+# CWD=$(pwd)
+# cd ~
+
+# swDentro=0
+# swPrimero=1
+
+# while IFS= read -r line
+# do
+#     if [[ $line = "#INIT PLUTUS ENVS ~/.bashrc - DONT DELETE THIS LINE" ]]; 
+#     then
+#         swDentro=1
+#     fi
+#     if [[ $swDentro = 0 ]]; 
+#     then
+        
+#         if [ $swPrimero = 1 ]; then
+#             echo $line>.bashrc.temp
+#             swPrimero=0
+#         else
+#             echo $line>>.bashrc.temp
+#         fi
+#     fi
+#     if [[ $line = "#END PLUTUS ENVS ~/.bashrc - DONT DELETE THIS LINE" ]]; 
+#     then
+#         swDentro=0
+#     fi
+# done < .bashrc
+
+
+
+# while IFS= read -r line
+# do
+#     echo $line>>.bashrc.temp
+# done < "$SCRIPTS/tools/write-env-list.sh"
+
+# cat ~/.bashrc.temp
+
+# extension=1
+# base=".bashrc.old"
+# file="${base}${extension}"
+
+# echo "FILE1: $file"
+
+# until ! [[ -f "$file"  ]]
+# do
+#     extension=$(($extension+1))
+#     file=${base}${extension}
+
+#     echo "FILE2: $file"
+
+# done
+
+# cp .bashrc "$file"
+
+# cp .bashrc.temp .bashrc
+
+# cd $CWD
+
+# echo "ENVS Exported and Writed down in ~/.bashrc"
+# echo "Backup in $file"
 
 
 

@@ -10,4 +10,4 @@ $CARDANO_NODE/cardano-cli address key-hash \
 	--verification-key-file $HASKELL_FILES/wallets/${walletName}.vkey --out-file $HASKELL_FILES/wallets/${walletName}.pkh 
 
 $CARDANO_NODE/cardano-cli address build \
-	 --payment-verification-key-file $HASKELL_FILES/wallets/${walletName}.vkey --out-file $HASKELL_FILES/wallets/${walletName}.addr --testnet-magic $TESTNET_MAGIC 
+	 --payment-verification-key-file $HASKELL_FILES/wallets/${walletName}.vkey --out-file $HASKELL_FILES/wallets/${walletName}.addr --$TESTNET_MAGIC 

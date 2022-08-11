@@ -58,7 +58,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 while IFS= read -r txin
                 do
                     results="$results\n$($CARDANO_NODE/cardano-cli query utxo\
-                    --tx-in $txin --testnet-magic $TESTNET_MAGIC)"
+                    --tx-in $txin --$TESTNET_MAGIC)"
                 done < "$HASKELL_FILES/wallets/${walletName}.utxo"
 
                 echo "$results" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl 

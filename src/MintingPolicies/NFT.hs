@@ -32,14 +32,14 @@ import           Wallet.Emulator.Wallet
 
 {-# INLINABLE mkPolicy #-}
 mkPolicy :: TxOutRef -> TokenName -> () -> ScriptContext -> Bool
-mkPolicy oref tn () ctx = traceIfFalse "UTxO not consumed"   hasUTxO           &&
+mkPolicy oref tn () ctx = traceIfFalse "UTxO not consumed"   hasInputUTxO           &&
                           traceIfFalse "wrong amount minted" checkMintedAmount
   where
     info :: TxInfo
     info = scriptContextTxInfo ctx
 
-    hasUTxO :: Bool
-    hasUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
+    hasInputUTxO :: Bool
+    hasInputUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
 
     checkMintedAmount :: Bool
     checkMintedAmount = case flattenValue (txInfoMint info) of

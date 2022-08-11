@@ -1,4 +1,4 @@
-Cabal-Version:      2.4
+cabal-version:      2.4
 Name:               smart-contracts
 Version:            0.1.0.0
 Author:              Manuel Padilla
@@ -41,6 +41,19 @@ library
                      , Validators.Deadline.PAB
                      , Validators.Deadline.Test
                      , Validators.Deadline.Typos
+
+                     , Validators.MarketNFT
+                     , Validators.MarketNFT.OffChain
+                     , Validators.MarketNFT.OnChain
+                     , Validators.MarketNFT.OnChainNFT
+                     , Validators.MarketNFT.PAB
+                     , Validators.MarketNFT.TestWithEmulator
+                     , Validators.MarketNFT.TestWithPABSimulator
+                     , Validators.MarketNFT.Typos
+                     , Validators.MarketNFT.OnChainHelpers
+                     , Validators.MarketNFT.OffChainHelpers
+                     , Validators.MarketNFT.Helpers
+
                      , Validators.Redeemer
                      , Validators.Redeemer.OffChain
                      , Validators.Redeemer.OnChain
@@ -52,43 +65,80 @@ library
                      , Validators.StakeSimple.OnChain
                      , Validators.StakeSimple.OnChainNFT
                      , Validators.StakeSimple.PAB
-                     , Validators.StakeSimple.Test
+                     , Validators.StakeSimple.TestWithEmulator
+                     , Validators.StakeSimple.TestWithPABSimulator
                      , Validators.StakeSimple.Typos
                      , Validators.StakeSimple.OnChainHelpers
                      , Validators.StakeSimple.OffChainHelpers
                      , Validators.StakeSimple.Helpers
+
+                     , Validators.StakePlus
+                     , Validators.StakePlus.OffChain
+                     , Validators.StakePlus.OnChain
+                     , Validators.StakePlus.OnChainNFT
+                     , Validators.StakePlus.PAB
+                     , Validators.StakePlus.TestWithEmulator
+                     , Validators.StakePlus.TestWithPABSimulator
+                     , Validators.StakePlus.Typos
+                     , Validators.StakePlus.OnChainHelpers
+                     , Validators.StakePlus.OffChainHelpers
+                     , Validators.StakePlus.Helpers
+
+
                      , MintingPolicies.Free
                      , MintingPolicies.NFT
                      , MintingPolicies.Plus
                      , MintingPolicies.Signed
                      , Utils
-                     
-  build-depends:       aeson
-                     , base ^>=4.14.1.0
-                     , bytestring
-                     , cardano-api
+
+  --------------------
+  -- IOG dependencies
+  --------------------
+  build-depends:
+                       cardano-api
                      , cardano-crypto-class
                      , cardano-ledger-core
                      , cardano-ledger-shelley
                      , cardano-wallet-core
-                     , containers
                      , data-default
-                     , freer-extras
                      , playground-common
+                     -- , plutus-chain-index-core
                      , plutus-contract
+                     -- , plutus-core
                      , plutus-ledger
                      , plutus-ledger-api
                      , plutus-ledger-constraints
-                     , plutus-tx-plugin
-                     , plutus-tx
-                     , serialise
-                     , text
-                     , openapi3
-                     , prettyprinter
+                     --, plutus-script-utils
                      , plutus-pab
                      , plutus-use-cases
-                    , lens
-                    , freer-simple
+                     , plutus-tx
+                     , plutus-tx-plugin      
+
+  ------------------------
+  -- Non-IOG dependencies
+  ------------------------
+  build-depends:
+                       aeson
+                     , base >= 4.9 && < 5
+                     , bytestring
+                     , containers
+                     , freer-extras
+                     , freer-simple
+                     -- , hashable
+                     , lens
+                     , openapi3
+                     , prettyprinter
+                     -- , semigroups
+                     , serialise
+                     -- , streaming
+                     -- , template-haskell
+                     , text
+                     , stm 
+                     , old-locale
+                     , time
+                     , directory
+                     , MissingH
+                    --  , stm , time, old-locale,directory  en test2
                     
   default-language:    Haskell2010
   ghc-options:         -Wall -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise
@@ -169,6 +219,18 @@ executable pab-api-server-auto
                      , text
                      , smart-contracts
 
+
+
+executable spec
+  main-is: Spec.hs
+  hs-source-dirs:      test
+  ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
+  build-depends:       aeson
+                     , base ^>= 4.14.1.0
+                     , data-default
+                     , freer-extras
+                     , freer-simple
+                     , text
 
 
 

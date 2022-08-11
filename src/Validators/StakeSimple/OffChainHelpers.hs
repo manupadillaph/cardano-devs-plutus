@@ -42,7 +42,7 @@ import           Playground.Types     (KnownCurrency (..))
 import           Plutus.Contract
 import qualified PlutusTx
 import           PlutusTx.Prelude     hiding (unless)
-import qualified Prelude              as P 
+import qualified Prelude              as HASKELL 
 import           Schema               (ToSchema)
 import     qualified      Data.OpenApi.Schema         (ToSchema)
 import           Text.Printf          (printf)
@@ -77,60 +77,52 @@ getValueFromChainIndexTxOut scriptChainIndexTxOut = scriptChainIndexTxOut ^. ciT
 {- | Try to get the generic Datum from a ChainIndexTxOut. -}
 getDatumFromChainIndexTxOut :: ChainIndexTxOut ->  Maybe ValidatorDatum
 getDatumFromChainIndexTxOut scriptChainIndexTxOut = do
-    -- logInfo @P.String $ printf "getDatumFromChainIndexTxOut de: %s " (P.show $ _ciTxOutDatum o)
+    -- logInfo @HASKELL.String $ printf "getDatumFromChainIndexTxOut de: %s " (HASKELL.show $ _ciTxOutDatum o)
     case _ciTxOutDatum scriptChainIndexTxOut of
         Left _          -> do
-            -- logInfo @P.String $ printf "Left " 
+            -- logInfo @HASKELL.String $ printf "Left " 
             Nothing
         Right datum -> do
             let 
                 validatorDatum = PlutusTx.fromBuiltinData (getDatum datum) :: Maybe ValidatorDatum
             case validatorDatum of
                 Nothing ->  do
-                    -- logInfo @P.String $ printf "Nothing "
+                    -- logInfo @HASKELL.String $ printf "Nothing "
                     Nothing    
                 Just (PoolState dPoolState) ->  do
-                    -- logInfo @P.String $ printf "Encontrado Datumm Master: %s" (P.show dPoolState)
+                    -- logInfo @HASKELL.String $ printf "Encontrado Datumm Master: %s" (HASKELL.show dPoolState)
                     Just (PoolState dPoolState)   
                 Just (UserState validatorUserState) ->  do
-                    -- logInfo @P.String $ printf "Encontrado Datumm User: %s" (P.show validatorUserState)
+                    -- logInfo @HASKELL.String $ printf "Encontrado Datumm User: %s" (HASKELL.show validatorUserState)
                     Just (UserState validatorUserState)   
 
 
+{- | Get the list of PoolState Datums from a list of Utxos -}
 getPoolStateListFromUtxoList :: [(TxOutRef, ChainIndexTxOut)] -> [PoolStateTypo]
 getPoolStateListFromUtxoList utxosWithPoolState  = do
-    [  fromJust (getPoolStateFromDatum (getDatumFromChainIndexTxOut  scriptChainIndexTxOut)) | (txOutRef, scriptChainIndexTxOut) <- utxosWithPoolState, datumIsPoolState  (getDatumFromChainIndexTxOut  scriptChainIndexTxOut) ]
+    [ getPoolStateFromUtxo (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- utxosWithPoolState, datumIsPoolState  (getDatumFromChainIndexTxOut  scriptChainIndexTxOut) ]
 
-
-
-   
-
-   
-{- | Get the list of utxos with valid PoolState datum in the address. -}
-getUtxoListWithValidPoolStateInScript :: Ledger.Address -> Contract w s Text [(TxOutRef, ChainIndexTxOut)]
-getUtxoListWithValidPoolStateInScript addressValidator  = do
-    utxos <- utxosAt addressValidator
-    logInfo @P.String $ printf "utxosAt: %s" (P.show utxos)
+{- | Get PoolState Datum from a Utxo -}
+getPoolStateFromUtxo :: (TxOutRef, ChainIndexTxOut) -> PoolStateTypo
+getPoolStateFromUtxo utxoWithPoolState  = do
     let 
-        utxosListValid = [ (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos, datumIsPoolState (getDatumFromChainIndexTxOut  scriptChainIndexTxOut) ]
-        -- TODO: revisar lista de utxo, comprobar datum correcto, tienen que contener los mismos invertsores que el pool, 
-        -- el mismo NFT y el NFT tiene que estar en el pool
+        scriptChainIndexTxOut = snd utxoWithPoolState
+    fromJust (getPoolStateFromDatum (getDatumFromChainIndexTxOut  scriptChainIndexTxOut))
+    
+{- | Get the list of UserState Datums from a list of Utxos -}
+getUserStateListFromUtxoList :: [(TxOutRef, ChainIndexTxOut)] -> [UserStateTypo]
+getUserStateListFromUtxoList utxosWithUserState  = do
+    [  getUserStateFromUtxo (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- utxosWithUserState, datumIsUserState  (getDatumFromChainIndexTxOut  scriptChainIndexTxOut) ]
 
-        utxosRef = [ txOutRef | (txOutRef, scriptChainIndexTxOut) <- utxosListValid ]
-
-    logInfo @P.String $ printf "utxos List Valid: %s" (P.show utxosRef)
-    return utxosListValid
-
-
-{- | Get the list of utxos in the address for use in the emulator trace. -}
-getUtxoListInEmulator :: Ledger.Address -> Trace.EmulatorTrace [(TxOutRef, TxOut)]
-getUtxoListInEmulator addr = do
-    state <- Trace.chainState
-    let utxoIndex = getIndex $ state ^. Trace.index 
-        utxos     =  [(oref, o) | (oref, o) <- Map.toList utxoIndex, txOutAddress o == addr]
-    P.pure utxos   
+{- | Get UserState Datum from a Utxos -}
+getUserStateFromUtxo :: (TxOutRef, ChainIndexTxOut) -> UserStateTypo
+getUserStateFromUtxo utxoWithUserState  = do
+    let 
+        scriptChainIndexTxOut = snd utxoWithUserState
+    fromJust (getUserStateFromDatum (getDatumFromChainIndexTxOut  scriptChainIndexTxOut))
 
 
+{- | Creates a new PoolState Datum using a list of Utxo whit PoolState Datums and adding the new fund to the specific master masterFunder. -}
 mkPoolStateWithNewFundFromUtxoList :: [(TxOutRef, ChainIndexTxOut)]  ->  PoolNFT -> Master -> Fund -> ValidatorDatum
 mkPoolStateWithNewFundFromUtxoList utxosWithPoolState poolNFT master fund  = do
     let 
@@ -138,23 +130,68 @@ mkPoolStateWithNewFundFromUtxoList utxosWithPoolState poolNFT master fund  = do
     
     mkPoolStateWithNewFundFromPoolStateList poolStateDatums poolNFT master fund 
 
-
+{- | Creates a new PoolState Datum using a list of Utxo with PoolState Datums and adding the new user NFT. -}
 mkPoolStateWithNewUserInvestFromUtxoList :: [(TxOutRef, ChainIndexTxOut)]  -> PoolNFT  ->  UserNFT  -> ValidatorDatum
 mkPoolStateWithNewUserInvestFromUtxoList utxosWithPoolState poolNFT userNFT   = do
     let 
         poolStateDatums = getPoolStateListFromUtxoList utxosWithPoolState
     
     mkPoolStateWithNewUserInvestFromPoolStateList poolStateDatums poolNFT userNFT 
+   
+{- | Get the list of utxos with valid PoolState datum in the script address. -}
+getUtxoListWithValidPoolStateInScript :: Ledger.Address -> Contract w s Text [(TxOutRef, ChainIndexTxOut)]
+getUtxoListWithValidPoolStateInScript addressValidator  = do
+    utxos <- utxosAt addressValidator
+    logInfo @HASKELL.String $ printf "utxosAt: %s" (HASKELL.show utxos)
+    let 
+        utxosListValid = [ (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos, datumIsPoolState (getDatumFromChainIndexTxOut  scriptChainIndexTxOut) ]
+        -- TODO: revisar lista de utxo, comprobar datum correcto, tienen que contener los mismos invertsores que el pool, 
+        -- el mismo NFT y el NFT tiene que estar en el pool
+
+        utxosRef = [ txOutRef | (txOutRef, scriptChainIndexTxOut) <- utxosListValid ]
+
+    logInfo @HASKELL.String $ printf "Utxos List with Valid PoolState: %s" (HASKELL.show utxosRef)
+    return utxosListValid
+
+{- | Get the list of utxos with valid UserState datum in the script address. -}
+getUtxoListWithValidUserStateInScript :: Ledger.Address -> UserNFT -> Contract w s Text [(TxOutRef, ChainIndexTxOut)]
+getUtxoListWithValidUserStateInScript addressValidator userNFT  = do
+    utxos <- utxosAt addressValidator
+    logInfo @HASKELL.String $ printf "utxosAt: %s" (HASKELL.show utxos)
+    let 
+        utxosListValidWithDatum = [ (txOutRef, scriptChainIndexTxOut, fromJust (getUserStateFromDatum (getDatumFromChainIndexTxOut  scriptChainIndexTxOut))) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos, datumIsUserState (getDatumFromChainIndexTxOut  scriptChainIndexTxOut) ]
+            
+
+        utxosListValid = [ (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut, dUserState) <- utxosListValidWithDatum, usUserNFT dUserState == userNFT]
+        
+        -- TODO: revisar lista de utxo, comprobar datum correcto, tienen que contener usuario registrado en el pool
+
+        utxosRef = [ txOutRef | (txOutRef, scriptChainIndexTxOut) <- utxosListValid ]
+
+    logInfo @HASKELL.String $ printf "Utxos List Valid UserState: %s" (HASKELL.show utxosRef)
+    return utxosListValid
+
+
+{- | Get the utxos in the address for use in the emulator trace. -}
+getUtxoListInEmulator :: Ledger.Address -> Trace.EmulatorTrace [(TxOutRef, TxOut)]
+getUtxoListInEmulator addr = do
+    state <- Trace.chainState
+    let utxoIndex = getIndex $ state ^. Trace.index 
+        utxos     =  [(oref, o) | (oref, o) <- Map.toList utxoIndex, txOutAddress o == addr]
+    HASKELL.pure utxos   
+
+
+
 
 
 
 
 -- getDatumContract :: [(TxOutRef, ChainIndexTxOut)]  -> Contract w s Text ()
 -- getDatumContract [(txOutRef, scriptChainIndexTxOut)] = do
---     logInfo @String $ printf "GetDatum %s" (P.show txOutRef)
+--     logInfo @String $ printf "GetDatum %s" (HASKELL.show txOutRef)
 --     let 
 --         dat = getDatumFromChainIndexTxOut scriptChainIndexTxOut
---     logInfo @String $ printf "Datum %s" (P.show dat)
+--     logInfo @String $ printf "Datum %s" (HASKELL.show dat)
 --     return ()
 -- getDatumContract [] = return ()
 -- getDatumContract ((txOutRef, scriptChainIndexTxOut):xs) = do
@@ -177,8 +214,6 @@ mkPoolStateWithNewUserInvestFromUtxoList utxosWithPoolState poolNFT userNFT   = 
 --         Nothing -> False
 --         Just (UserState validatorUserState) -> usUser validatorUserState == user && deadline >= usDeadline validatorUserState  
 --         _ -> False
-
-
 
 
 -- findUtxosMaster :: [(TxOutRef, ChainIndexTxOut)]  -> Master  ->  [(TxOutRef, ChainIndexTxOut)]
@@ -204,35 +239,27 @@ mkPoolStateWithNewUserInvestFromUtxoList utxosWithPoolState poolNFT userNFT   = 
 -- findUtxosFromMasters :: Ledger.Address -> Master -> Contract w s Text [(TxOutRef, ChainIndexTxOut)]
 -- findUtxosFromMasters addressValidator master = do
 --     utxos <- utxosAt addressValidator
---     logInfo @P.String $ printf "utxosAt: %s" (P.show utxos)
+--     logInfo @HASKELL.String $ printf "utxosAt: %s" (HASKELL.show utxos)
 --     let 
 --         xs = [ (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos ]
 --         utxosFromMaster = findUtxosMaster xs master 
 --         utxosRef = [ txOutRef | (txOutRef, scriptChainIndexTxOut) <- utxosFromMaster ]
 --     getDatumContract $ Map.toList utxos
---     logInfo @P.String $ printf "utxosFromMaster: %s" (P.show utxosRef)
+--     logInfo @HASKELL.String $ printf "utxosFromMaster: %s" (HASKELL.show utxosRef)
 --     return utxosFromMaster
-
-
 
 
 
 -- findUtxosFromUserWithDeadline :: Ledger.Address -> User  -> Deadline -> Contract w s Text [(TxOutRef, ChainIndexTxOut)]
 -- findUtxosFromUserWithDeadline addressValidator user deadline = do
 --     utxos <- utxosAt addressValidator
---     logInfo @P.String $ printf "utxosAt: %s" (P.show utxos)
+--     logInfo @HASKELL.String $ printf "utxosAt: %s" (HASKELL.show utxos)
 --     let 
 --         xs = [ (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos ]
 --         utxosFromUserWithDeadline = findUtxosUserWithDeadline xs user deadline
 --     getDatumContract $ Map.toList utxos
---     -- logInfo @P.String $ printf "utxosFromMaster: %s" (P.show utxosFromMaster)
+--     -- logInfo @HASKELL.String $ printf "utxosFromMaster: %s" (HASKELL.show utxosFromMaster)
 --     return utxosFromUserWithDeadline
-
-
-
-
-
-
 
 
 
@@ -244,164 +271,6 @@ mkPoolStateWithNewUserInvestFromUtxoList utxosWithPoolState poolNFT userNFT   = 
 --     case xs of
 --         [x] ->  return x
 
-
-
-
-
-
-
-
-
-
-
-
-
-
--- getValidatorDatumm :: (TxOutRef, ChainIndexTxOut) -> Maybe ValidatorDatum
--- getValidatorDatumm (oref,o) = case _ciTxOutDatum o of
---                         Left _          -> Nothing
---                         Right (Datum e) -> case PlutusTx.fromBuiltinData e of
---                             Nothing -> Nothing
---                             Just d@Validators.StakeSimple.Typos.ValidatorDatum{..} -> Just d
-
--- getPoolStateTypo :: (TxOutRef, ChainIndexTxOut) -> Maybe PoolStateTypo
--- getPoolStateTypo (txOutRef, scriptChainIndexTxOut) = case _ciTxOutDatum scriptChainIndexTxOut of
---                         Left _          -> Nothing
---                         Right (Datum eDatum) -> case PlutusTx.fromBuiltinData eDatum of
---                             Nothing -> Nothing
---                             Just datum@Validators.StakeSimple.Typos.PoolStateTypo{..}  -> Just datum
-
--- getPoolStateTypo1 :: PaymentPubKeyHash -> (TxOutRef, ChainIndexTxOut) -> Maybe PoolStateTypo
--- getPoolStateTypo1 p (txOutRef, scriptChainIndexTxOut) = case _ciTxOutDatum scriptChainIndexTxOut of
---                         Left _          -> Nothing
---                         Right (Datum eDatum) -> case PlutusTx.fromBuiltinData eDatum of
---                             Nothing -> Just (mkPoolStateTypo p)
---                             Just datum@Validators.StakeSimple.Typos.PoolStateTypo{..}  -> Just datum
-
-
--- getUserStateTypo :: (TxOutRef, ChainIndexTxOut) -> Maybe UserStateTypo
--- getUserStateTypo (txOutRef, scriptChainIndexTxOut) = do
-
---     case _ciTxOutDatum scriptChainIndexTxOut of
---         Left _          -> Nothing
---         Right (Datum eDatum) -> case PlutusTx.fromBuiltinData eDatum of
---             Nothing -> Nothing
---             Just datum@Validators.StakeSimple.Typos.UserStateTypo{..} -> Just datum 
-
-
--- {- | Get the datum from a ChainIndexTxOut, only if it is not a datum hash. -}
--- getDatumFromChainIndexTxOut ::  ChainIndexTxOut -> Maybe PoolStateTypo
--- getDatumFromChainIndexTxOut scriptChainIndexTxOut = do
---     let 
---         a = _ciTxOutDatum scriptChainIndexTxOut
---     case a of
---         Right d -> PlutusTx.fromBuiltinData $ getDatum d
---         _ -> Nothing    
-
---     -- case  _ciTxOutDatum scriptChainIndexTxOut of
---     --     Right d -> PlutusTx.fromBuiltinData $ getDatum d
---     --     _       -> Nothing
-
--- {- | Get the value from a ChainIndexTxOut. -}
--- getValueFromChainIndexTxOut :: ChainIndexTxOut -> Value
--- getValueFromChainIndexTxOut scriptChainIndexTxOut = scriptChainIndexTxOut ^. ciTxOutValue
-
-
--- -- -- | Monadic function for getting the datum from a ChainIndexTxOut.
--- -- getContractDatum :: ChainIndexTxOut -> Contract w s Text PoolStateTypo
--- -- getContractDatum  = maybe (PC.throwError "Cannot find contract datum") return . getDatumFromChainIndexTxOut
--- --     -- maybe (PC.throwError "Cannot find contract datum") return .
-     
-
-
-         
--- findUtxosFromMasters ::  Ledger.Address -> PaymentPubKeyHash -> Contract w s Text ([TxOutRef])
--- findUtxosFromMasters addressValidator ppkh  = do
---     utxos <- utxosAt addressValidator
---     logInfo @P.String $ printf "utxosAt %s" (P.show utxos)
---     let 
---         -- xs1 = [ getPoolStateTypo1 ppkh (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos ]
-
---         xs = [ (txOutRef, scriptChainIndexTxOut) | (txOutRef, scriptChainIndexTxOut) <- Map.toList utxos ]
-
---         utxosFromMaster = findUtxos xs ppkh
-
---     -- logInfo @P.String $ printf "xs1 %s" (P.show xs1)
-        
---     return utxosFromMaster
-
--- findUtxos :: [(TxOutRef, ChainIndexTxOut)]  -> PaymentPubKeyHash  ->  [TxOutRef]
--- findUtxos [] _ = []  
--- findUtxos [(txOutRef, scriptChainIndexTxOut)]  ppkh  
---     | checkUtxo (txOutRef, scriptChainIndexTxOut)  ppkh = [txOutRef]
---     | otherwise = []
--- findUtxos ((txOutRef, scriptChainIndexTxOut):xs) ppkh  
---     | checkUtxo (txOutRef, scriptChainIndexTxOut)  ppkh = txOutRef:findUtxos xs ppkh
---     | otherwise = findUtxos xs ppkh
-
--- checkUtxo  :: (TxOutRef, ChainIndexTxOut) -> PaymentPubKeyHash -> Bool
--- checkUtxo (txOutRef, scriptChainIndexTxOut) ppkh  = do
---     let 
-
---         datum    = getDatumFromChainIndexTxOut scriptChainIndexTxOut
---     case datum of 
---         Nothing -> True
---         Just PoolStateTypo{..} -> psMasterFunders == ppkh
-
-    -- case datum of
-    --     UserState vdu             -> False
-    --         -- PC.throwError
-    --         -- "Expected PoolStateTypo but found UserStateTypo in staking script UTxO."
-    --     PoolState vdm -> psMasterFunders vdm == ppkh
-
-    -- case getPoolStateTypo (txOutRef, scriptChainIndexTxOut) of
-    --     Nothing -> False
-    --     Just d@PoolStateTypo{..}
-    --         | psMasterFunders == ppkh -> True
-    --         | otherwise          -> True
-
-
--- getDatumm :: (TxOutRef, ChainIndexTxOut) -> Maybe ValidatorDatum
--- getDatumm (oref,o) = case _ciTxOutDatum o of
---                         Left _          -> Nothing
---                         Right (Datum e) -> case PlutusTx.fromBuiltinData e of
---                             Nothing -> Nothing
---                             Just d@ValidatorDatum{..} -> Just d
-
--- checkUTXO  :: (TxOutRef, ChainIndexTxOut) -> PaymentPubKeyHash -> Integer -> Bool
--- checkUTXO (oref,o)  ppkh name = do
---     case getDatumm (oref,o) of
---         Nothing -> False
---         Just d@ValidatorDatum{..}
---             | aCreator dData == ppkh && aName dData == name -> True
---             | otherwise                                           -> False
-
--- findUTXO :: [(TxOutRef, ChainIndexTxOut)]  -> PaymentPubKeyHash -> Integer -> Maybe TxOutRef
--- findUTXO [] _ _ = Nothing --do  
--- findUTXO [(oref,o)]  ppkh name  = do
---     if checkUTXO (oref, o) ppkh name then 
---         return oref
---     else 
---         Nothing
--- findUTXO ((oref,o):xs) ppkh name  
---     | checkUTXO (oref ,o)  ppkh name = return oref
---     | otherwise = findUTXO xs   ppkh name
-
--- findUtxoInValidator :: PaymentPubKeyHash -> Integer -> Contract w s Text (Maybe TxOutRef)
--- findUtxoInValidator ppkh name = do
---     utxos <- utxosAt addressValidator
---     let 
---         xs = [ (oref, o) | (oref, o) <- Map.toList utxos ]
---         out = findUTXO xs ppkh name
---     return out
- 
--- getFromValidator :: TxOutRef -> Contract w s Text (TxOutRef, ChainIndexTxOut)
--- getFromValidator get_oref= do
---     utxos <- utxosAt addressValidator
---     let 
---         xs = [ (oref, o) | (oref, o) <- Map.toList utxos , get_oref == oref]
---     case xs of
---         [x] ->  return x
 
 
 

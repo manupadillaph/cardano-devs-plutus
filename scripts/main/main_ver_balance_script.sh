@@ -8,7 +8,7 @@ lovelaceTotal=0
 countTxin=1
 
 result=$($CARDANO_NODE/cardano-cli query utxo\
-        --address $scriptAddr --testnet-magic $TESTNET_MAGIC)
+        --address $scriptAddr --$TESTNET_MAGIC)
 
 # echo $result
 

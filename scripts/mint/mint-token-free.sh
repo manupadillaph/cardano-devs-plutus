@@ -68,7 +68,7 @@ if [[ $opcion = "y" ]]; then
 
     ppFile=$HASKELL_FILES/config/tx/protocol.json
     $CARDANO_NODE/cardano-cli query protocol-parameters \
-                    --out-file $ppFile --testnet-magic $TESTNET_MAGIC 
+                    --out-file $ppFile --$TESTNET_MAGIC 
 
 
     unsignedFile=$HASKELL_FILES/transacciones/Free.unsigned
@@ -102,7 +102,7 @@ if [[ $opcion = "y" ]]; then
 
         $CARDANO_NODE/cardano-cli transaction build \
             --babbage-era \
-            --testnet-magic $TESTNET_MAGIC \
+            --$TESTNET_MAGIC \
             $walletTxInArray \
             --tx-in-collateral $walletTxIn \
             --tx-out "$addr + $minimoADA lovelace + $v" \
@@ -119,7 +119,7 @@ if [[ $opcion = "y" ]]; then
     else
         $CARDANO_NODE/cardano-cli transaction build \
             --babbage-era \
-            --testnet-magic $TESTNET_MAGIC \
+            --$TESTNET_MAGIC \
             $walletTxInArray \
             --tx-in-collateral $walletTxIn \
             --tx-out "$addr + $minimoADA lovelace + $v" \
@@ -138,13 +138,13 @@ if [[ $opcion = "y" ]]; then
         $CARDANO_NODE/cardano-cli transaction sign \
             --tx-body-file $unsignedFile \
             --signing-key-file $skeyFile \
-            --testnet-magic $TESTNET_MAGIC \
+            --$TESTNET_MAGIC \
             --out-file $signedFile
 
         if [ "$?" == "0" ]; then      
 
             $CARDANO_NODE/cardano-cli transaction submit \
-                --testnet-magic $TESTNET_MAGIC \
+                --$TESTNET_MAGIC \
                 --tx-file $signedFile
 
             if [ "$?" == "0" ]; then        

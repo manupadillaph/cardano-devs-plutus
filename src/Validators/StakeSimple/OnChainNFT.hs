@@ -36,14 +36,14 @@ import  Validators.StakeSimple.Helpers
 
 -- {-# INLINABLE mkPolicy #-}
 -- mkPolicy :: TxOutRef -> TokenName  ->() -> ScriptContext -> Bool
--- mkPolicy oref tn () ctx = traceIfFalse "UTxO not consumed"   hasUTxO           &&
+-- mkPolicy oref tn () ctx = traceIfFalse "UTxO not consumed"   hasInputUTxO           &&
 --                           traceIfFalse "wrong amount minted" checkMintedAmount
 --   where
 --     info :: TxInfo
 --     info = scriptContextTxInfo ctx
 
---     hasUTxO :: Bool
---     hasUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
+--     hasInputUTxO :: Bool
+--     hasInputUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
 
 --     checkMintedAmount :: Bool
 --     checkMintedAmount = case flattenValue (txInfoMint info) of
@@ -64,7 +64,7 @@ import  Validators.StakeSimple.Helpers
 
 -- {-# INLINABLE mkPolicy #-}
 -- mkPolicy :: TxOutRef ->  TxOutRef -> () -> ScriptContext -> Bool
--- mkPolicy oref oref2 _ ctx = traceIfFalse "UTxO not consumed"   hasUTxO           &&
+-- mkPolicy oref oref2 _ ctx = traceIfFalse "UTxO not consumed"   hasInputUTxO           &&
 --                           traceIfFalse "wrong amount minted" checkMintedAmount
 --   where
 --     info :: TxInfo
@@ -73,8 +73,8 @@ import  Validators.StakeSimple.Helpers
 --     tn :: TokenName
 --     tn = "PPEPE"
 
---     hasUTxO :: Bool
---     hasUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
+--     hasInputUTxO :: Bool
+--     hasInputUTxO = any (\i -> txInInfoOutRef i == oref) $ txInfoInputs info
 
 --     checkMintedAmount :: Bool
 --     checkMintedAmount = case flattenValue (txInfoMint info) of
@@ -99,7 +99,7 @@ import  Validators.StakeSimple.Helpers
 mkPolicy ::   MintingRedeemer  -> ScriptContext -> Bool
 
 mkPolicy (MintingRedeemer redeemerNFTTokenName redeemerNFTTxOutRef) ctx = 
-    traceIfFalse "Minting NFT Policy: UTxO not consumed"   hasUTxO           &&
+    traceIfFalse "Minting NFT Policy: UTxO not consumed"   hasInputUTxO           &&
     traceIfFalse "Minting NFT Policy: Wrong amount minted" checkMintedAmount &&
     traceIfFalse "Minting NFT Policy: Wrong NFT TokeName" checkTokenName
 
@@ -108,8 +108,8 @@ mkPolicy (MintingRedeemer redeemerNFTTokenName redeemerNFTTxOutRef) ctx =
     info :: TxInfo
     info = scriptContextTxInfo ctx
 
-    hasUTxO :: Bool
-    hasUTxO = any (\i -> txInInfoOutRef i == redeemerNFTTxOutRef) $ txInfoInputs info
+    hasInputUTxO :: Bool
+    hasInputUTxO = any (\i -> txInInfoOutRef i == redeemerNFTTxOutRef) $ txInfoInputs info
 
     checkMintedAmount :: Bool
     checkMintedAmount = case flattenValue (txInfoMint info) of
