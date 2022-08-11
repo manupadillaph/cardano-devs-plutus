@@ -4,7 +4,7 @@
 echo "Nombre Script File:"
 read scriptName
 
-scriptAddr=$(cat $HASKELL_FILES/${scriptName}.addr)
+scriptAddr=$(cat $FALCON_DEVS_HASKELL_FILES/${scriptName}.addr)
 
 echo $scriptAddr
 

@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-addrFile="$HASKELL_FILES/wallets/${walletName}.addr"
-skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
+addrFile="$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addr"
+skeyFile="$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey"
 
 
 # echo "walletTxIn: $walletTxIn"
@@ -17,7 +17,7 @@ walletAddr=$(cat $addrFile)
 token_name=""
 
 scriptPolicyName=""
-until [[ -f "$HASKELL_FILES/mintingpolicies/Signed-${scriptPolicyName}.plutus"  ]]
+until [[ -f "$FALCON_DEVS_HASKELL_FILES/mintingpolicies/Signed-${scriptPolicyName}.plutus"  ]]
 do
 
     printf "\nNombre de archivo de Minting Policy Signed: "
@@ -27,7 +27,7 @@ do
         read scriptPolicyName
     done
 
-    if ! [[ -f "$HASKELL_FILES/mintingpolicies/Signed-${scriptPolicyName}.plutus" ]]
+    if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/mintingpolicies/Signed-${scriptPolicyName}.plutus" ]]
     then
         printf "\nMinting Policiy file Signed-${scriptPolicyName}.plutus no existe\n"
     fi
@@ -37,19 +37,19 @@ do
     if [[ $opcion = "y" ]]; then 
         echo "Signed en base de Pkh: $walletSig"
 
-        #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+        #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
         CWD=$(pwd)
-        cd $HASKELL
+        cd $FALCON_DEVS_HASKELL
 
-        #printf "%s\n%s\n%s\n" "18" "$HASKELL_FILES/mintingpolicies" "Signed-${scriptPolicyName}" "$walletAddr" | cabal exec deploy-smart-contracts-auto
-        printf "%s\n%s\n%s\n" "19" "$HASKELL_FILES/mintingpolicies" "Signed-${scriptPolicyName}" "$walletSig" | cabal exec deploy-smart-contracts-auto
+        #printf "%s\n%s\n%s\n" "18" "$FALCON_DEVS_HASKELL_FILES/mintingpolicies" "Signed-${scriptPolicyName}" "$walletAddr" | cabal exec deploy-smart-contracts-auto
+        printf "%s\n%s\n%s\n" "19" "$FALCON_DEVS_HASKELL_FILES/mintingpolicies" "Signed-${scriptPolicyName}" "$walletSig" | cabal exec deploy-smart-contracts-auto
 
         cd $CWD
     fi
 
 done
 
-policyFile="$HASKELL_FILES/mintingpolicies/Signed-${scriptPolicyName}.plutus"
+policyFile="$FALCON_DEVS_HASKELL_FILES/mintingpolicies/Signed-${scriptPolicyName}.plutus"
 
 printf "\nDesea Mint Signed token ahora (y/n)?\n"
 read -n 1 -s opcion
@@ -67,19 +67,19 @@ if [[ $opcion = "y" ]]; then
         read token_cantidad
     done
 
-    ppFile=$HASKELL_FILES/config/tx/protocol.json
+    ppFile=$FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json
     $CARDANO_NODE/cardano-cli query protocol-parameters \
                     --out-file $ppFile --$TESTNET_MAGIC 
 
 
-    unsignedFile=$HASKELL_FILES/transacciones/Signed.unsigned
-    signedFile=$HASKELL_FILES/transacciones/Signed.signed
+    unsignedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Signed.unsigned
+    signedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Signed.signed
 
     pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
-    #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+    #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
     CWD=$(pwd)
-    cd $HASKELL
+    cd $FALCON_DEVS_HASKELL
 
     tnHex=$(cabal exec utils-token-name -- $token_name)
 
@@ -110,7 +110,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
+            --mint-redeemer-file $FALCON_DEVS_HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \
@@ -126,7 +126,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$addr + $minimoADA lovelace + $v" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
+            --mint-redeemer-file $FALCON_DEVS_HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \

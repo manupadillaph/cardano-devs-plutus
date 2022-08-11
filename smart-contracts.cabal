@@ -60,6 +60,7 @@ library
                      , Validators.Redeemer.PAB
                      , Validators.Redeemer.Test
                      , Validators.Redeemer.Typos
+                     
                      , Validators.StakeSimple
                      , Validators.StakeSimple.OffChain
                      , Validators.StakeSimple.OnChain

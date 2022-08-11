@@ -8,7 +8,7 @@ done
 
 FILE_encontrada=""
 
-for FILE in $HASKELL_FILES/datums/*; 
+for FILE in $FALCON_DEVS_HASKELL_FILES/datums/*; 
 do 
 
     datumHash=$($CARDANO_NODE/cardano-cli transaction hash-script-data --script-data-file "$FILE")

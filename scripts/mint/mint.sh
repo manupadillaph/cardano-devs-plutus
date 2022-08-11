@@ -28,7 +28,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
     read  opcionMenuMint
 
     if [[ $opcionMenuMint = "1" ]]; then 
-        source "$SCRIPTS/main/main_elegir_crear_wallet.sh"    
+        source "$FALCON_DEVS_SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
     if [[ $opcionMenuMint = "2" || $opcionMenuMint = "3" || $opcionMenuMint = "4" || $opcionMenuMint = "5" ]]; 
@@ -45,7 +45,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
             tokensTotal=()
             lovelaceTotal=0
 
-            source "$SCRIPTS/main/main_elegir_utxo_wallet.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_elegir_utxo_wallet.sh"
             
             if [[ $lovelaceTotal = 0 ]]; then
 
@@ -59,7 +59,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 do
                     results="$results\n$($CARDANO_NODE/cardano-cli query utxo\
                     --tx-in $txin --$TESTNET_MAGIC)"
-                done < "$HASKELL_FILES/wallets/${walletName}.utxo"
+                done < "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo"
 
                 echo "$results" | grep -Po "[a-zA-Z0-9]+ +[0-9]+ +[a-zA-Z0-9 \+\.\"]+" | nl 
                     
@@ -67,7 +67,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 echo "Elija cual desea usar para collateral y como parametro de la mint: "
                 read collateralIx
 
-                walletTxIn=$(cat "$HASKELL_FILES/wallets/${walletName}.utxo" | sed -n ${collateralIx}p)
+                walletTxIn=$(cat "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo" | sed -n ${collateralIx}p)
 
                 echo "walletTxIn: "$walletTxIn
                 echo "walletTxInArray: "$walletTxInArray
@@ -87,19 +87,19 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 fi 
 
                 if [[ $opcionMenuMint = "2" ]]; then 
-                    source "$SCRIPTS/mint/mint-token-free.sh" 
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-free.sh" 
                 fi
 
                 if [[ $opcionMenuMint = "3" ]]; then 
-                    source "$SCRIPTS/mint/mint-token-nft.sh"
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-nft.sh"
                 fi
 
                 if [[ $opcionMenuMint = "4" ]]; then 
-                    source "$SCRIPTS/mint/mint-token-plus.sh"
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-plus.sh"
                 fi
 
                 if [[ $opcionMenuMint = "5" ]]; then 
-                    source "$SCRIPTS/mint/mint-token-signed.sh"  
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-signed.sh"  
                 fi
 
             fi

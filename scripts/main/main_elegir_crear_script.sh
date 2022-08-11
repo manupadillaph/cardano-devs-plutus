@@ -2,7 +2,7 @@
 
 
 scriptName=""
-until [[ -f "$HASKELL_FILES/validators/${scriptName}.plutus" && -f "$HASKELL_FILES/validators/${scriptName}.hash"   && -f "$HASKELL_FILES/validators/${scriptName}.addr" ]]
+until [[ -f "$FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.plutus" && -f "$FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.hash"   && -f "$FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.addr" ]]
 do
 
     printf "\nNombre del Script: "
@@ -12,12 +12,12 @@ do
         read scriptName
     done
 
-    if ! [[ -f "$HASKELL_FILES/validators/${scriptName}.plutus" && -f "$HASKELL_FILES/validators/${scriptName}.hash" ]]
+    if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.plutus" && -f "$FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.hash" ]]
     then
         printf "\nValidator script file ${scriptName} no existe\n"
     else
         $CARDANO_NODE/cardano-cli address build  \
-        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --$TESTNET_MAGIC
+        --payment-script-file $FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.plutus --out-file $FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.addr --$TESTNET_MAGIC
     fi
 
     printf "\nDesea crear files .plutus, .hash del validator en haskell (y/n)\nImportante: Necesita tener NODO configurado e iniciado\n"
@@ -76,22 +76,22 @@ do
         #     # scriptNumeroOpcionExportHash=16
         # fi
 
-        #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+        #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
         CWD=$(pwd)
-        cd $HASKELL
+        cd $FALCON_DEVS_HASKELL
         
-        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportCBOR" "$HASKELL_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
-        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportHash" "$HASKELL_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
+        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportCBOR" "$FALCON_DEVS_HASKELL_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
+        printf "%s\n%s\n%s\n" "$scriptNumeroOpcionExportHash" "$FALCON_DEVS_HASKELL_FILES/validators" "$scriptName" | cabal exec deploy-smart-contracts-auto 
         
         cd $CWD
 
         $CARDANO_NODE/cardano-cli address build  \
-        --payment-script-file $HASKELL_FILES/validators/${scriptName}.plutus --out-file $HASKELL_FILES/validators/${scriptName}.addr --$TESTNET_MAGIC
+        --payment-script-file $FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.plutus --out-file $FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.addr --$TESTNET_MAGIC
 
     fi
 
 done
 
-scriptAddr=$(cat $HASKELL_FILES/validators/${scriptName}.addr)
+scriptAddr=$(cat $FALCON_DEVS_HASKELL_FILES/validators/${scriptName}.addr)
 
 echo "Script Address:" $scriptAddr

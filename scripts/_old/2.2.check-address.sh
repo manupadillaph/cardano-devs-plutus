@@ -3,7 +3,7 @@
 echo "Nombre Wallet:"
 read walletName
 
-walletAddr=$(cat $HASKELL_FILES/${walletName}.addr)
+walletAddr=$(cat $FALCON_DEVS_HASKELL_FILES/${walletName}.addr)
 
 echo $walletAddr
 

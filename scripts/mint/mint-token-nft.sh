@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-addrFile="$HASKELL_FILES/wallets/${walletName}.addr"
-skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
+addrFile="$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addr"
+skeyFile="$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey"
 
 
 # echo "walletTxIn: $walletTxIn"
@@ -15,7 +15,7 @@ skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
 token_name=""
 
 scriptPolicyName=""
-until [[ -f "$HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"  ]]
+until [[ -f "$FALCON_DEVS_HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"  ]]
 do
 
     printf "\nNombre de archivo de Minting Policy NFT: "
@@ -25,7 +25,7 @@ do
         read scriptPolicyName
     done
 
-    if ! [[ -f "$HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus" ]]
+    if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus" ]]
     then
         printf "\nMinting Policiy file NFT-${scriptPolicyName}.plutus no existe\n"
     fi
@@ -40,19 +40,19 @@ do
             read token_name
         done
 
-        #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+        #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
         CWD=$(pwd)
-        cd $HASKELL
+        cd $FALCON_DEVS_HASKELL
 
         echo "NFT en base de: $walletTxIn con el Token Name: $token_name"
-        printf "%s\n%s\n%s\n" "16" "$HASKELL_FILES/mintingpolicies" "NFT-${scriptPolicyName}" "$walletTxIn" "$token_name" | cabal exec deploy-smart-contracts-auto
+        printf "%s\n%s\n%s\n" "16" "$FALCON_DEVS_HASKELL_FILES/mintingpolicies" "NFT-${scriptPolicyName}" "$walletTxIn" "$token_name" | cabal exec deploy-smart-contracts-auto
 
         cd $CWD
     fi
 
 done
 
-policyFile="$HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"
+policyFile="$FALCON_DEVS_HASKELL_FILES/mintingpolicies/NFT-${scriptPolicyName}.plutus"
 
 printf "\nDesea Mint NFT token ahora (y/n)?\n"
 read -n 1 -s opcion
@@ -73,13 +73,13 @@ if [[ $opcion = "y" ]]; then
         read token_cantidad
     done
 
-    ppFile=$HASKELL_FILES/config/tx/protocol.json
+    ppFile=$FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json
     $CARDANO_NODE/cardano-cli query protocol-parameters \
                     --out-file $ppFile --$TESTNET_MAGIC 
 
 
-    unsignedFile=$HASKELL_FILES/transacciones/NFT.unsigned
-    signedFile=$HASKELL_FILES/transacciones/NFT.signed
+    unsignedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/NFT.unsigned
+    signedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/NFT.signed
 
     pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
@@ -110,7 +110,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
+            --mint-redeemer-file $FALCON_DEVS_HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \
@@ -126,7 +126,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$addr + $minimoADA lovelace + $v" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
+            --mint-redeemer-file $FALCON_DEVS_HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \

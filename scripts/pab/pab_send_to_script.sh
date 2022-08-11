@@ -1,11 +1,11 @@
 #!/bin/bash
 
-WALLET_ID=$(cat $HASKELL_FILES/wallets/$walletName.id)
+WALLET_ID=$(cat $FALCON_DEVS_HASKELL_FILES/wallets/$walletName.id)
 echo "WALLET ID:" $WALLET_ID
 
-#Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+#Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
 CWD=$(pwd)
-cd $HASKELL
+cd $FALCON_DEVS_HASKELL
 
 pkh=$(cabal exec utils-payment-key-hash -- $walletAddr)
 skh=$(cabal exec utils-stake-key-hash -- $walletAddr)

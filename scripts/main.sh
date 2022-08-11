@@ -67,11 +67,11 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
     read opcionMenuPrincipal
 
     if [[ $opcionMenuPrincipal = "1" ]]; then 
-        source "$SCRIPTS/main/main_elegir_crear_wallet.sh"    
+        source "$FALCON_DEVS_SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
     if [[ $opcionMenuPrincipal = "2" ]]; then 
-        source "$SCRIPTS/main/main_elegir_crear_script.sh"
+        source "$FALCON_DEVS_SCRIPTS/main/main_elegir_crear_script.sh"
     fi
 
     if [[ $opcionMenuPrincipal = "31" ]]; then 
@@ -79,7 +79,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_send_to_wallet.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_send_to_wallet.sh"
         fi
     fi
 
@@ -88,7 +88,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet y script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_send_to_script.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_send_to_script.sh"
         fi
     fi
 
@@ -98,7 +98,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet y script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_redeem_from_script.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_redeem_from_script.sh"
         fi 
     fi  
     
@@ -107,7 +107,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_ver_utxo_wallet.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_ver_utxo_wallet.sh"
         fi
     fi  
 
@@ -116,7 +116,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_ver_utxo_wallet_all.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_ver_utxo_wallet_all.sh"
         fi
 
     fi  
@@ -126,7 +126,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_elegir_addr_wallet.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_elegir_addr_wallet.sh"
         fi
     fi  
 
@@ -135,7 +135,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir script primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_ver_utxo_script.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_ver_utxo_script.sh"
         fi
     fi  
 
@@ -145,7 +145,7 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_ver_balance_wallet.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_ver_balance_wallet.sh"
         fi
     fi
 
@@ -154,36 +154,36 @@ while ! [[ $opcionMenuPrincipal = "0" ]]; do
              printf "\nDebe elegir script primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/main/main_ver_balance_script.sh"
+            source "$FALCON_DEVS_SCRIPTS/main/main_ver_balance_script.sh"
         fi
     fi
 
 
     if [[ $opcionMenuPrincipal = "61" ]]; then 
         
-        source "$SCRIPTS/main/main_datum_calcular_hash.sh"
+        source "$FALCON_DEVS_SCRIPTS/main/main_datum_calcular_hash.sh"
         
     fi  
 
     if [[ $opcionMenuPrincipal = "62" ]]; then 
         
-        source "$SCRIPTS/main/main_datum_buscar_hash.sh"
+        source "$FALCON_DEVS_SCRIPTS/main/main_datum_buscar_hash.sh"
 
     fi
 
     if [[ $opcionMenuPrincipal = "7"    ]]; then 
-        source "$SCRIPTS/mint/mint.sh"
+        source "$FALCON_DEVS_SCRIPTS/mint/mint.sh"
         opcionMenuPrincipal=""
     fi
 
     
     if [[ $opcionMenuPrincipal = "8" ]]; then 
-        source "$SCRIPTS/pab/pab.sh"  
+        source "$FALCON_DEVS_SCRIPTS/pab/pab.sh"  
         opcionMenuPrincipal=""
     fi
 
     if [[ $opcionMenuPrincipal = "9"    ]]; then 
-        source "$SCRIPTS/tools/tools.sh"
+        source "$FALCON_DEVS_SCRIPTS/tools/tools.sh"
         opcionMenuPrincipal=""
     fi
 

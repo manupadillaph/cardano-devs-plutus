@@ -1,18 +1,18 @@
 #!/bin/bash
 
 
-#walletTxIn=$(cat $HASKELL_FILES/wallets/${walletName}.utxo)
+#walletTxIn=$(cat $FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo)
 
 #printf "\nUltima dirección utilizada: %s" $walletTxIn
 
 printf "\nUltimas direcciones utilizadas:\n"
 
-if [[ -f "$HASKELL_FILES/wallets/${walletName}.utxo"  ]]
+if [[ -f "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo"  ]]
 then
     while IFS= read -r line
     do
         echo "$line"
-    done < "$HASKELL_FILES/wallets/${walletName}.utxo"
+    done < "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo"
 fi
 
 printf "\nDesea elegir otras (y/n)?\n"
@@ -60,10 +60,10 @@ if [[ $opcion = "y" ]]; then
                         echo "Agregando:" $TxHash#$TxIx
 
                         if [ $swPrimero = 1 ]; then
-                            echo $TxHash#$TxIx>$HASKELL_FILES/wallets/${walletName}.utxo
+                            echo $TxHash#$TxIx>$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo
                             swPrimero=0
                         else
-                            echo $TxHash#$TxIx>>$HASKELL_FILES/wallets/${walletName}.utxo
+                            echo $TxHash#$TxIx>>$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo
                         fi
 
                     fi
@@ -75,19 +75,19 @@ if [[ $opcion = "y" ]]; then
 
     done
 
-    #walletTxIn=$(cat $HASKELL_FILES/wallets/${walletName}.utxo)
+    #walletTxIn=$(cat $FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo)
 
 fi
 
 echo ""
 
-#read -r walletTxIn  < $HASKELL_FILES/wallets/${walletName}.utxo
+#read -r walletTxIn  < $FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo
 
 walletTxInArray=""
 
 echo "Tx Elegidas:" 
 
-if [[ -f "$HASKELL_FILES/wallets/${walletName}.utxo"  ]]
+if [[ -f "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo"  ]]
 then
 
     while IFS= read -r txin
@@ -176,7 +176,7 @@ then
             # fi
         fi
 
-    done < "$HASKELL_FILES/wallets/${walletName}.utxo"
+    done < "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.utxo"
 
 fi
 

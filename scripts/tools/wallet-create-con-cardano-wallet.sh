@@ -27,7 +27,7 @@ fi
 # echo "file:"
 # read file
 
-echo "creating wallet with name $name passphrase $passphrase in $HASKELL_FILES/wallets/$file.json "
+echo "creating wallet with name $name passphrase $passphrase in $FALCON_DEVS_HASKELL_FILES/wallets/$file.json "
 
 phrase=$($CARDANO_WALLET/cardano-wallet recovery-phrase generate)
 
@@ -39,7 +39,7 @@ do
     sep=', '
 done
 
-cat > $HASKELL_FILES/wallets/$file.json <<- EOM
+cat > $FALCON_DEVS_HASKELL_FILES/wallets/$file.json <<- EOM
 { "name": "$name"
 , "mnemonic_sentence": [$x]
 , "passphrase": "$passphrase"
@@ -48,4 +48,4 @@ EOM
 echo "saved restoration file to $file.json"
 
 
-bash $SCRIPTS/tools/wallet-create-con-cardano-wallet-desde-json.sh $file
+bash $FALCON_DEVS_SCRIPTS/tools/wallet-create-con-cardano-wallet-desde-json.sh $file

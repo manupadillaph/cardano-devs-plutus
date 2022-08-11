@@ -9,7 +9,7 @@ tokens=()
 tokensTotal=()
 lovelaceTotal=0
 
-source "$SCRIPTS/main/main_elegir_utxo_wallet.sh"
+source "$FALCON_DEVS_SCRIPTS/main/main_elegir_utxo_wallet.sh"
 
 if [[ $lovelaceTotal = 0 ]]; then
 
@@ -59,7 +59,7 @@ else
     printf "\nwalletTxOutArrayForChangeOfTokens:\n"
     echo $walletTxOutArrayForChangeOfTokens
 
-    source "$SCRIPTS/main/main_datum_elegir_crear.sh"
+    source "$FALCON_DEVS_SCRIPTS/main/main_datum_elegir_crear.sh"
 
     
     printf "\n\nRealizando Transferencia...\n\n"
@@ -71,8 +71,8 @@ else
             --change-address $walletAddr \
             $walletTxInArray \
             --tx-out "$scriptTxOutMultiAssets" \
-            --tx-out-datum-hash-file $HASKELL_FILES/datums/$datumFile.json \
-            --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
+            --tx-out-datum-hash-file $FALCON_DEVS_HASKELL_FILES/datums/$datumFile.json \
+            --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body 
     else
 
         $CARDANO_NODE/cardano-cli transaction build \
@@ -81,24 +81,24 @@ else
             --change-address $walletAddr \
             $walletTxInArray \
             --tx-out "$scriptTxOutMultiAssets" \
-            --tx-out-datum-hash-file $HASKELL_FILES/datums/$datumFile.json \
+            --tx-out-datum-hash-file $FALCON_DEVS_HASKELL_FILES/datums/$datumFile.json \
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
-            --out-file $HASKELL_FILES/transacciones/${scriptName}.body 
+            --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body 
     fi
 
     if [ "$?" == "0" ]; then
 
         $CARDANO_NODE/cardano-cli transaction sign \
-            --tx-body-file $HASKELL_FILES/transacciones/${scriptName}.body \
-            --signing-key-file $HASKELL_FILES/wallets/${walletName}.skey \
+            --tx-body-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body \
+            --signing-key-file $FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey \
             --$TESTNET_MAGIC \
-            --out-file $HASKELL_FILES/transacciones/${scriptName}.signed
+            --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.signed
 
         if [ "$?" == "0" ]; then
 
             $CARDANO_NODE/cardano-cli transaction submit \
                 --$TESTNET_MAGIC \
-                --tx-file $HASKELL_FILES/transacciones/${scriptName}.signed
+                --tx-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.signed
 
             if [ "$?" == "0" ]; then
                  printf "\nTransferencia Realidada!\n"

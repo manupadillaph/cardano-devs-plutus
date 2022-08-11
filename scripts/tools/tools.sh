@@ -59,7 +59,7 @@ while ! [[ $opcionMenuTools = "0" ]]; do
     echo "7: Exportar variables ENV"
 
     echo "Para set env en esta sesion ejecute en promt:"
-    echo "source \"$SCRIPTS/tools/write-env-list.sh\""
+    echo "source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list.sh\""
 
     echo "--"
 

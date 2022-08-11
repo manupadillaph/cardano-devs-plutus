@@ -36,9 +36,9 @@ echo "--Database: "$CARDANO_PAB_DATABASE
 
 
 
-#Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+#Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
 CWD=$(pwd)
-cd $HASKELL
+cd $FALCON_DEVS_HASKELL
 
 
 printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $CARDANO_PAB_SERVER_CONFIG  migrate

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.addrs"  ]]
+if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addrs"  ]]
 then
     printf "\nNo existe el archivo addrs. Debe cargar una wallet en el wallet server. Necesita archivo JSON.\n"
 
@@ -17,7 +17,7 @@ else
 
     if [[ $opcion = "y" ]]; then 
 
-        result=$(cat "$HASKELL_FILES/wallets/${walletName}.addrs")
+        result=$(cat "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addrs")
 
         echo "$result" | nl
 
@@ -27,9 +27,9 @@ else
             read walletNroAddr
         done
         
-        echo "$result" | sed -n ${walletNroAddr}p>$HASKELL_FILES/wallets/${walletName}.addr
+        echo "$result" | sed -n ${walletNroAddr}p>$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addr
 
-        walletAddr=$(cat $HASKELL_FILES/wallets/${walletName}.addr)
+        walletAddr=$(cat $FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addr)
 
         echo ""
         echo "Wallet Address Nueva:" $walletAddr

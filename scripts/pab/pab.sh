@@ -31,11 +31,11 @@ while ! [[ $opcionMenuPab = "0" ]]; do
     read  opcionMenuPab
 
     if [[ $opcionMenuPab = "1" ]]; then 
-        source "$SCRIPTS/main/main_elegir_crear_wallet.sh"    
+        source "$FALCON_DEVS_SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
     if [[ $opcionMenuPab = "2" ]]; then 
-        source "$SCRIPTS/pab/pab_elegir_validador.sh"
+        source "$FALCON_DEVS_SCRIPTS/pab/pab_elegir_validador.sh"
     fi
 
     if [[ $opcionMenuPab = "3" ]]; then 
@@ -43,7 +43,7 @@ while ! [[ $opcionMenuPab = "0" ]]; do
             printf "\nDebe elegir validador\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/pab/pab_init_database.sh"
+            source "$FALCON_DEVS_SCRIPTS/pab/pab_init_database.sh"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         fi
     fi
@@ -53,12 +53,12 @@ while ! [[ $opcionMenuPab = "0" ]]; do
              printf "\nDebe elegir wallet y validador primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            if ! [[ -f "$HASKELL_FILES/wallets/${walletName}.json" && -f "$HASKELL_FILES/wallets/${walletName}.id"  ]]
+            if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.json" && -f "$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.id"  ]]
             then
                 printf "\nWallet ${walletName} JSON o id files no existen. No se pueden inicicar los servicios de PAB con esta wallet.\n"
                 echo; read -rsn1 -p "Press any key to continue . . ."; echo
             else
-                source "$SCRIPTS/pab/pab_init_server.sh"
+                source "$FALCON_DEVS_SCRIPTS/pab/pab_init_server.sh"
             fi
         fi
     fi
@@ -68,7 +68,7 @@ while ! [[ $opcionMenuPab = "0" ]]; do
              printf "\nDebe elegir wallet y validador primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/pab/pab_send_to_cript.sh"
+            source "$FALCON_DEVS_SCRIPTS/pab/pab_send_to_cript.sh"
         fi
     fi
 
@@ -78,7 +78,7 @@ while ! [[ $opcionMenuPab = "0" ]]; do
              printf "\nDebe elegir wallet y validador primero\n"
              echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-            source "$SCRIPTS/pab/pab-redeem_from_script.sh"
+            source "$FALCON_DEVS_SCRIPTS/pab/pab-redeem_from_script.sh"
         fi 
     fi  
 

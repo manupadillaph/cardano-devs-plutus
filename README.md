@@ -289,7 +289,7 @@ CARDANO_WALLET=\~/source/tools/cardano-wallet-v2022-05-27-linux64
 export CARDANO_WALLET  
 SCRIPTS=\~/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-scripts/scripts
 export SCRIPTS
-NIX_SHELL=\$SCRIPTS/init-nix-shell.sh  
+NIX_SHELL=\$FALCON_DEVS_SCRIPTS/init-nix-shell.sh  
 export NIX_SHELL  
 
 - TESTNET_MAGIC viene del archivo testnet-shelley-genesis.json (leer CARDANO NODO)  
@@ -311,8 +311,8 @@ nix-shell
 Arreglar problemas de permisos:  
 
 > cd directorio_con_problemas  
-> bash $SCRIPTS/fix-permisos.sh  
-> bash $SCRIPTS/fix-permisos-cabal.sh
+> bash $FALCON_DEVS_SCRIPTS/fix-permisos.sh  
+> bash $FALCON_DEVS_SCRIPTS/fix-permisos-cabal.sh
 
 -------------------------------------------  
 
@@ -357,7 +357,7 @@ Y lo seteo en la variable de entorno \$TESTNET_MAGIC
 -------------------------------------------   
 **Iniciar nodo**:  
 
-> bash $SCRIPTS/init-cardano-node.sh  
+> bash $FALCON_DEVS_SCRIPTS/init-cardano-node.sh  
 
 init-cardano-node.sh:  
 > $CARDANO_NODE/cardano-node run \  
@@ -373,7 +373,7 @@ El nodo corre en el puerto: `3001`
 -------------------------------------------   
 **Chekear nodo**:  
 
-> bash $SCRIPTS/check-cardano-node.sh  
+> bash $FALCON_DEVS_SCRIPTS/check-cardano-node.sh  
 
 check-cardano-node.sh:  
 >	$CARDANO_NODE/cardano-cli \  
@@ -405,7 +405,7 @@ $CARDANO_WALLET/
 
 Debe estar corriendo el nodo primero.  
 
-> bash $SCRIPTS/init-cardano-wallet-server.sh  
+> bash $FALCON_DEVS_SCRIPTS/init-cardano-wallet-server.sh  
 
 init-cardano-wallet-server.sh:  
 > $CARDANO_WALLET/cardano-wallet serve \  
@@ -421,7 +421,7 @@ Crear carpeta para almacenar wallets:
 -------------------------------------------   
 
 **Crear wallet**  
-> bash $SCRIPTS/create-wallet.sh  
+> bash $FALCON_DEVS_SCRIPTS/create-wallet.sh  
 
 create-wallet.sh:  
 > \$CARDANO_WALLET/cardano-wallet recovery-phrase generate  
@@ -439,7 +439,7 @@ Creará un archivo json
 ------------------------------------------- 
 
 **Load the wallet and Inspect**:  
-> bash $SCRIPTS/load-and-check-wallet.sh  
+> bash $FALCON_DEVS_SCRIPTS/load-and-check-wallet.sh  
 
 A partir del archivo json se crea el id de la wallet, los archivos .prv y .pub que luego son transformados en .skey (PRIVATE KEY - SIGNING KEY) y .vkey (PUBLIC KEY - PAYMENT VERIFICATION KEY), del cual obtengo el PAYMENT VERIFICATION KEY HASH .pkh  
 También genera el archivo .addr con la primera dirección de la WALLET  
@@ -527,7 +527,7 @@ Ej: /home/manuelpadilla/source/tools/cardano-node-1.34.1-linux/db/node.socket
 -------------------------------------------  
 
 Start server:  
-> [NIX-SHELL]> bash $SCRIPTS/init-chain-index-server.sh  
+> [NIX-SHELL]> bash $FALCON_DEVS_SCRIPTS/init-chain-index-server.sh  
 
 init-chain-index-server.sh:  
 > #en [NIX-SHELL], para abrir ejecutar antes: bash $NIX_SHELL   
@@ -583,14 +583,14 @@ El PAB backend server corre en el puerto: `9080`
 *******************************************   
 
 Iniciar server:  
-> [NIX-SHELL]>  bash $SCRIPTS/init-playground-server.sh  
+> [NIX-SHELL]>  bash $FALCON_DEVS_SCRIPTS/init-playground-server.sh  
 
 init-playground.sh:  
 > [NIX-SHELL]> cd $PLUTUS_APPS/plutus-playground-client/  
 > [NIX-SHELL]> plutus-playground-server -i 120s  
 
 En otra consola, inicio cliente:  
-> [NIX-SHELL]>  bash $SCRIPTS/init-playground-client.sh  
+> [NIX-SHELL]>  bash $FALCON_DEVS_SCRIPTS/init-playground-client.sh  
 
 init-playground-client.sh:  
 > [NIX-SHELL]> cd $PLUTUS_APPS/plutus-playground-client  
@@ -625,7 +625,7 @@ https://github.com/dynamicstrategies/cardano-wallet-connector
 *******************************************     
 
 Iniciar:  
-> [NIX-SHELL]>  bash $SCRIPTS/init-plutus-docs.sh  
+> [NIX-SHELL]>  bash $FALCON_DEVS_SCRIPTS/init-plutus-docs.sh  
 
 init-plutus-docs.sh:  
 > [NIX-SHELL]> cd $PLUTUS_APPS  
@@ -747,7 +747,7 @@ https://www.epochconverter.com/
 
 Error con permisos:  
 > cd directorio_a_revisar  
-> bash $SCRIPTS/fix-permisos.sh  
+> bash $FALCON_DEVS_SCRIPTS/fix-permisos.sh  
 
 fix-permisos.sh:  
 > sudo chown manuelpadilla -R .  
@@ -759,7 +759,7 @@ sudo find . -type f -exec chmod +x {} \;
 
 Error en cabal build con permisos:  
 > cd directorio_a_revisar  
-> bash $SCRIPTS/fix-permisos-cabal.sh  
+> bash $FALCON_DEVS_SCRIPTS/fix-permisos-cabal.sh  
 
 fix-permisos-cabal.sh:  
 > sudo chown -hR manuelpadilla .

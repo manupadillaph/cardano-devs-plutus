@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-addrFile="$HASKELL_FILES/wallets/${walletName}.addr"
-skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
+addrFile="$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.addr"
+skeyFile="$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey"
 
 
 # echo "walletTxIn: $walletTxIn"
@@ -15,7 +15,7 @@ skeyFile="$HASKELL_FILES/wallets/${walletName}.skey"
 token_name=""
 
 scriptPolicyName=""
-until [[ -f "$HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"  ]]
+until [[ -f "$FALCON_DEVS_HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"  ]]
 do
 
     printf "\nNombre de archivo de Minting Policy Plus: "
@@ -25,7 +25,7 @@ do
         read scriptPolicyName
     done
 
-    if ! [[ -f "$HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus" ]]
+    if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus" ]]
     then
         printf "\nMinting Policiy file Plus-${scriptPolicyName}.plutus no existe\n"
     fi
@@ -48,11 +48,11 @@ do
 
         echo "Plus en base de: $walletTxIn con el Token Name: $token_name y cantidad máxima: $token_cantidad"
         
-        #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+        #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
         CWD=$(pwd)
-        cd $HASKELL
+        cd $FALCON_DEVS_HASKELL
 
-        printf "%s\n%s\n%s\n" "17" "$HASKELL_FILES/mintingpolicies" "Plus-${scriptPolicyName}" "$walletTxIn" "$token_name" "$token_cantidad" | cabal exec deploy-smart-contracts-auto
+        printf "%s\n%s\n%s\n" "17" "$FALCON_DEVS_HASKELL_FILES/mintingpolicies" "Plus-${scriptPolicyName}" "$walletTxIn" "$token_name" "$token_cantidad" | cabal exec deploy-smart-contracts-auto
 
         cd $CWD
         
@@ -60,7 +60,7 @@ do
 
 done
 
-policyFile="$HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"
+policyFile="$FALCON_DEVS_HASKELL_FILES/mintingpolicies/Plus-${scriptPolicyName}.plutus"
 
 printf "\nDesea Mint Plus token ahora (y/n)?\n"
 read -n 1 -s opcion
@@ -81,19 +81,19 @@ if [[ $opcion = "y" ]]; then
         read token_cantidad
     done
 
-    ppFile=$HASKELL_FILES/config/tx/protocol.json
+    ppFile=$FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json
     $CARDANO_NODE/cardano-cli query protocol-parameters \
                     --out-file $ppFile --$TESTNET_MAGIC 
 
 
-    unsignedFile=$HASKELL_FILES/transacciones/Plus.unsigned
-    signedFile=$HASKELL_FILES/transacciones/Plus.signed
+    unsignedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Plus.unsigned
+    signedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Plus.signed
 
     pid=$(cardano-cli transaction policyid --script-file $policyFile)
 
-    #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+    #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
     CWD=$(pwd)
-    cd $HASKELL
+    cd $FALCON_DEVS_HASKELL
 
     tnHex=$(cabal exec utils-token-name -- $token_name)
 
@@ -124,7 +124,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
+            --mint-redeemer-file $FALCON_DEVS_HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \
@@ -140,7 +140,7 @@ if [[ $opcion = "y" ]]; then
             --tx-out "$addr + $minimoADA lovelace + $v" \
             --mint "$v" \
             --mint-script-file $policyFile \
-            --mint-redeemer-file $HASKELL_FILES/redeemers/unit.json \
+            --mint-redeemer-file $FALCON_DEVS_HASKELL_FILES/redeemers/unit.json \
             --change-address $addr \
             --required-signer-hash $walletSig \
             --required-signer=$skeyFile  \

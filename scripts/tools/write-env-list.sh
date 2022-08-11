@@ -6,61 +6,69 @@ export SOURCE
 PLUTUS_APPS=$SOURCE/tools/plutus-apps
 export PLUTUS_APPS
 
-FALCON_DEVS=$SOURCE/repos/Falcon-Devs
+
+
+FALCON_DEVS=$SOURCE/copyRepos/Falcon-Devs
 export FALCON_DEVS
 
-HASKELL=$FALCON_DEVS/cardano-falcon-stakepol-devs-haskell
-export HASKELL
+FALCON_DEVS_HASKELL=$FALCON_DEVS/cardano-falcon-stakepol-devs-haskell
+export FALCON_DEVS_HASKELL
 
-FRONTEND=$FALCON_DEVS/cardano-falcon-stakepol-devs-reactjs-server-frontend
-export FRONTEND
+FALCON_DEVS_FRONTEND=$FALCON_DEVS/cardano-falcon-stakepol-devs-reactjs-server-frontend
+export FALCON_DEVS_FRONTEND
 
-BACKEND=$FALCON_DEVS/cardano-falcon-stakepol-devs-nodejs-server-backend
-export BACKEND
+FALCON_DEVS_BACKEND=$FALCON_DEVS/cardano-falcon-stakepol-devs-nodejs-server-backend
+export FALCON_DEVS_BACKEND
 
-SCRIPTS=$HASKELL/scripts
-export SCRIPTS
+FALCON_DEVS_SCRIPTS=$FALCON_DEVS_HASKELL/scripts
+export FALCON_DEVS_SCRIPTS
 
-HASKELL_FILES=$HASKELL/files
-export HASKELL_FILES
+FALCON_DEVS_HASKELL_FILES=$FALCON_DEVS_HASKELL/files
+export FALCON_DEVS_HASKELL_FILES
 
-HASKELL_FILES_CONFIG=$HASKELL/files/config
-export HASKELL_FILES_CONFIG
+FALCON_DEVS_HASKELL_FILES_CONFIG=$FALCON_DEVS_HASKELL/files/config
+export FALCON_DEVS_HASKELL_FILES_CONFIG
 
-MAIN=$HASKELL/scripts/main.sh
-export MAIN
 
-NIX_SHELL=$SCRIPTS/tools/init-nix-shell.sh
+
+MAIN1=$FALCON_DEVS_SCRIPTS/main.sh
+export MAIN1
+
+
+
+NIX_SHELL=$FALCON_DEVS_SCRIPTS/tools/init-nix-shell.sh
 export NIX_SHELL
 
-FIX_PERMISOS=$SCRIPTS/tools/fix-permisos.sh
+FIX_PERMISOS=$FALCON_DEVS_SCRIPTS/tools/fix-permisos.sh
 export FIX_PERMISOS
 
-INIT_NODE=$SCRIPTS/tools/init-cardano-node.sh
+
+
+INIT_NODE=$FALCON_DEVS_SCRIPTS/tools/init-cardano-node.sh
 export INIT_NODE
 
-CHECK_NODE=$SCRIPTS/tools/cardano-node-check.sh
+CHECK_NODE=$FALCON_DEVS_SCRIPTS/tools/cardano-node-check.sh
 export CHECK_NODE
 
-INIT_WALLET=$SCRIPTS/tools/init-cardano-wallet-server.sh
+INIT_WALLET=$FALCON_DEVS_SCRIPTS/tools/init-cardano-wallet-server.sh
 export INIT_WALLET
 
-INIT_CHAIN=$SCRIPTS/tools/init-chain-index-server.sh
+INIT_CHAIN=$FALCON_DEVS_SCRIPTS/tools/init-chain-index-server.sh
 export INIT_CHAIN
 
-INIT_PLAY_SERVER=$SCRIPTS/tools/init-playground-server.sh
+INIT_PLAY_SERVER=$FALCON_DEVS_SCRIPTS/tools/init-playground-server.sh
 export INIT_PLAY_SERVER
 
-INIT_PLAY_CLIENT=$SCRIPTS/tools/init-playground-client.sh
+INIT_PLAY_CLIENT=$FALCON_DEVS_SCRIPTS/tools/init-playground-client.sh
 export INIT_PLAY_CLIENT
 
-INIT_DOCS=$SCRIPTS/tools/init-plutus-docs.sh
+INIT_DOCS=$FALCON_DEVS_SCRIPTS/tools/init-plutus-docs.sh
 export INIT_DOCS
 
-WRITE_ENV=$SCRIPTS/tools/write-env.sh
+WRITE_ENV=$FALCON_DEVS_SCRIPTS/tools/write-env.sh
 export WRITE_ENV
 
-BACK2CWD=$SCRIPTS/tools/cd-back-to-cwd.sh
+BACK2CWD=$FALCON_DEVS_SCRIPTS/tools/cd-back-to-cwd.sh
 export BACK2CWD
 
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.0-linux2
@@ -79,37 +87,37 @@ export CARDANO_NODE_DB_PATH
 CARDANO_NODE_SOCKET_PATH=$CARDANO_NODE/db/node.socket
 export CARDANO_NODE_SOCKET_PATH
 
-CARDANO_TESNET_CONFIG=$HASKELL_FILES_CONFIG/cardano-node/testnet-config.json
+CARDANO_TESNET_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-config.json
 export CARDANO_TESNET_CONFIG
 
-CARDANO_TESNET_TOPOLOGY=$HASKELL_FILES_CONFIG/cardano-node/testnet-topology.json
+CARDANO_TESNET_TOPOLOGY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-topology.json
 export CARDANO_TESNET_TOPOLOGY
 
-CARDANO_TESNET_SHELLEY=$HASKELL_FILES_CONFIG/cardano-node/testnet-shelley-genesis.json
+CARDANO_TESNET_SHELLEY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-shelley-genesis.json
 export CARDANO_TESNET_SHELLEY
 
-CARDANO_TESNET_BYRON=$HASKELL_FILES_CONFIG/cardano-node/testnet-byron-genesis.json
+CARDANO_TESNET_BYRON=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-byron-genesis.json
 export CARDANO_TESNET_BYRON
 
 CARDANO_WALLET=$SOURCE/tools/cardano-wallet-v2022-07-01-linux64
 export CARDANO_WALLET
 
-CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG=$HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config.TEMPLATE.json
+CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config.TEMPLATE.json
 export CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG
 
-CARDANO_CHAIN_INDEX_CONFIG=$HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config.json
+CARDANO_CHAIN_INDEX_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config.json
 export CARDANO_CHAIN_INDEX_CONFIG
 
 CARDANO_CHAIN_INDEX_DB=$SOURCE/tools/cardano-chain-index/chain-index.db
 export CARDANO_CHAIN_INDEX_DB
 
-CARDANO_PAB_SERVER_TEMPLATE_CONFIG=$HASKELL_FILES/config/pab/pab-config.TEMPLATE.yml
+CARDANO_PAB_SERVER_TEMPLATE_CONFIG=$FALCON_DEVS_HASKELL_FILES/config/pab/pab-config.TEMPLATE.yml
 export CARDANO_PAB_SERVER_TEMPLATE_CONFIG
 
-CARDANO_PAB_SERVER_CONFIG=$HASKELL_FILES/config/pab/pab-config.VALIDATOR_SCRIPT_NAME.yml
+CARDANO_PAB_SERVER_CONFIG=$FALCON_DEVS_HASKELL_FILES/config/pab/pab-config.VALIDATOR_SCRIPT_NAME.yml
 export CARDANO_PAB_SERVER_CONFIG
 
-CARDANO_PAB_DATABASE=$HASKELL_FILES/pab/plutus-pab.VALIDATOR_SCRIPT_NAME.db
+CARDANO_PAB_DATABASE=$FALCON_DEVS_HASKELL_FILES/pab/plutus-pab.VALIDATOR_SCRIPT_NAME.db
 export CARDANO_PAB_DATABASE
 
 USUARIO=manuelpadilla

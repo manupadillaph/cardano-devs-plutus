@@ -8,13 +8,13 @@ CARDANO_PAB_DATABASE="${CARDANO_PAB_DATABASE/VALIDATOR_SCRIPT_NAME/"$scriptName"
 if ! [[ -f "$CARDANO_PAB_DATABASE" && -f "$CARDANO_PAB_SERVER_CONFIG" ]]
 then
     printf "\nDatabase $CARDANO_PAB_DATABASE o Config $CARDANO_PAB_SERVER_CONFIG no existen, creandolos...\n"
-    source "$SCRIPTS/pab/pab_init_database.sh"
+    source "$FALCON_DEVS_SCRIPTS/pab/pab_init_database.sh"
  
 fi
 
 printf "\nIniciando Pab con:\n"
 
-WALLET_ID=$(cat $HASKELL_FILES/wallets/$walletName.id)
+WALLET_ID=$(cat $FALCON_DEVS_HASKELL_FILES/wallets/$walletName.id)
 echo "WALLET ID:" $WALLET_ID
 echo "Passphrase:" $walletPassphrase
 echo " "
@@ -24,9 +24,9 @@ echo "--Database: "$CARDANO_PAB_DATABASE
 
 echo " "
 
-#Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+#Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
 CWD=$(pwd)
-cd $HASKELL
+cd $FALCON_DEVS_HASKELL
 
 printf "%s\n" "$scriptNumero"  | cabal exec -- pab-api-server-auto --config $CARDANO_PAB_SERVER_CONFIG webserver --passphrase $walletPassphrase
 

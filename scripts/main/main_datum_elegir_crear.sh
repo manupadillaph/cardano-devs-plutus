@@ -4,7 +4,7 @@ printf "\nDatum: \n"
 
 datumFile=""
 
-until [[ -f "$HASKELL_FILES/datums/$datumFile.json"  ]]
+until [[ -f "$FALCON_DEVS_HASKELL_FILES/datums/$datumFile.json"  ]]
 do
 
     printf "\nIngrese nombre del archivo Datum (DEF): "
@@ -13,7 +13,7 @@ do
         datumFile="DEF"
     fi
     
-    if ! [[ -f "$HASKELL_FILES/datums/$datumFile.json"  ]]
+    if ! [[ -f "$FALCON_DEVS_HASKELL_FILES/datums/$datumFile.json"  ]]
     then
         printf "\nDatum file ${datumFile}.json no existe\n"
     fi
@@ -45,11 +45,11 @@ do
             datumQty="3000111"
         fi
 
-        #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+        #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
         CWD=$(pwd)
-        cd $HASKELL
+        cd $FALCON_DEVS_HASKELL
 
-        printf "%s\n%s\n%s\n" "1" "$HASKELL_FILES/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto 
+        printf "%s\n%s\n%s\n" "1" "$FALCON_DEVS_HASKELL_FILES/datums" "$datumFile" "$datumCreator" "$datumDeadline" "$datumName" "$datumQty" | cabal exec deploy-smart-contracts-auto 
         
         cd $CWD
 
@@ -60,9 +60,9 @@ done
 
    
 printf "\nDatum JSON: "
-cat $HASKELL_FILES/datums/$datumFile.json | jq '.'
+cat $FALCON_DEVS_HASKELL_FILES/datums/$datumFile.json | jq '.'
 
-datumHash=$($CARDANO_NODE/cardano-cli transaction hash-script-data --script-data-file "$HASKELL_FILES/datums/$datumFile.json")
+datumHash=$($CARDANO_NODE/cardano-cli transaction hash-script-data --script-data-file "$FALCON_DEVS_HASKELL_FILES/datums/$datumFile.json")
 
 printf "\nDatum Hash: "
 echo $datumHash

@@ -14,7 +14,7 @@ tokens=()
 tokensTotal=()
 lovelaceTotal=0
 
-source "$SCRIPTS/main/main_elegir_utxo_wallet.sh"
+source "$FALCON_DEVS_SCRIPTS/main/main_elegir_utxo_wallet.sh"
 
 if [[ $lovelaceTotal = 0 ]]; then
 
@@ -75,7 +75,7 @@ else
             --change-address $walletAddr \
             $walletTxInArray \
             --tx-out "$walletTxOutMultiAssets" \
-            --out-file $HASKELL_FILES/transacciones/sendTo.body 
+            --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/sendTo.body 
     else
 
         $CARDANO_NODE/cardano-cli transaction build \
@@ -85,22 +85,22 @@ else
             $walletTxInArray \
             --tx-out "$walletTxOutMultiAssets" \
             --tx-out "$walletTxOutArrayForChangeOfTokens" \
-            --out-file $HASKELL_FILES/transacciones/sendTo.body 
+            --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/sendTo.body 
     fi
 
     if [ "$?" == "0" ]; then
 
         $CARDANO_NODE/cardano-cli transaction sign \
-            --tx-body-file $HASKELL_FILES/transacciones/sendTo.body \
-            --signing-key-file $HASKELL_FILES/wallets/${walletName}.skey \
+            --tx-body-file $FALCON_DEVS_HASKELL_FILES/transacciones/sendTo.body \
+            --signing-key-file $FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey \
             --$TESTNET_MAGIC \
-            --out-file $HASKELL_FILES/transacciones/sendTo.signed
+            --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/sendTo.signed
 
         if [ "$?" == "0" ]; then
 
             $CARDANO_NODE/cardano-cli transaction submit \
                 --$TESTNET_MAGIC \
-                --tx-file $HASKELL_FILES/transacciones/sendTo.signed
+                --tx-file $FALCON_DEVS_HASKELL_FILES/transacciones/sendTo.signed
 
             if [ "$?" == "0" ]; then
                  printf "\nTransferencia Realidada!\n"

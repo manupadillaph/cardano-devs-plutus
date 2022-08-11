@@ -4,7 +4,7 @@
 echo "Nombre Script File:"
 read scriptName
 
-scriptAddr=$(cat $HASKELL_FILES/${scriptName}.addr)
+scriptAddr=$(cat $FALCON_DEVS_HASKELL_FILES/${scriptName}.addr)
 
 echo $scriptAddr
 
@@ -19,5 +19,5 @@ TxIx=$(echo "$result" | grep -Po "[a-zA-Z0-9]+" | sed -n 5p)
 
 echo $TxHash#$TxIx
 
-echo $TxHash#$TxIx>$HASKELL_FILES/${scriptName}.utxo
+echo $TxHash#$TxIx>$FALCON_DEVS_HASKELL_FILES/${scriptName}.utxo
 
