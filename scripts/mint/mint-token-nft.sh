@@ -40,9 +40,14 @@ do
             read token_name
         done
 
+        #Para poder ejecutar el cabal exec necesito estar en la carpeta $HASKELL donde hice el cabal build
+        CWD=$(pwd)
+        cd $HASKELL
+
         echo "NFT en base de: $walletTxIn con el Token Name: $token_name"
         printf "%s\n%s\n%s\n" "16" "$HASKELL_FILES/mintingpolicies" "NFT-${scriptPolicyName}" "$walletTxIn" "$token_name" | cabal exec deploy-smart-contracts-auto
 
+        cd $CWD
     fi
 
 done
