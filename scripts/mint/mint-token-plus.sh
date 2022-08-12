@@ -81,15 +81,8 @@ if [[ $opcion = "y" ]]; then
         read token_cantidad
     done
 
-    ppFile=$FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json
-    $CARDANO_NODE/cardano-cli query protocol-parameters \
-                    --out-file $ppFile --$TESTNET_MAGIC 
-
-
-    unsignedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Plus.unsigned
-    signedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Plus.signed
-
-    pid=$(cardano-cli transaction policyid --script-file $policyFile)
+    
+    pid=$($CARDANO_NODE/cardano-cli transaction policyid --script-file $policyFile)
 
     #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
     CWD=$(pwd)
@@ -110,6 +103,15 @@ if [[ $opcion = "y" ]]; then
     echo "minted value: $v"
 
     # echo "address: $addr"
+
+    ppFile=$FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json
+    $CARDANO_NODE/cardano-cli query protocol-parameters \
+                    --out-file $ppFile --$TESTNET_MAGIC 
+
+
+    unsignedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Plus.unsigned
+    signedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Plus.signed
+
 
     printf "\n\nRealizando transferencia...\n\n"
 

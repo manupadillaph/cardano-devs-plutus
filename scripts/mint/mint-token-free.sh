@@ -74,7 +74,7 @@ if [[ $opcion = "y" ]]; then
     unsignedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Free.unsigned
     signedFile=$FALCON_DEVS_HASKELL_FILES/transacciones/Free.signed
 
-    pid=$(cardano-cli transaction policyid --script-file $policyFile)
+    pid=$($CARDANO_NODE/cardano-cli transaction policyid --script-file $policyFile)
 
     #Para poder ejecutar el cabal exec necesito estar en la carpeta $FALCON_DEVS_HASKELL donde hice el cabal build
     CWD=$(pwd)

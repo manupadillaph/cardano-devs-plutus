@@ -40,7 +40,7 @@ import           Utils
 {-# INLINABLE mkTokenPolicy #-}
 mkTokenPolicy :: TxOutRef -> TokenName -> Integer -> () -> ScriptContext -> Bool
 mkTokenPolicy oref tn amt () ctx = traceIfFalse "UTxO not consumed"   hasInputUTxO           &&
-                                   traceIfFalse "wrong amount minted" checkMintedAmount
+                                   traceIfFalse "wrong token name or amount minted" checkMintedAmount
   where
     info :: TxInfo
     info = scriptContextTxInfo ctx
@@ -65,7 +65,6 @@ policy oref tn amt = mkMintingPolicyScript $
 
 tokenCurSymbol :: TxOutRef -> TokenName -> Integer -> CurrencySymbol
 tokenCurSymbol oref tn = scriptCurrencySymbol . policy oref tn
-
 
 
 data TokenParams = TokenParams

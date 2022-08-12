@@ -2,7 +2,7 @@
 
 echo "Actualizando ENV en esta sesion ..."
 
-source "$FALCON_DEVS_SCRIPTS/tools/write-env-list.sh"
+source "$FALCON_DEVS_SCRIPTS/tools/write-env-list-testnet.sh"
 
 #antes copiaba todo el contenido de esa lista dentro de .bashrc, pero ahora solo pongo la linea de source
 
@@ -15,12 +15,22 @@ swPrimero=1
 while IFS= read -r line
 do
 
-    if [[ "$line" == *"# falcon-devs-env"* ]]; then
-        if [ $swPrimero = 1 ]; then
-            echo "# $line">.bashrc.temp
-            swPrimero=0
+   if [[ "$line" == *"# falcon-devs-env"* ]]; then
+        if ! [[ "$line" == *"##"* ]]; then
+
+            if [ $swPrimero = 1 ]; then
+                echo "## $line">.bashrc.temp
+                swPrimero=0
+            else
+                echo "## $line">>.bashrc.temp
+            fi
         else
-            echo "# $line">>.bashrc.temp
+            if [ $swPrimero = 1 ]; then
+                echo $line>.bashrc.temp
+                swPrimero=0
+            else
+                echo $line>>.bashrc.temp
+            fi
         fi
     else
          if [ $swPrimero = 1 ]; then
@@ -34,7 +44,7 @@ do
 done < .bashrc
 
 #esta es la linea que voy a agregar
-lineNew="[ -f \"$FALCON_DEVS_SCRIPTS/tools/write-env-list.sh\" ] && source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list.sh\" # falcon-devs-env"
+lineNew="[ -f \"$FALCON_DEVS_SCRIPTS/tools/write-env-list-testnet.sh\" ] && source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list-testnet.sh\" # falcon-devs-env"
 
 echo $lineNew>>.bashrc.temp
 
@@ -64,7 +74,7 @@ cd $CWD
 
 
 echo "Para set env en esta sesion ejecute en promt:"
-echo "source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list.sh\""
+echo "source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list-testnet.sh\""
 
 #de antes:
 # CWD=$(pwd)

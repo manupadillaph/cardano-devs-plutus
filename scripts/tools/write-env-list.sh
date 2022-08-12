@@ -7,7 +7,6 @@ PLUTUS_APPS=$SOURCE/tools/plutus-apps
 export PLUTUS_APPS
 
 
-
 FALCON_DEVS=$SOURCE/copyRepos/Falcon-Devs
 export FALCON_DEVS
 
@@ -65,8 +64,11 @@ export INIT_PLAY_CLIENT
 INIT_DOCS=$FALCON_DEVS_SCRIPTS/tools/init-plutus-docs.sh
 export INIT_DOCS
 
-WRITE_ENV=$FALCON_DEVS_SCRIPTS/tools/write-env.sh
-export WRITE_ENV
+WRITE_ENV_TESTNET=$FALCON_DEVS_SCRIPTS/tools/write-env-testnet.sh
+export WRITE_ENV_TESTNET
+
+WRITE_ENV_MAINNET=$FALCON_DEVS_SCRIPTS/tools/write-env-mainnet.sh
+export WRITE_ENV_MAINNET
 
 BACK2CWD=$FALCON_DEVS_SCRIPTS/tools/cd-back-to-cwd.sh
 export BACK2CWD
@@ -74,30 +76,70 @@ export BACK2CWD
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.0-linux2
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-testnetonly
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-testnetonly
-CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.2
-
+#CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.2
+CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-linux
 export CARDANO_NODE
 
 CARDANO_NODE_PORT=3001
 export CARDANO_NODE_PORT
 
-CARDANO_NODE_DB_PATH=$CARDANO_NODE/db
-export CARDANO_NODE_DB_PATH 
+if [[ $CARDANO_NODE_NETWORK = "TESTNET" ]]; then
 
-CARDANO_NODE_SOCKET_PATH=$CARDANO_NODE/db/node.socket
-export CARDANO_NODE_SOCKET_PATH
+    CARDANO_NODE_DB_PATH=$CARDANO_NODE/db-testnet
+    export CARDANO_NODE_DB_PATH 
 
-CARDANO_TESNET_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-config.json
-export CARDANO_TESNET_CONFIG
+    CARDANO_NODE_SOCKET_PATH=$CARDANO_NODE/db-testnet/node.socket
+    export CARDANO_NODE_SOCKET_PATH
 
-CARDANO_TESNET_TOPOLOGY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-topology.json
-export CARDANO_TESNET_TOPOLOGY
+    CARDANO_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-testnet/testnet-config.json
+    export CARDANO_CONFIG
 
-CARDANO_TESNET_SHELLEY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-shelley-genesis.json
-export CARDANO_TESNET_SHELLEY
+    CARDANO_TOPOLOGY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-testnet/testnet-topology.json
+    export CARDANO_TOPOLOGY
 
-CARDANO_TESNET_BYRON=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node/testnet-byron-genesis.json
-export CARDANO_TESNET_BYRON
+    CARDANO_SHELLEY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-testnet/testnet-shelley-genesis.json
+    export CARDANO_SHELLEY
+
+    CARDANO_BYRON=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-testnet/testnet-byron-genesis.json
+    export CARDANO_BYRON
+
+    TESTNET_MAGIC="testnet-magic 1097911063"
+    export TESTNET_MAGIC
+
+else 
+
+    CARDANO_NODE_DB_PATH=$CARDANO_NODE/db-mainnet
+    export CARDANO_NODE_DB_PATH 
+
+    CARDANO_NODE_SOCKET_PATH=$CARDANO_NODE/db-mainnet/node.socket
+    export CARDANO_NODE_SOCKET_PATH
+
+    CARDANO_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/config.json
+    export CARDANO_CONFIG
+
+    CARDANO_TOPOLOGY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/topology.json
+    export CARDANO_TOPOLOGY
+
+    CARDANO_SHELLEY=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/shelley-genesis.json
+    export CARDANO_SHELLEY
+
+    CARDANO_BYRON=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/byron-genesis.json
+    export CARDANO_BYRON
+
+    CARDANO_MAINNET_ALONZO=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/alonzo-genesis.json
+    export CARDANO_MAINNET_ALONZO
+
+    # CARDANO_MAINNET_RESTCONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/rest-config.json
+    # export CARDANO_MAINNET_RESTCONFIG
+
+    # CARDANO_MAINNET_DBSYNC=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-mainnet/mainnet-db-sync-config.json
+    # export CARDANO_MAINNET_DBSYNC
+
+    TESTNET_MAGIC="mainnet"
+    export TESTNET_MAGIC
+
+fi
+
 
 CARDANO_WALLET=$SOURCE/tools/cardano-wallet-v2022-07-01-linux64
 export CARDANO_WALLET
@@ -123,9 +165,7 @@ export CARDANO_PAB_DATABASE
 USUARIO=manuelpadilla
 export USUARIO
 
-TESTNET_MAGIC="testnet-magic 1097911063"
-export TESTNET_MAGIC
-
-
+CARDANO_TOOLS_TOKEN_METADATA_CREATOR=$SOURCE/tools/token-metadata-creator/token-metadata-creator
+export CARDANO_TOOLS_TOKEN_METADATA_CREATOR
 
 #END PLUTUS ENVS ~/.bashrc - DONT DELETE THIS LINE

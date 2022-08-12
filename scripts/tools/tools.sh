@@ -15,8 +15,8 @@ while ! [[ $opcionMenuTools = "0" ]]; do
     
     echo "--"
 
-    echo "11: Iniciar Cardano Node"  
-    echo "12: Check Cardano Node"  
+    echo "11: Iniciar Cardano Node ($CARDANO_NODE_NETWORK)"  
+    echo "12: Check Cardano Node ($CARDANO_NODE_NETWORK)"  
 
     echo "--"
 
@@ -56,10 +56,17 @@ while ! [[ $opcionMenuTools = "0" ]]; do
 
     echo "--"
 
-    echo "7: Exportar variables ENV"
+    echo "7: Exportar variables ENV para TESNTET"
 
     echo "Para set env en esta sesion ejecute en promt:"
-    echo "source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list.sh\""
+    echo "source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list-testnet.sh\""
+
+    echo "--"
+
+    echo "8: Exportar variables ENV para MAINNET"
+
+    echo "Para set env en esta sesion ejecute en promt:"
+    echo "source \"$FALCON_DEVS_SCRIPTS/tools/write-env-list-mainnet.sh\""
 
     echo "--"
 
@@ -117,7 +124,13 @@ while ! [[ $opcionMenuTools = "0" ]]; do
     fi
 
     if [[ $opcionMenuTools = "7" ]]; then 
-        bash "$WRITE_ENV"
+        bash "$WRITE_ENV_TESTNET"
+        echo; read -rsn1 -p "Press any key to continue . . ."; echo
+        
+    fi
+
+    if [[ $opcionMenuTools = "8" ]]; then 
+        bash "$WRITE_ENV_MAINNET"
         echo; read -rsn1 -p "Press any key to continue . . ."; echo
         
     fi

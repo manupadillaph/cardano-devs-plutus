@@ -17,6 +17,10 @@ while ! [[ $opcionMenuMint = "0" ]]; do
     echo "5: Mint Tokens Signed"
 
     echo "--"
+
+    echo "6: Token Metadata Creator"
+     
+    echo "--"
     
     echo "0: Regresar al Menu Principal"
 
@@ -31,7 +35,7 @@ while ! [[ $opcionMenuMint = "0" ]]; do
         source "$FALCON_DEVS_SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
-    if [[ $opcionMenuMint = "2" || $opcionMenuMint = "3" || $opcionMenuMint = "4" || $opcionMenuMint = "5" ]]; 
+    if [[ $opcionMenuMint = "2" || $opcionMenuMint = "3" || $opcionMenuMint = "4" || $opcionMenuMint = "5" || $opcionMenuMint = "6" ]]; 
     then 
         if [[ $walletName = ""  ]]; then
             printf "\nDebe elegir wallet primero\n"
@@ -102,6 +106,9 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                     source "$FALCON_DEVS_SCRIPTS/mint/mint-token-signed.sh"  
                 fi
 
+                if [[ $opcionMenuMint = "6" ]]; then 
+                    source "$FALCON_DEVS_SCRIPTS/mint/token-metadata-creator.sh"  
+                fi
             fi
         fi
     fi  

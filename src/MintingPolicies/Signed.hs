@@ -40,11 +40,7 @@ import           Data.Maybe                  (fromJust)
 import           Plutus.Contract.Wallet      (getUnspentOutput)
 
 
-
 import qualified Prelude
-
-
-
 
 
 {-# INLINABLE mkPolicy #-}
