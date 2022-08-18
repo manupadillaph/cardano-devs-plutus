@@ -104,31 +104,9 @@ library
   --------------------
   -- Local components
   --------------------
-  build-depends:   plutus-script-utils >=1.0.0
-
-  -- --------------------------
-  -- -- Other IOG dependencies
-  -- --------------------------
-  -- build-depends:
-
-  -- ------------------------
-  -- -- Non-IOG dependencies
-  -- ------------------------
-  -- build-depends:
-  --   , aeson
-  --   , bytestring
-  --   , containers
-  --   , filepath
-  --   , serialise
-  --   , strict-containers
-  --   , text
-  --   , transformers
-  --   , transformers-except
-
-
   build-depends:
                      --  cardano-api
-                    cardano-api             >=1.35
+                     cardano-api             >=1.35
                      --, cardano-cli             >=1.35
                      , cardano-crypto-class
                      , cardano-ledger-core
@@ -147,13 +125,11 @@ library
                      , plutus-ledger-constraints
                      --, plutus-script-utils
                      , plutus-pab
+                     , plutus-script-utils >=1.0.0
                      --, plutus-use-cases
                      , plutus-tx               >=1.0.0
                      , plutus-tx-plugin        >=1.0.0 
-
-                        
-  
-
+    
   ------------------------
   -- Non-IOG dependencies
   ------------------------
@@ -184,8 +160,8 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise
 
-executable deploy-smart-contracts-manual
-  main-is: deploy-smart-contracts-manual.hs
+executable deploy-manual
+  main-is: deploy-manual.hs
   hs-source-dirs:
       app
   build-depends:
@@ -194,8 +170,8 @@ executable deploy-smart-contracts-manual
       filepath
   default-language: Haskell2010
 
-executable deploy-smart-contracts-auto
-  main-is: deploy-smart-contracts-auto.hs
+executable deploy-auto
+  main-is: deploy-auto.hs
   hs-source-dirs:
       app
   build-depends:

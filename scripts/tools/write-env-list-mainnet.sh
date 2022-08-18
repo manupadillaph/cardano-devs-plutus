@@ -4,6 +4,10 @@ CARDANO_NODE_NETWORK="MAINNET"
 export CARDANO_NODE_NETWORK
 
 
+SOURCE=/home/manuelpadilla/source
+export SOURCE
+
+
 FALCON_DEVS=$SOURCE/copyRepos/Falcon-Devs
 export FALCON_DEVS
 

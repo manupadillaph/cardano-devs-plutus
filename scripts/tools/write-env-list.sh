@@ -1,7 +1,5 @@
 #INIT PLUTUS ENVS ~/.bashrc - DONT DELETE THIS LINE 
 
-SOURCE=/home/manuelpadilla/source
-export SOURCE
 
 PLUTUS_APPS=$SOURCE/tools/plutus-apps
 export PLUTUS_APPS
