@@ -2,6 +2,9 @@
 dist
 dist-*
 cabal-dev
+#**/*OLD/
+#**/src/**/*OLD/
+#**/*old/
 *.o
 *.hi
 *.hie
@@ -22,5 +25,3 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
-**/_OLD
-**/_old
