@@ -561,6 +561,7 @@ examplePoolParams = PoolParams
         ppInterest    = 1 ,
         ppMinumunInvest     = 1,
         ppMinumunCompoundInvest    = 1,
+        ppMaximunInvest     = 1,
         ppDeadline    = examplePOSIXTime,
         ppPoolNFT  = LedgerValueV1.assetClass LedgerApiV1.adaSymbol LedgerApiV1.adaToken,
         ppPoolNFTTxOutRef = exampleTxOutRef,
