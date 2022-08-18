@@ -418,7 +418,7 @@ fundAndMergePool walletNro pParams shutdown = do
 
                 formatValues utxoRef =  [P.show val   |  val <- LedgerValueV1.flattenValue $ Helpers.fromJust $ LedgerBlockchain.value blockchain utxoRef ]
 
-                formatUtxoValues = concat [(P.show ( 1 +  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
+                formatUtxoValues = concat [(P.show ( 1 P.+  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
 
                 formatSelected :: [(Integer,Ledger.TxOutRef)]  -> [P.String]  
                 formatSelected opciones = concat [ (P.show numOpcion):(P.show utxoRef) :[] | (numOpcion, utxoRef) <-  opciones ]
@@ -786,7 +786,7 @@ utxoAtScript walletNro pParams shutdown = do
 
                 formatValues utxoRef =  [P.show val   |  val <- LedgerValueV1.flattenValue $ Helpers.fromJust $ LedgerBlockchain.value blockchain utxoRef ]
 
-                formatUtxoValues = concat [(P.show ( 1 +  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
+                formatUtxoValues = concat [(P.show ( 1 P.+  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
 
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Utxo at Script"

@@ -57,7 +57,7 @@ instance PABEffectsContractBuiltin.HasDefinitions ValidatorContracts where
 exampleStartParams :: OffChain.StartParams
 exampleStartParams = OffChain.StartParams
     { 
-        OffChain.ppDeadline = 1657143764000,
+        OffChain.spDeadline = 1657143764000,
         OffChain.spName     = 0,
         OffChain.spAdaQty   = 0
     }

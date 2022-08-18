@@ -23,8 +23,8 @@ module Deploy
     ( 
       writeUnit
 
-    -- , writeRedeemer
-    -- , writeDatum
+    , writeLockerRedeemer
+    , writeLockerDatum
 
     , writeValidatorLockerV1Hash
     , writeValidatorLockerV1
@@ -148,6 +148,31 @@ writeValidatorLockerV1Hash path file = do
 -- -- writeValidatorLockerAddress path file = do
 -- --     writeJSON  (path SystemFilePathPosix.</> file ++ ".addr") (Validators.LockerV1.addressValidator)
 
+writeLockerRedeemer :: P.String -> P.String -> Integer -> P.IO ()
+writeLockerRedeemer path file opcion = do
+    let 
+        redeemer = Validators.LockerV1.ValidatorRedeemer { 
+            Validators.LockerV1.rTipo = opcion
+        }
+        opcionStr = P.show opcion
+    writeJSON (path SystemFilePathPosix.</> file ++ ".json") redeemer
+
+writeLockerDatum:: P.String -> P.String -> P.String -> Integer -> Integer -> Integer-> P.IO ()
+writeLockerDatum path file creator deadline name qty = do
+    let 
+        pkh = Utils.pkhFromStr creator
+    
+        datum = Validators.LockerV1.ValidatorDatum {
+            Validators.LockerV1.dData = Validators.LockerV1.ValidatorData{
+                    Validators.LockerV1.aCreator =  Ledger.PaymentPubKeyHash pkh,
+                    Validators.LockerV1.aDeadline    = P.fromInteger  deadline,
+                    Validators.LockerV1.aName = name,
+                    Validators.LockerV1.aAdaQty  = qty 
+                }
+            }
+
+    writeJSON (path SystemFilePathPosix.</> file ++ ".json") datum
+
 writeValidatorAlwaysFalseV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
 writeValidatorAlwaysFalseV1 path file = do
     writeValidatorV1 path (file ++ ".plutus") Validators.AlwaysFalseV1.codeValidator  
@@ -245,32 +270,6 @@ writeMintingPolicyTokensV1 path file oref' tn' amt' = do
 -- writeMintingPolicy file = CardanoApi.writeFileTextEnvelope @(ApiShelley.PlutusScript ApiShelley.PlutusScriptV1) file Nothing . ApiShelley.PlutusScriptSerialised . SBS.toShort . LBS.toStrict . CodecSerialise.serialise . LedgerScriptsV1.getMintingPolicy
 
 
--- writeRedeemer :: P.String -> P.String -> Integer -> P.IO ()
--- writeRedeemer path file opcion = do
---     let 
---         redeemer = Validators.LockerV1.ValidatorRedeemer { 
---             Validators.LockerV1.rTipo = opcion
---         }
---         opcionStr = P.show opcion
---     writeJSON (path SystemFilePathPosix.</> file ++ ".json") redeemer
-
-
-
--- writeDatum:: P.String -> P.String -> P.String -> Integer -> Integer -> Integer-> P.IO ()
--- writeDatum path file creator deadline name qty = do
---     let 
---         pkh = Utils.pkhFromStr creator
-    
---         datum = Validators.LockerV1.ValidatorDatum {
---             Validators.LockerV1.dData = Validators.LockerV1.ValidatorData{
---                     Validators.LockerV1.T.aCreator =  Ledger.PaymentPubKeyHash pkh
---                     , Validators.LockerV1.aDeadline    = fromInteger  deadline
---                     , Validators.LockerV1.aName = name
---                     , Validators.LockerV1.aAdaQty  = qty 
---                 }
---             }
-
---     writeJSON (path SystemFilePathPosix.</> file ++ ".json") datum
 
 -- writeValidator :: P.FilePath -> Ledger.Validator -> P.IO (P.Either (CardanoApi.FileError ()) ())
 -- writeValidator file = CardanoApi.writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file Nothing . PlutusScriptSerialised . SBS.toShort . LBS.toStrict . serialise . Ledger.unValidatorScript

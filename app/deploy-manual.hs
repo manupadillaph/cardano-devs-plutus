@@ -24,8 +24,8 @@ main = do
 
   putStrLn "Deploy Smart Contracts:"
 
-  putStrLn "1: write datum"
-  putStrLn "2: write redeemer"
+  putStrLn "1: write ValidatorLocker datum"
+  putStrLn "2: write ValidatorLocker redeemer"
 
   putStrLn "3: write Validator Locker plutus cbor"
   putStrLn "4: write Validator Locker hash"
@@ -48,32 +48,32 @@ main = do
   opcion <- getLine
 
   case read opcion of
-    -- 1 -> do
-    --   putStrLn "Ingrese path:"
-    --   path <- getLine
-    --   putStrLn "Ingrese nombre para el archivo Datum:"
-    --   filename <- getLine
-    --   putStrLn "Ingrese creator:"
-    --   creator <- getLine
-    --   putStrLn "Ingrese deadline:"
-    --   deadline <- getLine
-    --   putStrLn "Ingrese name:"
-    --   name <- getLine
-    --   putStrLn "Ingrese qty:"
-    --   qty <- getLine
-    --   Deploy.writeDatum path filename creator (read deadline) (read name) (read qty)
-    --   putStrLn "Datum File Hecho en:"
-    --   putStrLn filename
-    -- 2 -> do
-    --   putStrLn "Ingrese path:"
-    --   path <- getLine
-    --   putStrLn "Ingrese nombre para el archivo Redeemer:"
-    --   filename <- getLine
-    --   putStrLn "Ingrese redeemer (1 o 2):"
-    --   opcion <- getLine
-    --   Deploy.writeRedeemer path filename (read opcion)
-    --   putStrLn "Redeemer File Hecho en:"
-    --   putStrLn filename  
+    1 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Datum:"
+      filename <- getLine
+      putStrLn "Ingrese creator:"
+      creator <- getLine
+      putStrLn "Ingrese deadline:"
+      deadline <- getLine
+      putStrLn "Ingrese name:"
+      name <- getLine
+      putStrLn "Ingrese qty:"
+      qty <- getLine
+      Deploy.writeLockerDatum path filename creator (read deadline) (read name) (read qty)
+      putStrLn "Datum File Hecho en:"
+      putStrLn filename
+    2 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Redeemer:"
+      filename <- getLine
+      putStrLn "Ingrese redeemer (1 o 2):"
+      opcion <- getLine
+      Deploy.writeLockerRedeemer path filename (read opcion)
+      putStrLn "Redeemer File Hecho en:"
+      putStrLn filename  
     3 -> do
       putStrLn "Ingrese path:"
       path <- getLine

@@ -60,7 +60,7 @@ import qualified Validators.AlwaysFalseV1.OnChain    as OnChain (typedValidator,
 
 data StartParams = StartParams
     { 
-        ppDeadline :: !LedgerApiV1.POSIXTime,
+        spDeadline :: !LedgerApiV1.POSIXTime,
         spName     :: !Integer,
         spAdaQty   :: !Integer
     } deriving (P.Eq, P.Ord, GHCGenerics.Generic, DataAeson.ToJSON, DataAeson.FromJSON, Schema.ToSchema, DataOpenApiSchema.ToSchema, P.Show)
@@ -84,7 +84,7 @@ start StartParams{..} = do
             let a = T.ValidatorData
                     { 
                         aCreator  = pkh,
-                        aDeadline = ppDeadline,
+                        aDeadline = spDeadline,
                         aName     = spName,
                         aAdaQty   = spAdaQty
                     }

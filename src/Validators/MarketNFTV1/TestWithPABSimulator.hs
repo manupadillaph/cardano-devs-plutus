@@ -52,7 +52,7 @@ test = TraceEmulator.runEmulatorTraceIO $ do
 --     --h2 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 2) endpoints
 
 --     TraceEmulator.callEndpoint @"start" h1 $ OffChain.StartParams{  
---             ppDeadline = deadline,
+--             spDeadline = deadline,
 --             spName = 55,
 --             spAdaQty   = 3000000
 --         }
