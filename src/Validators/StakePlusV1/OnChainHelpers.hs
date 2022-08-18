@@ -27,14 +27,14 @@ module Validators.StakePlusV1.OnChainHelpers where
 
 import qualified Ledger                              (unPaymentPubKeyHash, valuePaidTo) --PaymentPubKeyHash, getCardanoTxId, pubKeyHashAddress, 
 import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
+import qualified Plutus.V1.Ledger.Contexts           as LedgerContextsV1 (ScriptContext, TxInfo, scriptContextTxInfo, txSignedBy, getContinuingOutputs, findDatum)
 import qualified Plutus.V1.Ledger.Interval           as LedgerIntervalV1 (contains, interval, from, member) --, 
+import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
+import qualified Plutus.V1.Ledger.Tx                 as LedgerTxV1 (txOutDatum)
 import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import qualified PlutusTx
 import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
-import qualified Plutus.V1.Ledger.Contexts           as LedgerContextsV1 (ScriptContext, TxInfo, scriptContextTxInfo, txSignedBy, getContinuingOutputs, findDatum)
-import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
-import qualified Plutus.V1.Ledger.Tx                 as LedgerTxV1 (txOutDatum)
 
 --Import Internos
 

@@ -52,6 +52,8 @@ import qualified Wallet.Emulator.Wallet              as WalletEmulator (knownWal
 import qualified Validators.StakePlusV1.OffChain    as OffChain
 import qualified Validators.StakePlusV1.Typos       as T
 
+--Modulo
+
 data ValidatorContracts = 
     MasterCreatePool T.MasterCreatePoolParams |
     MasterFundPool T.MasterFundPoolParams |

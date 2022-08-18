@@ -23,7 +23,7 @@
 
 module Validators.StakePlusV1.Typos where
 
---Import Nuevos
+--Import Externos
 
 import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
 import qualified Data.OpenApi.Schema                 as DataOpenApiSchema (ToSchema)

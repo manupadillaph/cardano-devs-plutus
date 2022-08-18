@@ -23,36 +23,51 @@
 
 module Validators.StakeSimpleV1.Typos where
 
-import           Control.Monad        hiding (fmap)
+-- import           Control.Monad        hiding (fmap)
+-- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
+-- import           Data.LisNonEmpty   (NonEmpty (..))
+-- import           Data.Map             as Map
+-- import           Data.Text            (pack, Text)
+-- import           Data.String  
+-- import qualified GHC.Generics                        as GHCGenerics (Generic)
+-- import           Ledger               hiding (singleton)
+-- import qualified Ledger.Constraints   as Constraints
+-- import qualified Ledger.Typed.Scripts as Scripts
+-- import           LedgerValueV1.Value         as Value
+-- import           Ledger.Ada           as Ada
+-- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
+-- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
+-- import           Playground.Types     (KnownCurrency (..))
+-- import           Plutus.Contract
+-- import qualified PlutusTx
+-- import           PlutusTx.Prelude     hiding (unless)
+-- import qualified Prelude              as P 
+-- import qualified Schema                              (ToSchema)
+-- import qualified      Data.OpenApi.Schema         (ToSchema)
+-- import           TexPrintf          (printf)
+-- import Data.Typeable
+
+-- import          Plutus.Trace.Emulator  as Emulator
+-- import          WalleEmulator.Wallet
+-- import          Data.Default
+-- import          Ledger.TimeSlot 
+
+-- --Import Nuevos
+
+--Import Externos
+
 import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
-import           Data.List.NonEmpty   (NonEmpty (..))
-import           Data.Map             as Map
-import           Data.Text            (pack, Text)
-import           Data.String  
+import qualified Data.OpenApi.Schema                 as DataOpenApiSchema (ToSchema)
 import qualified GHC.Generics                        as GHCGenerics (Generic)
-import           Ledger               hiding (singleton)
-import qualified Ledger.Constraints   as Constraints
-import qualified Ledger.Typed.Scripts as Scripts
-import           LedgerValueV1.Value         as Value
-import           Ledger.Ada           as Ada
-import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
-import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
-import           Playground.Types     (KnownCurrency (..))
-import           Plutus.Contract
+import qualified Ledger                              
+import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
+import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import qualified PlutusTx
-import           PlutusTx.Prelude     hiding (unless)
-import qualified Prelude              as P 
+import           PlutusTx.Prelude                    hiding (unless)
+import qualified Prelude                             as P
 import qualified Schema                              (ToSchema)
-import qualified      Data.OpenApi.Schema         (ToSchema)
-import           Text.Printf          (printf)
-import Data.Typeable
 
-import          Plutus.Trace.Emulator  as Emulator
-import          Wallet.Emulator.Wallet
-import          Data.Default
-import          Ledger.TimeSlot 
-
---Import Nuevos
+--Modulo:
 
 --Synonimus definition for clear writting
 
@@ -180,11 +195,11 @@ mkPoolState  poolNFT masterFunders userNFTs = PoolState $ mkPoolStateTypo  poolN
 
 
 
-mkUserStateTypo :: User -> UserNFT -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> Proffit -> Proffit -> Maybe LedgerApiV1.POSIXTime   -> UserStateTypo
+mkUserStateTypo :: User -> UserNFT -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit -> Maybe LedgerApiV1.POSIXTime  -> UserStateTypo
 mkUserStateTypo user userNFT invest createdat deadline cashedout rewardsNotClaimed  lastClaim = UserStateTypo { usUser = user, usUserNFT = userNFT , usInvest = invest ,usCreatedAt = createdat , usDeadline = deadline , usRewardsNotClaimed = rewardsNotClaimed , usChashedOut = cashedout, usLastClaimAt = lastClaim }
 
 
-mkUserState:: User -> UserNFT ->  Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> Proffit -> Proffit  -> Maybe LedgerApiV1.POSIXTime -> ValidatorDatum
+mkUserState:: User -> UserNFT ->  Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit -> Maybe LedgerApiV1.POSIXTime -> ValidatorDatum
 mkUserState user userNFT invest createdat deadline  cashedout rewardsNotClaimed lastClaim = UserState $ mkUserStateTypo user userNFT invest createdat deadline cashedout  rewardsNotClaimed lastClaim
 
 
@@ -399,10 +414,10 @@ mkRedeemMasterGetPoolTypo   poolNFT tn txoutref master fund  = RedeemMasterGetPo
         rmgpFund = fund
     }
 
-mkRedeemUserInvest :: PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> LedgerApiV1.Redeemer 
+mkRedeemUserInvest :: PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> LedgerApiV1.Redeemer 
 mkRedeemUserInvest poolNFT userNFT tn txoutref user invest createdAt deadline = LedgerApiV1.Redeemer $  PlutusTx.toBuiltinData (RedeemUserInvest  $ mkRedeemUserInvestTypo poolNFT userNFT tn txoutref user invest  createdAt deadline)
 
-mkRedeemUserInvestTypo ::  PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> RedeemUserInvestTypo
+mkRedeemUserInvestTypo ::  PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> RedeemUserInvestTypo
 mkRedeemUserInvestTypo  poolNFT userNFT tn txoutref user invest createdAt deadline = RedeemUserInvestTypo { 
         ruiPoolNFT =  poolNFT,
         ruiUserNFT =  userNFT ,
@@ -414,10 +429,10 @@ mkRedeemUserInvestTypo  poolNFT userNFT tn txoutref user invest createdAt deadli
         ruiDeadline = deadline
     }  
 
-mkRedeemUserGetInvest :: PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> LedgerApiV1.Redeemer
+mkRedeemUserGetInvest :: PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> LedgerApiV1.Redeemer
 mkRedeemUserGetInvest poolNFT userNFT tn txoutref user invest createdAt deadline = LedgerApiV1.Redeemer $  PlutusTx.toBuiltinData (RedeemUserGetInvest  $ mkRedeemUserGetInvestTypo poolNFT userNFT tn txoutref user invest  createdAt deadline)
 
-mkRedeemUserGetInvestTypo ::  PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> RedeemUserGetInvestTypo
+mkRedeemUserGetInvestTypo ::  PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> RedeemUserGetInvestTypo
 mkRedeemUserGetInvestTypo    poolNFT userNFT tn txoutref user invest createdAt deadline  = RedeemUserGetInvestTypo {
         rugiPoolNFT =  poolNFT,
         rugiUserNFT =  userNFT ,
@@ -441,10 +456,10 @@ mkRedeemUserGetRewardsTypo    poolNFT userNFT  user claim  claimAt = RedeemUserG
         rugrClaimAt = claimAt
     }
 
-mkRedeemUserInvestRewards ::PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> LedgerApiV1.Redeemer
+mkRedeemUserInvestRewards ::PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> LedgerApiV1.Redeemer
 mkRedeemUserInvestRewards poolNFT userNFT tn txoutref user invest createdAt deadline = LedgerApiV1.Redeemer $  PlutusTx.toBuiltinData (RedeemUserInvestRewards  $ mkRedeemUserInvestRewardsTypo poolNFT userNFT tn txoutref user invest  createdAt deadline)
 
-mkRedeemUserInvestRewardsTypo ::  PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> T.Deadline -> RedeemUserInvestRewardsTypo
+mkRedeemUserInvestRewardsTypo ::  PoolNFT -> UserNFT -> LedgerValueV1.TokenName -> LedgerApiV1.TxOutRef -> User -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> RedeemUserInvestRewardsTypo
 mkRedeemUserInvestRewardsTypo   poolNFT userNFT tn txoutref user invest createdAt deadline  = RedeemUserInvestRewardsTypo {
         ruirPoolNFT =  poolNFT,
         ruirUserNFT =  userNFT ,
@@ -561,11 +576,10 @@ examplePoolParams = PoolParams
         ppInterest    = 1 ,
         ppMinumunInvest     = 1,
         ppMinumunCompoundInvest    = 1,
-        ppMaximunInvest     = 1,
         ppDeadline    = examplePOSIXTime,
         ppPoolNFT  = LedgerValueV1.assetClass LedgerApiV1.adaSymbol LedgerApiV1.adaToken,
         ppPoolNFTTxOutRef = exampleTxOutRef,
-        ppCurSymbolForMintingNFTPolicy = adaSymbol,
+        ppCurSymbolForMintingNFTPolicy = LedgerValueV1.adaSymbol,
         ppValidTimeRange  = examplePOSIXTime,
         ppMinimunClaim  = 1
     }

@@ -23,53 +23,81 @@
 
 module Validators.StakeSimpleV1.OffChain where
 
-import           Control.Monad        hiding (fmap)
-import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
-import           Data.List.NonEmpty   (NonEmpty (..))
-import           Data.Map             as Map
-import           Data.Text            (pack, Text)
-import           Data.String  
-import qualified GHC.Generics                        as GHCGenerics (Generic)
-import           Ledger               hiding (singleton)
-import qualified Ledger.Constraints   as Constraints
-import qualified Ledger.Typed.Scripts as Scripts
-import           LedgerValueV1.Value         as Value
-import           Ledger.Ada           as Ada
-import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
-import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
-import           Playground.Types     (KnownCurrency (..))
-import           Plutus.Contract
+-- import           Control.Monad        hiding (fmap)
+-- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
+-- import           Data.List.NonEmpty   (NonEmpty (..))
+-- import           Data.Map             as Map
+-- import           Data.Text            (pack, Text)
+-- import           Data.String  
+-- import qualified GHC.Generics                        as GHCGenerics (Generic)
+-- import           Ledger               hiding (singleton)
+-- import qualified Ledger.Constraints   as Constraints
+-- import qualified Ledger.Typed.Scripts as Scripts
+-- import           LedgerValueV1.Value         as Value
+-- import           Ledger.Ada           as Ada
+-- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
+-- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
+-- import           Playground.Types     (KnownCurrency (..))
+-- import           Plutus.Contract
+-- import qualified PlutusTx
+-- import           PlutusTx.Prelude     hiding (unless)
+-- import qualified Prelude              as P 
+-- import qualified Schema                              (ToSchema)
+-- import     qualified      Data.OpenApi.Schema         (ToSchema)
+-- import           Text.Printf          (printf)
+-- import Data.Typeable
+
+-- import          Plutus.Trace.Emulator  as Emulator
+-- import          Wallet.Emulator.Wallet
+-- import          Data.Default
+-- import          Ledger.TimeSlot 
+
+-- --Import Nuevos
+
+-- import           Data.Void            (Void)
+
+
+-- --Import Internos
+-- import qualified Validators.StakeSimpleV1.Typos  
+-- import qualified Validators.StakeSimpleV1.OffChainHelpers     
+-- import qualified Validators.StakeSimpleV1.Helpers     
+-- import qualified Validators.StakeSimpleV1.OnChain     (typedValidator, codeValidator, addressValidator)
+-- import qualified Validators.StakeSimpleV1.OnChainNFT     (mintingNFTPolicy)
+
+
+--Import Externos
+
+import qualified Cardano.Api                         as CardanoApi  
+import qualified Cardano.Api.Shelley                 as ApiShelley
+import qualified Control.Monad                       as Monad (void)
+import qualified Data.Map                            as DataMap
+import qualified Data.Text                           as DataText ( Text)
+import qualified Ledger                              (getCardanoTxId, pubKeyHashAddress) --PaymentPubKeyHash, --POSIXTime(POSIXTime), --, unPaymentPubKeyHash, valuePaidTo, Slot(Slot)
+import qualified Ledger.Ada                          as LedgerAda
+import qualified Ledger.Constraints                  as LedgerConstraints
+import qualified Ledger.Tx                           as LedgerTx (ChainIndexTxOut (..))
+import qualified Playground.Contract                 (mkSchemaDefinitions)
+import qualified Plutus.Contract                     as PlutusContract
+import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
+import qualified Plutus.V1.Ledger.Interval           as LedgerIntervalV1 (interval) --, contains,  , from, member
+import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import qualified PlutusTx
-import           PlutusTx.Prelude     hiding (unless)
-import qualified Prelude              as P 
-import qualified Schema                              (ToSchema)
-import     qualified      Data.OpenApi.Schema         (ToSchema)
-import           Text.Printf          (printf)
-import Data.Typeable
-
-import          Plutus.Trace.Emulator  as Emulator
-import          Wallet.Emulator.Wallet
-import          Data.Default
-import          Ledger.TimeSlot 
-
---Import Nuevos
-
-import           Data.Void            (Void)
-
+import           PlutusTx.Prelude                    hiding (unless)
+import qualified Prelude                             as P
+import qualified Text.Printf                         as TextPrintf (printf)
 
 --Import Internos
-import qualified Validators.StakeSimpleV1.Typos  
-import qualified Validators.StakeSimpleV1.OffChainHelpers     
-import qualified Validators.StakeSimpleV1.Helpers     
-import qualified Validators.StakeSimpleV1.OnChain     (typedValidator, codeValidator, addressValidator)
-import qualified Validators.StakeSimpleV1.OnChainNFT     (mintingNFTPolicy)
 
-Helpers.minLovelace :: Integer
-Helpers.minLovelace = 2000000
+import qualified Validators.StakeSimpleV1.Helpers         as Helpers
+import qualified Validators.StakeSimpleV1.OffChainHelpers as OffChainHelpers  
+import qualified Validators.StakeSimpleV1.OnChain         as OnChain (typedValidator, codeValidator, addressValidator)
+import qualified Validators.StakeSimpleV1.OnChainNFT      as OnChainNFT (mintingNFTPolicy)
+import qualified Validators.StakeSimpleV1.Typos           as T
+  
+-- Modulo:
 
-
-masterCreatePool :: MasterCreatePoolParams -> PlutusContract.Contract w s DataText.Text ()
-masterCreatePool MasterCreatePoolParams{..} = do
+masterCreatePool :: T.MasterCreatePoolParams -> PlutusContract.Contract w s DataText.Text ()
+masterCreatePool T.MasterCreatePoolParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Master Create Pool ---------------------------------------------"  
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"   
@@ -103,7 +131,7 @@ masterCreatePool MasterCreatePoolParams{..} = do
 
         dPoolState = T.mkPoolState (T.ppPoolNFT mcpPoolParam) masterFunders userNFTs
 
-        redeemerMinting   = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData $ MintingRedeemer { T.mrTokenName = poolNFTTokenName, T.mrTxOutRef = poolNFTTxOutRef} 
+        redeemerMinting   = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData $ T.MintingRedeemer { T.mrTokenName = poolNFTTokenName, T.mrTxOutRef = poolNFTTxOutRef} 
         
         ---
 
@@ -144,8 +172,8 @@ masterCreatePool MasterCreatePoolParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
 
 
-masterFundPool :: MasterFundPoolParams -> PlutusContract.Contract w s DataText.Text ()
-masterFundPool MasterFundPoolParams{..} = do
+masterFundPool :: T.MasterFundPoolParams -> PlutusContract.Contract w s DataText.Text ()
+masterFundPool T.MasterFundPoolParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Master Fund Pool ----------------------------------------------"  
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"  
@@ -178,11 +206,11 @@ masterFundPool MasterFundPoolParams{..} = do
 
                 valueTotalForPoolState = foldl (<>) valueFundForPoolState listValuesEnUtxosPoolStateList 
 
-                dPoolState = T.mkPoolStateWithNewFundFromUtxoList utxosListAtScriptWithPoolState (T.ppPoolNFT mspPoolParam) master mspFund 
+                dPoolState = OffChainHelpers.mkPoolStateWithNewFundFromUtxoList utxosListAtScriptWithPoolState (T.ppPoolNFT mspPoolParam) master mspFund 
 
 
 
-                redeemerValidator = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (mkRedeemMasterFundPool (T.ppPoolNFT mspPoolParam)  master mspFund )
+                redeemerValidator = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (T.mkRedeemMasterFundPool (T.ppPoolNFT mspPoolParam)  master mspFund )
                 
                 txOutRefsPoolState   = fst <$> utxosListAtScriptWithPoolState
                 
@@ -232,8 +260,8 @@ masterFundPool MasterFundPoolParams{..} = do
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------" 
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"  
 
-masterGetBackFund ::  MasterGetBackFundParams -> PlutusContract.Contract w s DataText.Text ()
-masterGetBackFund MasterGetBackFundParams{..} = do
+masterGetBackFund :: T.MasterGetBackFundParams -> PlutusContract.Contract w s DataText.Text ()
+masterGetBackFund T.MasterGetBackFundParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Master GetBack Fund -------------------------------------------"  
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"     
@@ -248,7 +276,7 @@ masterGetBackFund MasterGetBackFundParams{..} = do
 
     --     [] -> Plutus.PlutusContract.throwError "Pool From Master Not Found" 
 
-    --     _  -> do
+    --     _ -> do
 
     --         let 
     --             redeemer      = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData mkRedeemMasterGetPool
@@ -274,8 +302,8 @@ masterGetBackFund MasterGetBackFundParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------" 
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"  
 
-userInvest ::  UserInvestParams -> PlutusContract.Contract w s DataText.Text ()
-userInvest UserInvestParams{..} = do
+userInvest :: T.UserInvestParams -> PlutusContract.Contract w s DataText.Text ()
+userInvest T.UserInvestParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User Invest ----------------------------------------------------"  
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
@@ -324,14 +352,14 @@ userInvest UserInvestParams{..} = do
     
                 valueForPoolState = foldl (<>) (LedgerAda.lovelaceValueOf 0) listValuesEnUtxosPoolStateList 
 
-                dPoolState = T.mkPoolStateWithNewUserInvestFromUtxoList utxosListAtScriptWithPoolState poolNFT userNFT
+                dPoolState = OffChainHelpers.mkPoolStateWithNewUserInvestFromUtxoList utxosListAtScriptWithPoolState poolNFT userNFT
 
                 txOutRefsPoolState   = fst <$> utxosListAtScriptWithPoolState
                 
                 -- Creates Redeemer
 
-                redeemerValidator = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (mkRedeemUserInvest poolNFT userNFT  userNFTTokenName userNFTTxOutRef  user uipInvest uipCreatedAt uipDeadline )
-                redeemerMinting   = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData $ MintingRedeemer { T.mrTokenName = userNFTTokenName, T.mrTxOutRef = userNFTTxOutRef} 
+                redeemerValidator = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (T.mkRedeemUserInvest poolNFT userNFT  userNFTTokenName userNFTTxOutRef  user uipInvest uipCreatedAt uipDeadline )
+                redeemerMinting   = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData $ T.MintingRedeemer { T.mrTokenName = userNFTTokenName, T.mrTxOutRef = userNFTTxOutRef} 
 
                 ---
 
@@ -387,8 +415,8 @@ userInvest UserInvestParams{..} = do
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
 
-userGetBackInvest ::  UserGetBackInvestParams -> PlutusContract.Contract w s DataText.Text ()
-userGetBackInvest UserGetBackInvestParams{..} = do
+userGetBackInvest :: T.UserGetBackInvestParams -> PlutusContract.Contract w s DataText.Text ()
+userGetBackInvest T.UserGetBackInvestParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User GetBack Invest --------------------------------------------" 
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
@@ -403,7 +431,7 @@ userGetBackInvest UserGetBackInvestParams{..} = do
 
     --     [] -> Plutus.PlutusContract.throwError "User Invest Not Found" 
 
-    --     _  -> do
+    --     _ -> do
 
     --         let 
     --             redeemer      = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData mkRedeemUserGetInvest
@@ -428,8 +456,8 @@ userGetBackInvest UserGetBackInvestParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
 
-userGetRewards ::  UserGetRewardsParams -> PlutusContract.Contract w s DataText.Text ()
-userGetRewards UserGetRewardsParams{..} = do
+userGetRewards :: T.UserGetRewardsParams -> PlutusContract.Contract w s DataText.Text ()
+userGetRewards T.UserGetRewardsParams{..} = do
 
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User Get Rewards -----------------------------------------------"  
@@ -511,18 +539,18 @@ userGetRewards UserGetRewardsParams{..} = do
 
                 listValuesEnUtxosPoolStateList = [ OffChainHelpers.getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosListAtScriptWithPoolState] 
 
-                poolStateDatums = getPoolStateListFromUtxoList utxosListAtScriptWithPoolState 
+                poolStateDatums = OffChainHelpers.getPoolStateListFromUtxoList utxosListAtScriptWithPoolState 
 
                 valueForPoolState = foldl (<>) (negate (LedgerAda.lovelaceValueOf ugrpClaim)) listValuesEnUtxosPoolStateList 
 
     
-                dPoolState = T.mkPoolStateFromPoolStateList poolStateDatums poolNFT   
+                dPoolState = Helpers.mkPoolStateFromPoolStateList poolStateDatums poolNFT   
 
                 txOutRefsPoolState   = fst <$> utxosListAtScriptWithPoolState
                 
                 -- Creates Redeemer
 
-                redeemerValidator = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (mkRedeemUserGetRewards poolNFT userNFT  user ugrpClaim now )
+                redeemerValidator = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (T.mkRedeemUserGetRewards poolNFT userNFT  user ugrpClaim now )
                 
                 ---
 
@@ -582,8 +610,8 @@ userGetRewards UserGetRewardsParams{..} = do
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"        
 
-userInvestRewards ::  UserInvestRewardsParams -> PlutusContract.Contract w s DataText.Text ()
-userInvestRewards UserInvestRewardsParams{..} = do
+userInvestRewards :: T.UserInvestRewardsParams -> PlutusContract.Contract w s DataText.Text ()
+userInvestRewards T.UserInvestRewardsParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User Invest Rewards --------------------------------------------"  
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"      
@@ -597,13 +625,13 @@ userInvestRewards UserInvestRewardsParams{..} = do
 
 
 type ValidatorSchema =
-        PlutusContract.Endpoint "masterCreatePool" MasterCreatePoolParams PlutusContract..\/ 
-        PlutusContract.Endpoint "masterFundPool" MasterFundPoolParams PlutusContract..\/ 
-        PlutusContract.Endpoint "masterGetBackFund" MasterGetBackFundParams PlutusContract..\/ 
-        PlutusContract.Endpoint "userInvest" UserInvestParams PlutusContract..\/ 
-        PlutusContract.Endpoint "userGetBackInvest" UserGetBackInvestParams PlutusContract..\/ 
-        PlutusContract.Endpoint "userGetRewards" UserGetRewardsParams PlutusContract..\/ 
-        PlutusContract.Endpoint "userInvestRewards" UserInvestRewardsParams
+        PlutusContract.Endpoint "masterCreatePool" T.MasterCreatePoolParams PlutusContract..\/ 
+        PlutusContract.Endpoint "masterFundPool" T.MasterFundPoolParams PlutusContract..\/ 
+        PlutusContract.Endpoint "masterGetBackFund" T.MasterGetBackFundParams PlutusContract..\/ 
+        PlutusContract.Endpoint "userInvest" T.UserInvestParams PlutusContract..\/ 
+        PlutusContract.Endpoint "userGetBackInvest" T.UserGetBackInvestParams PlutusContract..\/ 
+        PlutusContract.Endpoint "userGetRewards" T.UserGetRewardsParams PlutusContract..\/ 
+        PlutusContract.Endpoint "userInvestRewards" T.UserInvestRewardsParams
         
 endpoints :: PlutusContract.Contract () ValidatorSchema DataText.Text ()
 endpoints = PlutusContract.awaitPromise (masterCreatePool' `PlutusContract.select` masterFundPool' `PlutusContract.select` masterGetBackFund' `PlutusContract.select` userInvest' `PlutusContract.select` userGetBackInvest' `PlutusContract.select` userGetRewards' `PlutusContract.select` userInvestRewards') >> endpoints
@@ -616,5 +644,5 @@ endpoints = PlutusContract.awaitPromise (masterCreatePool' `PlutusContract.selec
     userGetRewards' = PlutusContract.endpoint @"userGetRewards" userGetRewards
     userInvestRewards' = PlutusContract.endpoint @"userInvestRewards" userInvestRewards
 
-mkSchemaDefinitions ''ValidatorSchema
+Playground.Contract.mkSchemaDefinitions ''ValidatorSchema
 

@@ -23,64 +23,90 @@
 
 module Validators.StakeSimpleV1.Helpers where
 
-import           Control.Monad        hiding (fmap)
-import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
-import           Data.List.NonEmpty   (NonEmpty (..))
-import           Data.Map             as Map
-import           Data.Text            (pack, Text)
-import           Data.String  
-import qualified GHC.Generics                        as GHCGenerics (Generic)
---import           Ledger               hiding (singleton)
-import qualified Ledger.Constraints   as Constraints
-import qualified Ledger.Typed.Scripts as Scripts
-import           LedgerValueV1.Value         as Value
-import           Ledger.Ada           as Ada
-import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
-import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
-import           Playground.Types     (KnownCurrency (..))
-import           Plutus.Contract
-import qualified PlutusTx
-import           PlutusTx.Prelude     hiding (unless)
-import qualified Prelude              as P 
-import qualified Schema                              (ToSchema)
-import qualified Data.OpenApi.Schema         (ToSchema)
-import           Text.Printf          (printf)
-import           Data.Typeable
-import           Plutus.Trace.Emulator  as Emulator
-import qualified Wallet.Emulator.Wallet              as WalletEmulator
-import           Data.Default
---import          Ledger.TimeSlot 
+-- import           Control.Monad        hiding (fmap)
+-- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
+-- import           Data.List.NonEmpty   (NonEmpty (..))
+-- import           Data.Map             as Map
+-- import           Data.Text            (pack, Text)
+-- import           Data.String  
+-- import qualified GHC.Generics                        as GHCGenerics (Generic)
+-- --import           Ledger               hiding (singleton)
+-- import qualified Ledger.Constraints   as Constraints
+-- import qualified Ledger.Typed.Scripts as Scripts
+-- import           LedgerValueV1.Value         as Value
+-- import           Ledger.Ada           as Ada
+-- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
+-- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
+-- import           Playground.Types     (KnownCurrency (..))
+-- import           Plutus.Contract
+-- import qualified PlutusTx
+-- import           PlutusTx.Prelude     hiding (unless)
+-- import qualified Prelude              as P 
+-- import qualified Schema                              (ToSchema)
+-- import qualified Data.OpenApi.Schema         (ToSchema)
+-- import           Text.Printf          (printf)
+-- import           Data.Typeable
+-- import           Plutus.Trace.Emulator  as Emulator
+-- import qualified Wallet.Emulator.Wallet              as WalletEmulator
+-- import           Data.Default
+-- --import          Ledger.TimeSlot 
 
---Import Nuevos
+-- --Import Nuevos
 
-import          Control.Lens
+-- import          Control.Lens
 
-import PlutusTx.Builtins
+-- import PlutusTx.Builtins
 
-import qualified Data.Map as Map
-import Ledger 
-import Ledger.Index
-import qualified Plutus.Trace.Emulator  as Trace
-import qualified Data.List
-
-
-import qualified Data.ByteString.Char8 as C
-
---import Ledger           ( LedgerApiV1.POSIXTime(LedgerApiV1.POSIXTime), Ledger.Slot(Slot) )
-import Ledger.TimeSlot  ( LedgerTimeSlot.SlotConfig(SlotConfig), LedgerTimeSlot.posixTimeToEnclosingSlot,slotToBeginPOSIXTime,LedgerTimeSlot.slotToEndPOSIXTime )
+-- import qualified Data.Map as Map
+-- import Ledger 
+-- import Ledger.Index
+-- import qualified Plutus.Trace.Emulator  as Trace
+-- import qualified Data.List
 
 
---Import Internos
-import qualified Validators.StakeSimpleV1.Typos 
+-- import qualified Data.ByteString.Char8 as C
+
+-- --import Ledger           ( LedgerApiV1.POSIXTime(LedgerApiV1.POSIXTime), Ledger.Slot(Slot) )
+-- import Ledger.TimeSlot  ( LedgerTimeSlot.SlotConfig(SlotConfig), LedgerTimeSlot.posixTimeToEnclosingSlot,slotToBeginPOSIXTime,LedgerTimeSlot.slotToEndPOSIXTime )
+
+
+-- --Import Internos
+-- import qualified Validators.StakeSimpleV1.Typos 
 
 --Validators Helper Functions for On and OffChain code
 
+--Import Externos
+
+import qualified Data.ByteString.Char8               as DataByteStringChar8
+import qualified Ledger                              ( Slot(Slot) ) --POSIXTime(POSIXTime), 
+import qualified Ledger.TimeSlot                     as LedgerTimeSlot ( SlotConfig(SlotConfig), posixTimeToEnclosingSlot, slotToEndPOSIXTime) --,slotToBeginPOSIXTime
+import           PlutusTx.Prelude                    hiding (unless)
+import qualified Prelude                             as P
+import qualified Plutus.Script.Utils.V1.Scripts                as UtilsScriptsV1
+import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
+import qualified Plutus.V1.Ledger.Contexts           as LedgerContextsV1 (ScriptContext, TxInfo, scriptContextTxInfo, txSignedBy, getContinuingOutputs, findDatum)
+import qualified Plutus.V1.Ledger.Interval           as LedgerIntervalV1 (contains, interval) --from, 
+import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
+import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
+import qualified Plutus.V1.Ledger.Tx                 as LedgerTxV1 (txOutDatum)
+import qualified PlutusTx
+import qualified PlutusTx.Builtins                   as TxBuiltins 
+
+--Import Internos
+
+import qualified Validators.StakeSimpleV1.Typos        as T
+
+-- Modulo:
+
+-- minumun ada that a txout can hold
+minLovelace :: Integer
+minLovelace = 2000000
 
 {-# INLINABLE checkIntervalSize #-}
 checkIntervalSize :: LedgerApiV1.Interval LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> Bool
 checkIntervalSize iv len =
     case getLowerBoundFromInterval iv of
-        Just t  -> LedgerIntervalV1.interval t (t + len) `LedgerIntervalV1.contains` iv
+        Just t -> LedgerIntervalV1.interval t (t + len) `LedgerIntervalV1.contains` iv
         Nothing -> False
 
 
@@ -88,35 +114,35 @@ checkIntervalSize iv len =
 getLowerBoundFromInterval :: LedgerApiV1.Interval a -> Maybe a
 getLowerBoundFromInterval iv = case LedgerApiV1.ivFrom iv of
     LedgerApiV1.LowerBound (LedgerApiV1.Finite lBound) _ -> Just lBound
-    _                            -> Nothing
+    _                           -> Nothing
 
 
 {-# INLINABLE stringToBuiltinByteString #-}
-stringToBuiltinByteString :: P.String -> BuiltinByteString
-stringToBuiltinByteString = toBuiltin . DataText.pack
+stringToBuiltinByteString :: P.String -> TxBuiltins.BuiltinByteString
+stringToBuiltinByteString = TxBuiltins.toBuiltin . DataByteStringChar8.pack
 
 {- | Function to return the Just value from a Maybe. -}
-{-# INLINABLE Helpers.fromJust #-}
-Helpers.fromJust :: Maybe a -> a
-Helpers.fromJust (Just valueInfo) = valueInfo
-Helpers.fromJust Nothing = traceError
-                   "Helpers.fromJust Nothing"
+{-# INLINABLE fromJust #-}
+fromJust :: Maybe a -> a
+fromJust (Just valueInfo) = valueInfo
+fromJust Nothing = traceError
+                   "fromJust Nothing"
                    
 
 {- | Try to get the PoolState Datum from a generic Datum. -}
 {-# INLINABLE getPoolStateFromDatum #-}
-getPoolStateFromDatum ::  Maybe ValidatorDatum -> Maybe PoolStateTypo
+getPoolStateFromDatum ::  Maybe T.ValidatorDatum -> Maybe T.PoolStateTypo
 getPoolStateFromDatum datum = case datum of
-    Just (PoolState dPoolState) -> do
+    Just (T.PoolState dPoolState) -> do
         -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm PoolState: %s" (P.show dPoolState)
         Just dPoolState  
     _ -> Nothing
 
 {- | Try to get the UserState Datum from a generic Datum. -}
 {-# INLINABLE getUserStateFromDatum #-}
-getUserStateFromDatum ::  Maybe ValidatorDatum -> Maybe UserStateTypo
+getUserStateFromDatum ::  Maybe T.ValidatorDatum -> Maybe T.UserStateTypo
 getUserStateFromDatum datum = case datum of
-    Just (UserState dUserState) -> do
+    Just (T.UserState dUserState) -> do
         -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm UserState: %s" (P.show dUserState)
         Just dUserState  
     _ -> Nothing
@@ -124,21 +150,21 @@ getUserStateFromDatum datum = case datum of
 
 {- | Check if the Datum is a PoolState. -}
 {-# INLINABLE datumIsPoolState #-}
-datumIsPoolState :: Maybe ValidatorDatum -> Bool
-datumIsPoolState (Just (PoolState _)) = True
+datumIsPoolState :: Maybe T.ValidatorDatum -> Bool
+datumIsPoolState (Just (T.PoolState _)) = True
 datumIsPoolState _             = False
 
 {- | Check if the Datum is a UserState. -}
 {-# INLINABLE datumIsUserState #-}
-datumIsUserState :: Maybe ValidatorDatum -> Bool
-datumIsUserState (Just (UserState _)) = True
+datumIsUserState :: Maybe T.ValidatorDatum -> Bool
+datumIsUserState (Just (T.UserState _)) = True
 datumIsUserState _             = False
 
 
 {- | Creates a new PoolState Datum using all the old Datums and adding the new fund to the specific master masterFunder. -}
-{-# INLINABLE T.mkPoolStateWithNewFundFromPoolStateList #-}
-T.mkPoolStateWithNewFundFromPoolStateList :: [PoolStateTypo] -> PoolNFT -> Master -> Fund -> ValidatorDatum
-T.mkPoolStateWithNewFundFromPoolStateList poolStateDatums poolNFT master fund  = do
+{-# INLINABLE mkPoolStateWithNewFundFromPoolStateList #-}
+mkPoolStateWithNewFundFromPoolStateList :: [T.PoolStateTypo] -> T.PoolNFT -> T.Master -> T.Fund -> T.ValidatorDatum
+mkPoolStateWithNewFundFromPoolStateList poolStateDatums poolNFT master fund  = do
     let 
         userNFTs = concat [ T.psUsersNFT datum | datum <- poolStateDatums ]
         masterFunders = concat [ T.psMasterFunders datum | datum <- poolStateDatums ]
@@ -150,40 +176,40 @@ T.mkPoolStateWithNewFundFromPoolStateList poolStateDatums poolNFT master fund  =
                 -- traceError "Can't Find Master Funder In Datums"
                 -- TODO: deberia dejar el error de arriba, pero como quiero ver como funciona los controles OnChain dejo que cree un nuevo PoolState Datum con un master que no existe
                 T.mkMasterFunder master fund
-            Just MasterFunder{..}  -> 
-                T.mkMasterFunder master (T.mfFund  + fund)
+            Just T.MasterFunder{..} -> 
+                T.mkMasterFunder master (mfFund  + fund)
 
-    PoolState $ T.mkPoolStateTypo poolNFT (masterFunderNew:masterFunder_others) userNFTs
+    T.PoolState $ T.mkPoolStateTypo poolNFT (masterFunderNew:masterFunder_others) userNFTs
 
 
 
 {- | Creates a new PoolState Datum with all the old Datums. -}
-{-# INLINABLE T.mkPoolStateFromPoolStateList #-}
-T.mkPoolStateFromPoolStateList :: [PoolStateTypo] -> PoolNFT  -> ValidatorDatum
-T.mkPoolStateFromPoolStateList poolStateDatums poolNFT  = do
+{-# INLINABLE mkPoolStateFromPoolStateList #-}
+mkPoolStateFromPoolStateList :: [T.PoolStateTypo] -> T.PoolNFT -> T.ValidatorDatum
+mkPoolStateFromPoolStateList poolStateDatums poolNFT  = do
     let 
         userNFTs = concat [ T.psUsersNFT datum | datum <- poolStateDatums ]
         masterFunders = concat [ T.psMasterFunders datum | datum <- poolStateDatums ]
         -- TODO: poolNFT es un parametro que deberia chekear sea igual a todos los PoolState Datums que estoy juntando.
 
-    PoolState $ T.mkPoolStateTypo poolNFT masterFunders userNFTs
+    T.PoolState $ T.mkPoolStateTypo poolNFT masterFunders userNFTs
 
 
 {- | Creates a new PoolState Datum sing all the old Datums and adding the new user NFT. -}
-{-# INLINABLE T.mkPoolStateWithNewUserInvestFromPoolStateList #-}
-T.mkPoolStateWithNewUserInvestFromPoolStateList :: [PoolStateTypo] -> PoolNFT  -> UserNFT -> ValidatorDatum
-T.mkPoolStateWithNewUserInvestFromPoolStateList poolStateDatums poolNFT userNFT  = do
+{-# INLINABLE mkPoolStateWithNewUserInvestFromPoolStateList #-}
+mkPoolStateWithNewUserInvestFromPoolStateList :: [T.PoolStateTypo] -> T.PoolNFT -> T.UserNFT -> T.ValidatorDatum
+mkPoolStateWithNewUserInvestFromPoolStateList poolStateDatums poolNFT userNFT  = do
     let 
         userNFTs = concat [ T.psUsersNFT datum | datum <- poolStateDatums ]
         masterFunders = concat [ T.psMasterFunders datum | datum <- poolStateDatums ]
 
-    PoolState $ T.mkPoolStateTypo poolNFT masterFunders (userNFT:userNFTs)
+    T.PoolState $ T.mkPoolStateTypo poolNFT masterFunders (userNFT:userNFTs)
 
 
 -- Definition of Currency Symbol for the NFT
 
 {-# INLINABLE curSymbol #-}
-curSymbol :: LedgerScriptsV1.MintingPolicy  -> LedgerValueV1.CurrencySymbol
+curSymbol :: LedgerScriptsV1.MintingPolicy -> LedgerValueV1.CurrencySymbol
 curSymbol  = UtilsScriptsV1.scriptCurrencySymbol 
 
 -- Helpers for conversion of time and slots
@@ -219,9 +245,9 @@ getOnwOutputs = LedgerContextsV1.getContinuingOutputs
 
 {- | Gets the datum attached to a utxo. -}
 {-# INLINABLE getDatumFromTxOut #-}
-getDatumFromTxOut :: PlutusTx.FromData ValidatorDatum => LedgerApiV1.TxOut -> LedgerContextsV1.ScriptContext -> Maybe ValidatorDatum
-getDatumFromTxOut o ctx = LedgerApiV1.txOutValue o >>= (`LedgerContextsV1.findDatum` LedgerContextsV1.scriptContextTxInfo ctx)
-                   >>= PlutusTx.fromBuiltinData . LedgerScriptsV1.getDatum :: Maybe ValidatorDatum
+getDatumFromTxOut :: PlutusTx.FromData T.ValidatorDatum => LedgerApiV1.TxOut -> LedgerContextsV1.ScriptContext -> Maybe T.ValidatorDatum
+getDatumFromTxOut o ctx = LedgerTxV1.txOutDatum o >>= (`LedgerContextsV1.findDatum` LedgerContextsV1.scriptContextTxInfo ctx)
+                   >>= PlutusTx.fromBuiltinData . LedgerScriptsV1.getDatum :: Maybe T.ValidatorDatum
 
 
 {- | Gets the input PoolState Datums of the tx ScriptContext. -}
@@ -231,25 +257,25 @@ getInputPoolStateDatums ctx = do
     let
         txInInfoResolveds = [LedgerApiV1.txInInfoResolved  txInfoInput | txInfoInput <- LedgerApiV1.txInfoInputs (LedgerContextsV1.scriptContextTxInfo ctx)]
 
-        txOutAndDatums = [  (LedgerApiV1.txInInfoResolved, getDatumFromTxOut LedgerApiV1.txInInfoResolved ctx) | LedgerApiV1.txInInfoResolved <- txInInfoResolveds]
+        txOutAndDatums = [  (txInInfoResolved, getDatumFromTxOut txInInfoResolved ctx) | txInInfoResolved <- txInInfoResolveds]
 
         txOutAndJustDatums = [  (txtout, dat) | (txtout, dat) <- txOutAndDatums, isJust dat ]
 
-        txOutAndPoolState =  [  (txtout, Helpers.fromJust $ getPoolStateFromDatum dat) | (txtout, dat) <- txOutAndJustDatums,  datumIsPoolState dat ] 
+        txOutAndPoolState =  [  (txtout, fromJust $ getPoolStateFromDatum dat) | (txtout, dat) <- txOutAndJustDatums,  datumIsPoolState dat ] 
 
     txOutAndPoolState
 
 {-# INLINABLE getInputUserStateDatums #-}
-getInputUserStateDatums :: LedgerContextsV1.ScriptContext -> [(LedgerApiV1.TxOut, UserStateTypo)]
+getInputUserStateDatums :: LedgerContextsV1.ScriptContext -> [(LedgerApiV1.TxOut, T.UserStateTypo)]
 getInputUserStateDatums ctx = do
     let
         txInInfoResolveds = [LedgerApiV1.txInInfoResolved  txInfoInput | txInfoInput <- LedgerApiV1.txInfoInputs (LedgerContextsV1.scriptContextTxInfo ctx)]
 
-        txOutAndDatums = [  (LedgerApiV1.txInInfoResolved, getDatumFromTxOut LedgerApiV1.txInInfoResolved ctx) | LedgerApiV1.txInInfoResolved <- txInInfoResolveds]
+        txOutAndDatums = [  (txInInfoResolved, getDatumFromTxOut txInInfoResolved ctx) | txInInfoResolved <- txInInfoResolveds]
 
         txOutAndJustDatums = [  (txtout, dat) | (txtout, dat) <- txOutAndDatums, isJust dat ]
 
-        txOutAndUserState =  [  (txtout, Helpers.fromJust $ getUserStateFromDatum dat) | (txtout, dat) <- txOutAndJustDatums,  datumIsUserState dat ] 
+        txOutAndUserState =  [  (txtout, fromJust $ getUserStateFromDatum dat) | (txtout, dat) <- txOutAndJustDatums,  datumIsUserState dat ] 
 
     txOutAndUserState
 
@@ -258,20 +284,20 @@ getSingleOwnOutputPoolStateDatum :: LedgerContextsV1.ScriptContext -> (LedgerApi
 getSingleOwnOutputPoolStateDatum ctx = 
     case getOnwOutputs ctx of
         [txOut] -> case getDatumFromTxOut txOut ctx of
-            Just (PoolState dPoolState)  -> (txOut, dPoolState)
-            Nothing   -> traceError "Wrong output PoolState Datum type."
-        _   -> traceError "Expected exactly one output with PoolState Datum."
+            Just (T.PoolState dPoolState) -> (txOut, dPoolState)
+            Nothing  -> traceError "Wrong output PoolState Datum type."
+        _  -> traceError "Expected exactly one output with PoolState Datum."
 
 {-# INLINABLE getDoubleOwnOutputsPoolStateAndUSerStateDatum #-}
-getDoubleOwnOutputsPoolStateAndUSerStateDatum :: LedgerContextsV1.ScriptContext -> ((LedgerApiV1.TxOut, T.PoolStateTypo),(LedgerApiV1.TxOut, UserStateTypo))
+getDoubleOwnOutputsPoolStateAndUSerStateDatum :: LedgerContextsV1.ScriptContext -> ((LedgerApiV1.TxOut, T.PoolStateTypo),(LedgerApiV1.TxOut, T.UserStateTypo))
 getDoubleOwnOutputsPoolStateAndUSerStateDatum ctx = 
     case getOnwOutputs ctx of
         [txOut1,txOut2]-> case (getDatumFromTxOut txOut1 ctx, getDatumFromTxOut txOut2 ctx) of
-            (Just (PoolState dPoolState), Just (UserState dUserState) ) -> ((txOut1, dPoolState),(txOut2, dUserState))
-            (Just (UserState dUserState), Just (PoolState dPoolState) ) -> ((txOut2, dPoolState),(txOut1, dUserState))
-            (Nothing,_)   -> traceError "Wrong output PoolState Datum or UserState Datum type."
-            (_,Nothing)   -> traceError "Wrong output PoolState Datum or UserState Datum type."
-        _   -> traceError "Expected exactly two output. One with PoolState Datum and other with UserState Datum"
+            (Just (T.PoolState dPoolState), Just (T.UserState dUserState) ) -> ((txOut1, dPoolState),(txOut2, dUserState))
+            (Just (T.UserState dUserState), Just (T.PoolState dPoolState) ) -> ((txOut2, dPoolState),(txOut1, dUserState))
+            (Nothing,_)  -> traceError "Wrong output PoolState Datum or UserState Datum type."
+            (_,Nothing)  -> traceError "Wrong output PoolState Datum or UserState Datum type."
+        _  -> traceError "Expected exactly two output. One with PoolState Datum and other with UserState Datum"
 
 
 
@@ -310,7 +336,7 @@ msPerYearMi :: Integer
 msPerYearMi = msPerYear * 1_000_000
 
 {-# INLINABLE getRewardsPerInvest #-}
-getRewardsPerInvest :: Maybe LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> Invest  -> Proffit
+getRewardsPerInvest :: Maybe LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> T.Invest -> T.Proffit
 getRewardsPerInvest lastClaim now depTime invest =
     case lastClaim of
         Nothing -> getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)
@@ -320,7 +346,7 @@ getRewardsPerInvest lastClaim now depTime invest =
             -- then getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)
             -- else getRewards $ LedgerApiV1.getPOSIXTime (now - lClaim)
   where
-    getRewards :: Integer -> Proffit
+    getRewards :: Integer -> T.Proffit
     -- TODO: deberia calcular 1% por slot, o sea por segundo, o sea por 1000ms
     -- getlevel: 1%
     -- 1% * 10000ms * 10_000_000    divide 100% * 1000ms * 

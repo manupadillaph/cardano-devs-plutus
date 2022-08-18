@@ -23,11 +23,13 @@
 
 module Validators.StakePlusV1.OnChain
     ( 
-      codeValidator,
-      typedValidator
-    , hashValidator
-    , addressValidator
+        codeValidator,
+        typedValidator,
+        hashValidator,
+        addressValidator
     ) where
+
+--Import Externos
 
 import qualified Ledger.Ada                          as LedgerAda
 import qualified Plutus.Script.Utils.V1.Typed.Scripts          as UtilsTypedScriptsV1

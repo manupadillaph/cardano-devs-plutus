@@ -70,17 +70,17 @@ library
                      , Validators.LockerV1.TestWithEmulator
                      , Validators.LockerV1.Typos
 
-                    --  , Validators.StakeSimpleV1
-                    --  , Validators.StakeSimpleV1.OffChain
-                    --  , Validators.StakeSimpleV1.OnChain
-                    --  , Validators.StakeSimpleV1.OnChainNFT
-                    --  , Validators.StakeSimpleV1.PAB
-                    --  , Validators.StakeSimpleV1.TestWithEmulator
-                    --  , Validators.StakeSimpleV1.TestWithPABSimulator
-                    --  , Validators.StakeSimpleV1.Typos
-                    --  , Validators.StakeSimpleV1.OnChainHelpers
-                    --  , Validators.StakeSimpleV1.OffChainHelpers
-                    --  , Validators.StakeSimpleV1.Helpers
+                     , Validators.StakeSimpleV1
+                     , Validators.StakeSimpleV1.OffChain
+                     , Validators.StakeSimpleV1.OnChain
+                     , Validators.StakeSimpleV1.OnChainNFT
+                     , Validators.StakeSimpleV1.PAB
+                     , Validators.StakeSimpleV1.TestWithEmulator
+                     , Validators.StakeSimpleV1.TestWithPABSimulator
+                     , Validators.StakeSimpleV1.Typos
+                     , Validators.StakeSimpleV1.OnChainHelpers
+                     , Validators.StakeSimpleV1.OffChainHelpers
+                     , Validators.StakeSimpleV1.Helpers
 
                      , Validators.StakePlusV1
                      , Validators.StakePlusV1.OffChain

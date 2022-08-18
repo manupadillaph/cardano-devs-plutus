@@ -21,9 +21,7 @@
 
 --{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Validators.MarketNFTV1.Typos (
-    ValidatorDatum (..),  ValidatorRedeemer (..), NFT
-) where
+module Validators.MarketNFTV1.Typos where
 
 --Import Externos:
 

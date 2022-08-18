@@ -26,9 +26,9 @@ main = do
 
   putStrLn "1: write Validator LockerV1 datum"
   putStrLn "2: write Validator LockerV1 redeemer"
-
   putStrLn "3: write Validator LockerV1 plutus cbor"
   putStrLn "4: write Validator LockerV1 hash"
+
   putStrLn "5: write Validator AlwaysTrueV1 plutus cbor"
   putStrLn "6: write Validator AlwaysTrueV1 hash"
   putStrLn "7: write Validator AlwaysFalseV1 plutus cbor"
@@ -39,6 +39,21 @@ main = do
   putStrLn "12: write Validator DeadlineV1 hash"
   putStrLn "13: write Validator RedeemerV1 plutus cbor"
   putStrLn "14: write Validator RedeemerV1 hash"
+
+  putStrLn "121: write Validator Market NFT V1 datum"
+  putStrLn "122: write Validator Market NFT V1 redeemer"
+  putStrLn "123: write Validator Market NFT V1 cbor"
+  putStrLn "124: write Validator Market NFT V1 hash"
+
+  putStrLn "131: write Validator Stake Simple V1 datum"
+  putStrLn "132: write Validator Stake Simple V1 redeemer"
+  putStrLn "133: write Validator Stake Simple V1 cbor"
+  putStrLn "134: write Validator Stake Simple V1 hash"
+
+  putStrLn "141: write Validator Stake Plus V1 datum"
+  putStrLn "142: write Validator Stake Plus V1 redeemer"
+  putStrLn "143: write Validator Stake Plus V1 cbor"
+  putStrLn "144: write Validator Stake Plus V1 hash"
 
   putStrLn "15: write Minting PolicyFreeV1"
   putStrLn "16: write Minting PolicyNFTV1"
