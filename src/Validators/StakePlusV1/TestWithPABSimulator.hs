@@ -168,7 +168,7 @@ walletFromEntity entity =
         WalletEmulator.WalletEntity wallet -> Just wallet
         _ -> Nothing
 
---path2 = "~/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell/"
+--path2 = "~/source/Plutus-Devs/cardano-devs-plutus/"
 path = ""
 
 

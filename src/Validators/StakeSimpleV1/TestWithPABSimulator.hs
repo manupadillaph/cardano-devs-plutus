@@ -165,7 +165,7 @@ writeJSON file   = B.writeFile $  path ++ file
 -- stringEq a = a
 
 
---path2 = "~/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell/"
+--path2 = "~/source/Plutus-Devs/cardano-devs-plutus/"
 path = ""
 
 mainLoop :: Maybe Integer -> Maybe PoolParams -> Control.Monad.Freer.Internal.Eff (Plutus.PAB.Core.PABEffects (Builtin PAB.ValidatorContracts) (Simulator.SimulatorState (Builtin PAB.ValidatorContracts))) () -> Control.Monad.Freer.Internal.Eff (Plutus.PAB.Core.PABEffects (Builtin PAB.ValidatorContracts) (Simulator.SimulatorState (Builtin PAB.ValidatorContracts))) ()

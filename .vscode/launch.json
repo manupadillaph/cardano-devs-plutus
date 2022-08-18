@@ -10,7 +10,7 @@
             "name": "haskell-debug-adapter",
             "internalConsoleOptions": "openOnSessionStart",
             "workspace": "${workspaceFolder}",
-            "startup": "/home/manuelpadilla/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell/app/utils-token-name.hs",
+            "startup": "/home/manuelpadilla/source/Plutus-Devs/cardano-devs-plutus/app/utils-token-name.hs",
             "startupFunc": "main",
             "startupArgs": "",
             "stopOnEntry": false,
