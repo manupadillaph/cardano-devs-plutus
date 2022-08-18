@@ -121,7 +121,7 @@ data UserStateTypo = UserStateTypo
         usDeadline   :: Deadline,
         usChashedOut   :: Proffit,
         usRewardsNotClaimed   :: Proffit,
-        usLastClaimAt   :: (P.Maybe LedgerApiV1.POSIXTime)
+        usLastClaimAt   :: (Maybe LedgerApiV1.POSIXTime)
     } deriving (P.Eq, P.Show, GHCGenerics.Generic)
   deriving anyclass (DataAeson.ToJSON, DataAeson.FromJSON)
 
@@ -173,7 +173,7 @@ mkPoolStateTypo  poolNFT masterFunders userNFTs cashedout countTotalUtxoWithPool
         compareUserNFT :: UserNFT -> UserNFT -> Ordering
         compareUserNFT userNFT1 userNFT2
             | userNFT1 < userNFT2 = LT
-            | otherwise = P.GT
+            | otherwise = GT
         -- need to be in order so it can be used after for cheking equality
         masterFundersOrder = sortBy compareMasterFunders masterFunders
         userNFTsOrder = sortBy compareUserNFT userNFTs
@@ -185,11 +185,11 @@ mkPoolState  poolNFT masterFunders userNFTs cashedout countTotalUtxoWithPoolStat
 
 
 
-mkUserStateTypo :: User -> UserNFT -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit -> P.Maybe LedgerApiV1.POSIXTime   -> UserStateTypo
+mkUserStateTypo :: User -> UserNFT -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit -> Maybe LedgerApiV1.POSIXTime   -> UserStateTypo
 mkUserStateTypo user userNFT invest createdat deadline cashedout rewardsNotClaimed  lastClaim = UserStateTypo { usUser = user, usUserNFT = userNFT , usInvest = invest ,usCreatedAt = createdat , usDeadline = deadline , usRewardsNotClaimed = rewardsNotClaimed , usChashedOut = cashedout, usLastClaimAt = lastClaim }
 
 
-mkUserState:: User -> UserNFT ->  Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit  -> P.Maybe LedgerApiV1.POSIXTime -> ValidatorDatum
+mkUserState:: User -> UserNFT ->  Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit  -> Maybe LedgerApiV1.POSIXTime -> ValidatorDatum
 mkUserState user userNFT invest createdat deadline  cashedout rewardsNotClaimed lastClaim = UserState $ mkUserStateTypo user userNFT invest createdat deadline cashedout  rewardsNotClaimed lastClaim
 
 

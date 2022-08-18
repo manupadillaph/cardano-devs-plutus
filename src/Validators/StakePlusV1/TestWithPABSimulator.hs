@@ -81,7 +81,7 @@ walletPaymentPubKeyHash :: Integer -> Ledger.PaymentPubKeyHash
 walletPaymentPubKeyHash walletNumber = LedgerCardanoWallet.paymentPubKeyHash (LedgerCardanoWallet.fromWalletNumber $ LedgerCardanoWallet.WalletNumber walletNumber)
 
 walletPaymentPubKeyHashAddress ::  Integer -> LedgerAddressV1.Address
-walletPaymentPubKeyHashAddress walletNumber = Ledger.pubKeyHashAddress (walletPaymentPubKeyHash walletNumber) P.Nothing
+walletPaymentPubKeyHashAddress walletNumber = Ledger.pubKeyHashAddress (walletPaymentPubKeyHash walletNumber) Nothing
 
 getUtxosListInPABSimulator :: Ledger.Blockchain -> LedgerAddressV1.Address -> [(Ledger.TxOutRef, Ledger.TxOut)]
 getUtxosListInPABSimulator blockchain addr =  do
@@ -117,7 +117,7 @@ getAda = do
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Ingrese un monto ADA:"
     numberSrt <- MonadIOClass.liftIO P.getLine
     case TextRead.readMaybe numberSrt of 
-        P.Just x -> 
+        Just x -> 
             if x > 0 then return x
             else getAda
         _ -> getAda
@@ -162,17 +162,17 @@ fromScript pParams entity =
         _ -> False
 
 
-walletFromEntity :: WalletEmulator.Entity -> P.Maybe WalletEmulator.Wallet
+walletFromEntity :: WalletEmulator.Entity -> Maybe WalletEmulator.Wallet
 walletFromEntity entity = 
     case entity of 
-        WalletEmulator.WalletEntity wallet -> P.Just wallet
-        _ -> P.Nothing
+        WalletEmulator.WalletEntity wallet -> Just wallet
+        _ -> Nothing
 
 --path2 = "~/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell/"
 path = ""
 
 
-elegirWallet ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+elegirWallet ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 elegirWallet walletNro pParams shutdown = do
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Ingrese una wallet:"
 
@@ -185,11 +185,11 @@ elegirWallet walletNro pParams shutdown = do
 
     mainLoop (TextRead.readMaybe opcionWallet)  pParams shutdown
 
-crearPoolParams ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+crearPoolParams ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 crearPoolParams walletNro pParams shutdown = do
 
     case walletNro of
-        P.Just walletNro -> do
+        Just walletNro -> do
 
             blockchain <- PABSimulator.blockchain
 
@@ -244,7 +244,7 @@ crearPoolParams walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) (P.Just pParams) shutdown
+            mainLoop (Just walletNro) (Just pParams) shutdown
 
         _  -> do
 
@@ -256,7 +256,7 @@ crearPoolParams walletNro pParams shutdown = do
 
     
 
-elegirPoolParams ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+elegirPoolParams ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 elegirPoolParams walletNro pParams shutdown = do
 
     files <- MonadIOClass.liftIO $ SystemDirectory.getDirectoryContents "files/stakePlus"
@@ -280,11 +280,11 @@ elegirPoolParams walletNro pParams shutdown = do
 
 
 
-crearPool ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+crearPool ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 crearPool walletNro pParams shutdown = do
 
     case (walletNro,  pParams) of
-        (P.Just walletNro, P.Just pParams) -> do
+        (Just walletNro, Just pParams) -> do
             let 
 
                 poolNFT = T.ppPoolNFT pParams
@@ -325,23 +325,23 @@ crearPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) (P.Just pParams) shutdown
+            mainLoop (Just walletNro) (Just pParams) shutdown
 
-        (_, P.Just pParams) -> do
+        (_, Just pParams) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Wallet"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing (P.Just pParams) shutdown
+            mainLoop Nothing (Just pParams) shutdown
 
-        (P.Just walletNro, _) -> do
+        (Just walletNro, _) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Pool Params"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) P.Nothing shutdown
+            mainLoop (Just walletNro) Nothing shutdown
 
         (_, _) -> do
 
@@ -349,12 +349,12 @@ crearPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing P.Nothing shutdown
+            mainLoop Nothing Nothing shutdown
 
-fundPool ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+fundPool ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 fundPool walletNro pParams shutdown = do
     case (walletNro,  pParams) of
-        (P.Just walletNro, P.Just pParams) -> do
+        (Just walletNro, Just pParams) -> do
 
             fund <- getAda
 
@@ -375,23 +375,23 @@ fundPool walletNro pParams shutdown = do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
-            mainLoop (P.Just walletNro) (P.Just pParams) shutdown
+            mainLoop (Just walletNro) (Just pParams) shutdown
 
-        (_, P.Just pParams) -> do
+        (_, Just pParams) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Wallet"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing (P.Just pParams) shutdown
+            mainLoop Nothing (Just pParams) shutdown
 
-        (P.Just walletNro, _) -> do
+        (Just walletNro, _) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Pool Params"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) P.Nothing shutdown
+            mainLoop (Just walletNro) Nothing shutdown
 
         (_, _) -> do
 
@@ -399,13 +399,13 @@ fundPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing P.Nothing shutdown
+            mainLoop Nothing Nothing shutdown
 
-fundAndMergePool ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+fundAndMergePool ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 fundAndMergePool walletNro pParams shutdown = do
 
     case (walletNro,  pParams) of
-        (P.Just walletNro, P.Just pParams) -> do
+        (Just walletNro, Just pParams) -> do
             
             blockchain <- PABSimulator.blockchain    
 
@@ -418,7 +418,7 @@ fundAndMergePool walletNro pParams shutdown = do
 
                 formatValues utxoRef =  [P.show val   |  val <- LedgerValueV1.flattenValue $ Helpers.fromJust $ LedgerBlockchain.value blockchain utxoRef ]
 
-                formatUtxoValues = concat [(P.show ( 1 P.+  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
+                formatUtxoValues = concat [(P.show ( 1 +  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
 
                 formatSelected :: [(Integer,Ledger.TxOutRef)]  -> [P.String]  
                 formatSelected opciones = concat [ (P.show numOpcion):(P.show utxoRef) :[] | (numOpcion, utxoRef) <-  opciones ]
@@ -442,9 +442,9 @@ fundAndMergePool walletNro pParams shutdown = do
                     opcionUtxo <- MonadIOClass.liftIO P.getLine
 
                     case TextRead.readMaybe opcionUtxo of 
-                        P.Just 0 -> 
+                        Just 0 -> 
                             return opciones
-                        P.Just x -> do
+                        Just x -> do
                             let 
                                 new = (x,fst $ uTxOuts!!(x-1)):opciones
                             selectUtxo new
@@ -479,23 +479,23 @@ fundAndMergePool walletNro pParams shutdown = do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
-            mainLoop (P.Just walletNro) (P.Just pParams) shutdown
+            mainLoop (Just walletNro) (Just pParams) shutdown
 
-        (_, P.Just pParams) -> do
+        (_, Just pParams) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Wallet"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing (P.Just pParams) shutdown
+            mainLoop Nothing (Just pParams) shutdown
 
-        (P.Just walletNro, _) -> do
+        (Just walletNro, _) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Pool Params"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) P.Nothing shutdown
+            mainLoop (Just walletNro) Nothing shutdown
 
         (_, _) -> do
 
@@ -503,12 +503,12 @@ fundAndMergePool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing P.Nothing shutdown
+            mainLoop Nothing Nothing shutdown
 
-investInPool ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+investInPool ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 investInPool walletNro pParams shutdown = do
     case (walletNro,  pParams) of
-        (P.Just walletNro, P.Just pParams) -> do
+        (Just walletNro, Just pParams) -> do
             
             blockchain <- PABSimulator.blockchain
 
@@ -570,23 +570,23 @@ investInPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop  (P.Just walletNro) (P.Just pParams) shutdown
+            mainLoop  (Just walletNro) (Just pParams) shutdown
 
-        (_, P.Just pParams) -> do
+        (_, Just pParams) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Wallet"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing (P.Just pParams) shutdown
+            mainLoop Nothing (Just pParams) shutdown
 
-        (P.Just walletNro, _) -> do
+        (Just walletNro, _) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Pool Params"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) P.Nothing shutdown
+            mainLoop (Just walletNro) Nothing shutdown
 
         (_, _) -> do
 
@@ -594,12 +594,12 @@ investInPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing P.Nothing shutdown
+            mainLoop Nothing Nothing shutdown
 
-claimRewardsFromPool ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+claimRewardsFromPool ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 claimRewardsFromPool walletNro pParams shutdown = do
     case (walletNro,  pParams) of
-        (P.Just walletNro, P.Just pParams) -> do
+        (Just walletNro, Just pParams) -> do
             
             files <- MonadIOClass.liftIO $ SystemDirectory.getDirectoryContents "files/stakePlus"
             
@@ -648,23 +648,23 @@ claimRewardsFromPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop  (P.Just walletNro) (P.Just pParams) shutdown
+            mainLoop  (Just walletNro) (Just pParams) shutdown
 
-        (_, P.Just pParams) -> do
+        (_, Just pParams) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Wallet"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing (P.Just pParams) shutdown
+            mainLoop Nothing (Just pParams) shutdown
 
-        (P.Just walletNro, _) -> do
+        (Just walletNro, _) -> do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Elija Pool Params"
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) P.Nothing shutdown
+            mainLoop (Just walletNro) Nothing shutdown
 
         (_, _) -> do
 
@@ -672,13 +672,13 @@ claimRewardsFromPool walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop P.Nothing P.Nothing shutdown
+            mainLoop Nothing Nothing shutdown
 
 
 
 
 
-balances ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+balances ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 balances walletNro pParams shutdown = do
     let
         master1 = 1
@@ -705,7 +705,7 @@ balances walletNro pParams shutdown = do
     mapM_ (PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)) ["User 2: " ++ P.show   (walletPaymentPubKeyHash user2  ) ++ " " ++  P.show value | (entity, value) <-  DataMap.toList balances, fromWallet user2 entity ]
     
     case pParams of
-        P.Just pParams -> do
+        Just pParams -> do
             mapM_ (PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)) ["Script: " ++ P.show (OnChain.hashValidator pParams) ++ " " ++  P.show value | (entity, value) <-  DataMap.toList balances, fromScript pParams  entity ]
     
         _  -> 
@@ -722,10 +722,10 @@ balances walletNro pParams shutdown = do
     
 
 
-utxoAtWallet ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+utxoAtWallet ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 utxoAtWallet walletNro pParams shutdown = do
     case walletNro of
-        P.Just walletNro -> do
+        Just walletNro -> do
 
             blockchain <- PABSimulator.blockchain
 
@@ -744,7 +744,7 @@ utxoAtWallet walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop (P.Just walletNro) pParams shutdown 
+            mainLoop (Just walletNro) pParams shutdown 
 
         _  -> do
 
@@ -755,11 +755,11 @@ utxoAtWallet walletNro pParams shutdown = do
             mainLoop walletNro pParams shutdown
 
 
-utxoAtScript ::  P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
+utxoAtScript ::  Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () 
 utxoAtScript walletNro pParams shutdown = do
 
     case pParams of
-        P.Just pParams -> do
+        Just pParams -> do
             blockchain <- PABSimulator.blockchain
 
             let 
@@ -778,15 +778,15 @@ utxoAtScript walletNro pParams shutdown = do
                     --         if Helpers.datumIsUserState dat then
                     --             Helpers.getUserStateFromMaybeDatum dat   
                     --         else 
-                    --             P.Nothing
+                    --             Nothing
                     -- else 
-                    --     P.Nothing
+                    --     Nothing
 
                     P.show $ Helpers.fromJust $ LedgerTxV1.txOutDatum utxout
 
                 formatValues utxoRef =  [P.show val   |  val <- LedgerValueV1.flattenValue $ Helpers.fromJust $ LedgerBlockchain.value blockchain utxoRef ]
 
-                formatUtxoValues = concat [(P.show ( 1 P.+  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
+                formatUtxoValues = concat [(P.show ( 1 +  Helpers.fromJust(DataList.elemIndex (utxoRef, utxout) uTxOuts))): (    "At: " ++ P.show utxoRef):("Datum: " ++  datumFrom utxout):formatValues utxoRef | (utxoRef, utxout) <-  uTxOuts ]
 
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Utxo at Script"
@@ -798,7 +798,7 @@ utxoAtScript walletNro pParams shutdown = do
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
 
-            mainLoop walletNro (P.Just pParams) shutdown 
+            mainLoop walletNro (Just pParams) shutdown 
 
         _  -> do
 
@@ -808,25 +808,25 @@ utxoAtScript walletNro pParams shutdown = do
 
             mainLoop walletNro pParams shutdown
 
-mainLoop :: P.Maybe Integer -> P.Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) ()
+mainLoop :: Maybe Integer -> Maybe T.PoolParams -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) () -> MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts))) ()
 mainLoop walletNro pParams shutdown = do
 
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) ""
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "OPERACIONES:"
 
     case walletNro of
-        P.Nothing ->
+        Nothing ->
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "1 - Elegir Wallet"
-        P.Just walletNro ->
+        Just walletNro ->
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "1 - Elegir Wallet (" ++ P.show walletNro ++ ")"
 
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) ""
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "21 - Crear Pool Params"
 
     case pParams of
-        P.Nothing ->
+        Nothing ->
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "22 - Elegir Pool Params"
-        P.Just pParams ->
+        Just pParams ->
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "22 - Elegir Pool Params(" ++ P.show (T.ppPoolNFT pParams ) ++ ")"
 
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) ""
@@ -853,40 +853,40 @@ mainLoop walletNro pParams shutdown = do
 
     case TextRead.readMaybe opcion of
 
-        P.Just 1 -> do
+        Just 1 -> do
 
             elegirWallet walletNro pParams shutdown
 
-        P.Just 21 -> do
+        Just 21 -> do
             
             crearPoolParams walletNro pParams shutdown
 
-        P.Just 22 -> do
+        Just 22 -> do
 
             elegirPoolParams walletNro pParams shutdown
 
-        P.Just 31 -> do
+        Just 31 -> do
             
             crearPool walletNro pParams shutdown
 
-        P.Just 32 -> do
+        Just 32 -> do
             
             fundPool walletNro pParams shutdown
 
-        P.Just 33 -> do
+        Just 33 -> do
             
             fundAndMergePool walletNro pParams shutdown
 
-        P.Just 41 -> do
+        Just 41 -> do
             
             investInPool walletNro pParams shutdown
 
-        P.Just 42 -> do
+        Just 42 -> do
             
             claimRewardsFromPool walletNro pParams shutdown
 
 
-        P.Just 81 -> do
+        Just 81 -> do
             
             balances walletNro pParams shutdown
 
@@ -895,16 +895,16 @@ mainLoop walletNro pParams shutdown = do
 
             mainLoop walletNro pParams shutdown
 
-        P.Just 82 -> do
+        Just 82 -> do
             
             utxoAtWallet walletNro pParams shutdown
 
-        P.Just 83 -> do
+        Just 83 -> do
             
             utxoAtScript walletNro pParams shutdown
 
 
-        P.Just 99 -> do
+        Just 99 -> do
             
             balances walletNro pParams shutdown
 
@@ -945,7 +945,7 @@ myTrace2 = do
     -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "user1 PkhAddress = " ++ P.show (walletPaymentPubKeyHashAddress user1)
 
 
-    mainLoop P.Nothing P.Nothing shutdown
+    mainLoop Nothing Nothing shutdown
 
 
 

@@ -52,54 +52,54 @@ getValueFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> LedgerValueV1.Value
 getValueFromChainIndexTxOut = LedgerTx._ciTxOutValue 
 
 {- | Try to get the generic Datum from a ChainIndexTxOut. -}
-getDatumm :: LedgerTx.ChainIndexTxOut -> P.Maybe T.ValidatorDatum
+getDatumm :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
 getDatumm chainIndexTxOut = do
     let
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum chainIndexTxOut
 
-    LedgerApiV1.Datum e <- P.snd datHashOrDatum
+    LedgerApiV1.Datum e <- snd datHashOrDatum
 
     case PlutusTx.fromBuiltinData e of
-        P.Nothing -> P.Nothing
-        P.Just d -> d
+        Nothing -> Nothing
+        Just d -> d
 
 {- | Try to get the generic Datum from a ChainIndexTxOut. -}
-getDatumFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> P.Maybe T.ValidatorDatum
+getDatumFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
 getDatumFromChainIndexTxOut scriptChainIndexTxOut = do
 
     let
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum scriptChainIndexTxOut
 
-    LedgerApiV1.Datum e <- P.snd datHashOrDatum
+    LedgerApiV1.Datum e <- snd datHashOrDatum
 
     case PlutusTx.fromBuiltinData e of
-        P.Nothing -> P.Nothing
-        P.Just (T.PoolState dPoolState) -> do
+        Nothing -> Nothing
+        Just (T.PoolState dPoolState) -> do
             -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm Master: %s" (P.show dPoolState)
-            P.Just (T.PoolState dPoolState)   
-        P.Just (T.UserState validatorUserState) -> do
+            Just (T.PoolState dPoolState)   
+        Just (T.UserState validatorUserState) -> do
             -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm User: %s" (P.show validatorUserState)
-            P.Just (T.UserState validatorUserState)   
+            Just (T.UserState validatorUserState)   
 
     -- PlutusContract.logInfo @P.String $ TextPrintf.printf "getDatumFromChainIndexTxOut de: %s " (P.show $ _ciTxOutDatum o)
     
     -- case _ciTxOutDatum scriptChainIndexTxOut of
-    --     P.Left _          -> do
-    --         -- PlutusContract.logInfo @P.String $ TextPrintf.printf "P.Left " 
-    --         P.Nothing
-    --     P.Right datum -> do
+    --     Left _          -> do
+    --         -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Left " 
+    --         Nothing
+    --     Right datum -> do
     --         let 
-    --             validatorDatum = PlutusTx.fromBuiltinData (LedgerScriptsV1.getDatum datum) :: P.Maybe T.ValidatorDatum
+    --             validatorDatum = PlutusTx.fromBuiltinData (LedgerScriptsV1.getDatum datum) :: Maybe T.ValidatorDatum
     --         case validatorDatum of
-    --             P.Nothing -> do
-    --                 -- PlutusContract.logInfo @P.String $ TextPrintf.printf "P.Nothing "
-    --                 P.Nothing    
-    --             P.Just (T.PoolState dPoolState) -> do
+    --             Nothing -> do
+    --                 -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Nothing "
+    --                 Nothing    
+    --             Just (T.PoolState dPoolState) -> do
     --                 -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm Master: %s" (P.show dPoolState)
-    --                 P.Just (T.PoolState dPoolState)   
-    --             P.Just (T.UserState validatorUserState) -> do
+    --                 Just (T.PoolState dPoolState)   
+    --             Just (T.UserState validatorUserState) -> do
     --                 -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm User: %s" (P.show validatorUserState)
-    --                 P.Just (T.UserState validatorUserState)   
+    --                 Just (T.UserState validatorUserState)   
 
 
 {- | Get the list of PoolState Datums from a list of Utxos -}
@@ -205,14 +205,14 @@ getUtxoListWithValidUserStateInScript addressValidator userNFT  = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "Utxos List Valid UserState: %s" (P.show utxosRef)
     return utxosListValid
 
-getUtxoWithNFTInList :: [(LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)] -> T.PoolNFT -> P.Maybe (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)
+getUtxoWithNFTInList :: [(LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)] -> T.PoolNFT -> Maybe (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)
 getUtxoWithNFTInList utxos poolNFT  = do
     let
         utxoWithNFT = [utxo  | utxo <- utxos , LedgerValueV1.assetClassValueOf  (getValueFromChainIndexTxOut $ snd utxo) poolNFT > 0 ]
 
     case utxoWithNFT of
-        [x] -> P.Just x
-        _ -> P.Nothing
+        [x] -> Just x
+        _ -> Nothing
 
 
 
@@ -234,7 +234,7 @@ removeUxtoByTxOutRef x (y:ys)
 
 
 -- manager :: PubKeyHash
--- manager = let (P.Just pkh) = PlutusTx.fromBuiltinData (mkB "abfff883edcf7a2e38628015cebb72952e361b2c8a2262f7daf9c16e") in pkh 
+-- manager = let (Just pkh) = PlutusTx.fromBuiltinData (mkB "abfff883edcf7a2e38628015cebb72952e361b2c8a2262f7daf9c16e") in pkh 
 -- pk = Ledger.PaymentPubKeyHash manager
 -- dm = T.mkPoolState pk
 -- datadm = PlutusTx.toData dm

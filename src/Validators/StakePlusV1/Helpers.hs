@@ -53,27 +53,27 @@ minLovelace = 2000000
 checkIntervalSize :: LedgerApiV1.Interval LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> Bool
 checkIntervalSize iv len =
     case getLowerBoundFromInterval iv of
-        P.Just t  -> LedgerIntervalV1.interval t (t + len) `LedgerIntervalV1.contains` iv
-        P.Nothing -> False
+        Just t  -> LedgerIntervalV1.interval t (t + len) `LedgerIntervalV1.contains` iv
+        Nothing -> False
 
 
 {-# INLINABLE getLowerBoundFromInterval #-}
-getLowerBoundFromInterval :: LedgerApiV1.Interval a -> P.Maybe a
+getLowerBoundFromInterval :: LedgerApiV1.Interval a -> Maybe a
 getLowerBoundFromInterval iv = case LedgerApiV1.ivFrom iv of
-    LedgerApiV1.LowerBound (LedgerApiV1.Finite lBound) _ -> P.Just lBound
-    _                            -> P.Nothing
+    LedgerApiV1.LowerBound (LedgerApiV1.Finite lBound) _ -> Just lBound
+    _                            -> Nothing
 
 
 {-# INLINABLE stringToBuiltinByteString #-}
 stringToBuiltinByteString :: P.String -> TxBuiltins.BuiltinByteString
 stringToBuiltinByteString = TxBuiltins.toBuiltin . DataByteStringChar8.pack
 
-{- | Function to return the P.Just value from a P.Maybe. -}
+{- | Function to return the Just value from a Maybe. -}
 {-# INLINABLE fromJust #-}
-fromJust :: P.Maybe a -> a
-fromJust (P.Just valueInfo) = valueInfo
-fromJust P.Nothing = traceError
-                   "fromJust P.Nothing"
+fromJust :: Maybe a -> a
+fromJust (Just valueInfo) = valueInfo
+fromJust Nothing = traceError
+                   "fromJust Nothing"
 
 {-# INLINABLE get1st #-}
 get1st :: (t, t1, t2) -> t
@@ -99,44 +99,44 @@ removeItem x (y:ys) | x == y    = removeItem x ys
 
 {- | Try to get the PoolState Datum from a generic Datum. -}
 {-# INLINABLE getPoolStateFromMaybeDatum #-}
-getPoolStateFromMaybeDatum ::  P.Maybe T.ValidatorDatum -> P.Maybe T.PoolStateTypo
+getPoolStateFromMaybeDatum ::  Maybe T.ValidatorDatum -> Maybe T.PoolStateTypo
 getPoolStateFromMaybeDatum datum = case datum of
-    P.Just (T.PoolState dPoolState) -> P.Just dPoolState
-    _ -> P.Nothing
+    Just (T.PoolState dPoolState) -> Just dPoolState
+    _ -> Nothing
 
 {- | Try to get the PoolState Datum from a generic Datum. -}
 {-# INLINABLE getPoolStateFromDatum #-}
-getPoolStateFromDatum :: T.ValidatorDatum -> P.Maybe T.PoolStateTypo
+getPoolStateFromDatum :: T.ValidatorDatum -> Maybe T.PoolStateTypo
 getPoolStateFromDatum datum = case datum of
-    (T.PoolState dPoolState) -> P.Just dPoolState
-    _ -> P.Nothing
+    (T.PoolState dPoolState) -> Just dPoolState
+    _ -> Nothing
 
 
 {- | Try to get the UserState Datum from a generic Datum. -}
 {-# INLINABLE getUserStateFromMaybeDatum #-}
-getUserStateFromMaybeDatum ::  P.Maybe T.ValidatorDatum -> P.Maybe T.UserStateTypo
+getUserStateFromMaybeDatum ::  Maybe T.ValidatorDatum -> Maybe T.UserStateTypo
 getUserStateFromMaybeDatum datum = case datum of
-    P.Just (T.UserState dUserState) -> P.Just dUserState
-    _ -> P.Nothing
+    Just (T.UserState dUserState) -> Just dUserState
+    _ -> Nothing
 
 {- | Try to get the UserState Datum from a generic Datum. -}
 {-# INLINABLE getUserStateFromDatum #-}
-getUserStateFromDatum ::   T.ValidatorDatum -> P.Maybe T.UserStateTypo
+getUserStateFromDatum ::   T.ValidatorDatum -> Maybe T.UserStateTypo
 getUserStateFromDatum datum = case datum of
-    (T.UserState dUserState) -> P.Just dUserState
-    _ -> P.Nothing
+    (T.UserState dUserState) -> Just dUserState
+    _ -> Nothing
 
 
 {- | Check if the Datum is a T.PoolState. -}
 {-# INLINABLE datumIsPoolState #-}
-datumIsPoolState :: P.Maybe T.ValidatorDatum -> Bool
-datumIsPoolState (P.Just (T.PoolState _)) = True
+datumIsPoolState :: Maybe T.ValidatorDatum -> Bool
+datumIsPoolState (Just (T.PoolState _)) = True
 datumIsPoolState _             = False
 
 {- | Check if the Datum is a UserState. -}
 {-# INLINABLE datumIsUserState #-}
-datumIsUserState :: P.Maybe T.ValidatorDatum -> Bool
-datumIsUserState (P.Just (T.UserState _)) = True
+datumIsUserState :: Maybe T.ValidatorDatum -> Bool
+datumIsUserState (Just (T.UserState _)) = True
 datumIsUserState _             = False
 
 
@@ -212,11 +212,11 @@ mkPoolStateWithNewCountFundsFromPoolState poolStateDatum poolNFT  = do
 --         masterFunderOld =  find (\masterFunder -> T.mfMaster masterFunder == master) masterFunders
 
 --         masterFunderNew = case masterFunderOld of
---             P.Nothing -> 
+--             Nothing -> 
 --                 -- traceError "Can't Find Master Funder In Datums"
 --                 -- TODO: deberia dejar el error de arriba, pero como quiero ver como funciona los controles OnChain dejo que cree un nuevo T.PoolState Datum con un master que no existe
 --                 T.mkMasterFunder master fund
---             P.Just T.MasterFunder{..}  -> 
+--             Just T.MasterFunder{..}  -> 
 --                 T.mkMasterFunder master (T.mfFund  + fund)
 
 --         cashedout = sum [ T.psChashedOut datum | datum <- poolStateDatums ]
@@ -269,11 +269,11 @@ mkPoolStateWithNewFundFromPoolStateList poolStateDatums poolNFT master fund  cou
         -- masterFunderOld =  find (\masterFunder -> T.mfMaster masterFunder == master) masterFunders
 
         -- masterFunderNew = case masterFunderOld of
-        --     P.Nothing -> 
+        --     Nothing -> 
         --         -- traceError "Can't Find Master Funder In Datums"
         --         -- TODO: deberia dejar el error de arriba, pero como quiero ver como funciona los controles OnChain dejo que cree un nuevo T.PoolState Datum con un master que no existe
         --         T.mkMasterFunder master fund
-        --     P.Just T.MasterFunder{..}  -> 
+        --     Just T.MasterFunder{..}  -> 
         --         T.mkMasterFunder master (T.mfFund  + fund)
 
         cashedout = sum [ T.psChashedOut datum | datum <- poolStateDatums ]
@@ -374,11 +374,11 @@ msPerYearMi :: Integer
 msPerYearMi = msPerYear * 1_000_000
 
 {-# INLINABLE getRewardsPerInvest #-}
-getRewardsPerInvest :: P.Maybe LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> T.Invest  -> T.Proffit
+getRewardsPerInvest :: Maybe LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> T.Invest  -> T.Proffit
 getRewardsPerInvest lastClaim now depTime invest =
     case lastClaim of
-        P.Nothing -> getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)
-        P.Just lClaim ->
+        Nothing -> getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)
+        Just lClaim ->
             getRewards $ LedgerApiV1.getPOSIXTime (now - lClaim)
             -- if lClaim < depTime
             -- then getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)

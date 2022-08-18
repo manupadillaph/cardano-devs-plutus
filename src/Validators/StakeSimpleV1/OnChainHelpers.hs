@@ -259,7 +259,7 @@ correctSingleOwnOutputPoolState_Value_WithSumValuesAndNewFund redeemerFund ctx =
 
         valueRedeemerFund  = LedgerAda.lovelaceValueOf redeemerFund 
 
-        valueTotal = P.foldl (<>) valueRedeemerFund listValuesEnInputsUtxos
+        valueTotal = foldl (<>) valueRedeemerFund listValuesEnInputsUtxos
 
     valueTotal == LedgerApiV1.txOutValue txtout
 
@@ -286,7 +286,7 @@ correctSingleOwnOutputPoolState_Datum_Value_WithSumDatumsAndNewFund  redeemerFun
 
         valueRedeemerFund  = LedgerAda.lovelaceValueOf redeemerFund 
 
-        valueTotal = P.foldl (<>) valueRedeemerFund listValuesEnPoolStateMasterFunders
+        valueTotal = foldl (<>) valueRedeemerFund listValuesEnPoolStateMasterFunders
 
     LedgerAda.fromValue valueTotal == LedgerAda.fromValue (LedgerApiV1.txOutValue txtout)
 
@@ -318,7 +318,7 @@ correctDoubleOwnOutputPoolState_Value_WithSumValues ctx  = do
         inputsTxOut = fst <$> inputsTxOutWithPoolStateDatums
         listValuesEnInputsUtxos = [ LedgerApiV1.txOutValue inputTxOut | inputTxOut <- inputsTxOut] 
 
-        valueTotal = P.foldl (<>) (LedgerAda.lovelaceValueOf 0) listValuesEnInputsUtxos
+        valueTotal = foldl (<>) (LedgerAda.lovelaceValueOf 0) listValuesEnInputsUtxos
 
     valueTotal == LedgerApiV1.txOutValue txtout
 
@@ -341,7 +341,7 @@ correctDoubleOwnOutputsUserState_Datum_OfNewUser  redeemerUser redeemerUserNFT r
 
         --LedgerApiV1.txInfoValidRange info
 
-        newOutputDatum = T.mkUserState  redeemerUser redeemerUserNFT redeemerInvest  redeemerCreatedAt redeemerDeadline 0 0 P.Nothing
+        newOutputDatum = T.mkUserState  redeemerUser redeemerUserNFT redeemerInvest  redeemerCreatedAt redeemerDeadline 0 0 Nothing
 
     newOutputDatum == T.UserState outputUserStateDatum
 
@@ -407,7 +407,7 @@ correctDoubleOwnOutputsUserState_Datum_WithNewClaimRewards redeemerUser redeemer
                                     (T.usDeadline  inputUserStateDatum )  
                                     totalRewardsCashedOut
                                     rewardsNotClaimed
-                                    (P.Just T.rugrClaimAt)
+                                    (Just T.rugrClaimAt)
 
                 newOutputDatum == T.UserState outputUserStateDatum
         _ -> traceError "ERROR in correctDoubleOwnOutputsUserState_Datum_WithNewClaimRewards: Not one single UserState Input"
@@ -426,7 +426,7 @@ correctDoubleOwnOutputPoolState_Value_LessClaimRewards T.rugrClaim ctx = do
 
         listValuesEnInputsUtxos = [ LedgerApiV1.txOutValue inputTxOut | inputTxOut <- inputsTxOut] 
 
-        valueTotal = P.foldl (<>)  (LedgerAda.lovelaceValueOf 0) listValuesEnInputsUtxos
+        valueTotal = foldl (<>)  (LedgerAda.lovelaceValueOf 0) listValuesEnInputsUtxos
 
          
 
@@ -515,30 +515,30 @@ correctClaimValue pParams T.rugrClaim T.rugrClaimAt ctx = do
 --     then, this function computes the new UserState by updating his last claim
 --     and, the total amount of rewards to be claimed.
 
---     Other way it returns P.Nothing.
+--     Other way it returns Nothing.
 -- -}
 -- {-# INLINABLE claim #-}
--- claim :: UserState -> LedgerApiV1.POSIXTime -> OperationSettings -> P.Maybe (UserState, Integer)
+-- claim :: UserState -> LedgerApiV1.POSIXTime -> OperationSettings -> Maybe (UserState, Integer)
 -- claim userState cTime fconf =
 --     if rewards < minClaim fconf
---     then P.Nothing
---     else P.Just (newUserState, rewards)
+--     then Nothing
+--     else Just (newUserState, rewards)
 --   where
 --     newUserState :: UserState
---     newUserState = userState { lastClaim = P.Just cTime}
+--     newUserState = userState { lastClaim = Just cTime}
 
 --     rewards :: Integer
 --     rewards = computeRewards (deposits userState) (lastClaim userState) cTime
 
 
 
--- claimRes :: P.Maybe (UserState, Integer)
+-- claimRes :: Maybe (UserState, Integer)
 -- claimRes = Business.claim inputUserState time (opSettings $ settings staking)
 
 -- {-# INLINABLE computeRewards #-}
 -- computeRewards
 --     :: [Deposit]
---     -> P.Maybe LedgerApiV1.POSIXTime
+--     -> Maybe LedgerApiV1.POSIXTime
 --     -> LedgerApiV1.POSIXTime
 --     -> Integer
 -- computeRewards deposits lastClaim now =

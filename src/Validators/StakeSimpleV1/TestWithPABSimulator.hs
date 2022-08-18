@@ -121,7 +121,7 @@ import          Validators.StakeSimpleV1.Helpers
 import          Validators.StakeSimpleV1.PAB
 
 handlers :: SimulatorEffectHandlers (Builtin PAB.ValidatorContracts)
-handlers = Simulator.mkSimulatorHandlers Data.Default.def  P.$ interpret (contractHandler Builtin.handleBuiltin)
+handlers = Simulator.mkSimulatorHandlers Data.Default.def  $ interpret (contractHandler Builtin.handleBuiltin)
 
 getWallet :: Integer -> Wallet
 getWallet = WalletEmulator.knownWallet
@@ -130,7 +130,7 @@ walletPaymentPubKeyHash :: Integer -> Ledger.PaymentPubKeyHash
 walletPaymentPubKeyHash walletNumber = CW.paymentPubKeyHash (CW.fromWalletNumber $ CW.WalletNumber walletNumber)
 
 walletPaymentPubKeyHashAddress ::  Integer -> Address
-walletPaymentPubKeyHashAddress walletNumber = pubKeyHashAddress (walletPaymentPubKeyHash walletNumber) P.Nothing
+walletPaymentPubKeyHashAddress walletNumber = pubKeyHashAddress (walletPaymentPubKeyHash walletNumber) Nothing
 
 getUtxosListInPABSimulator :: Blockchain -> LedgerAddressV1.Address -> [LedgerApiV1.TxOutRef]
 getUtxosListInPABSimulator blockchain addr =  do
@@ -168,23 +168,23 @@ writeJSON file   = B.writeFile $  path ++ file
 --path2 = "~/source/cardano-falcon-stakepool-devs/cardano-falcon-stakepol-devs-haskell/"
 path = ""
 
-mainLoop :: P.Maybe Integer -> P.Maybe PoolParams -> Control.Monad.Freer.Internal.Eff (Plutus.PAB.Core.PABEffects (Builtin PAB.ValidatorContracts) (Simulator.SimulatorState (Builtin PAB.ValidatorContracts))) () -> Control.Monad.Freer.Internal.Eff (Plutus.PAB.Core.PABEffects (Builtin PAB.ValidatorContracts) (Simulator.SimulatorState (Builtin PAB.ValidatorContracts))) ()
+mainLoop :: Maybe Integer -> Maybe PoolParams -> Control.Monad.Freer.Internal.Eff (Plutus.PAB.Core.PABEffects (Builtin PAB.ValidatorContracts) (Simulator.SimulatorState (Builtin PAB.ValidatorContracts))) () -> Control.Monad.Freer.Internal.Eff (Plutus.PAB.Core.PABEffects (Builtin PAB.ValidatorContracts) (Simulator.SimulatorState (Builtin PAB.ValidatorContracts))) ()
 mainLoop walletNro pParams shutdown = do
 
     Simulator.logString @(Builtin PAB.ValidatorContracts) "OPERACIONES:"
 
     case walletNro of
-        P.Nothing ->
+        Nothing ->
             Simulator.logString @(Builtin PAB.ValidatorContracts) "1 - Elegir Wallet"
-        P.Just walletNro ->
+        Just walletNro ->
             Simulator.logString @(Builtin PAB.ValidatorContracts) $ "1 - Elegir Wallet (" ++ P.show walletNro ++ ")"
 
     Simulator.logString @(Builtin PAB.ValidatorContracts) "21 - Crear Pool Params"
 
     case pParams of
-        P.Nothing ->
+        Nothing ->
             Simulator.logString @(Builtin PAB.ValidatorContracts) "22 - Elegir Pool Params"
-        P.Just pParams ->
+        Just pParams ->
             Simulator.logString @(Builtin PAB.ValidatorContracts) $ "22 - Elegir Pool Params(" ++ P.show (T.ppPoolNFT pParams ) ++ ")"
 
     
@@ -203,7 +203,7 @@ mainLoop walletNro pParams shutdown = do
 
     case readMaybe opcion of
 
-        P.Just 1 -> do
+        Just 1 -> do
 
             Simulator.logString @(Builtin PAB.ValidatorContracts) "Ingrese una wallet:"
 
@@ -216,7 +216,7 @@ mainLoop walletNro pParams shutdown = do
 
             mainLoop (readMaybe opcionWallet)  pParams shutdown
 
-        P.Just 21 -> do
+        Just 21 -> do
 
             let
                 master1 = 1
@@ -261,9 +261,9 @@ mainLoop walletNro pParams shutdown = do
             Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
             void $ liftIO P.getLine
 
-            mainLoop walletNro (P.Just pParams) shutdown
+            mainLoop walletNro (Just pParams) shutdown
 
-        P.Just 22 -> do
+        Just 22 -> do
 
             files <- liftIO $ getDirectoryContents "files/stakeSimple"
             
@@ -284,10 +284,10 @@ mainLoop walletNro pParams shutdown = do
 
             mainLoop walletNro pParams shutdown
 
-        P.Just 31 -> do
+        Just 31 -> do
             
             case (walletNro,  pParams) of
-                (P.Just walletNro, P.Just pParams) -> do
+                (Just walletNro, Just pParams) -> do
                     let 
 
                         poolNFT = T.ppPoolNFT pParams
@@ -324,23 +324,23 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop (P.Just walletNro) (P.Just pParams) shutdown
+                    mainLoop (Just walletNro) (Just pParams) shutdown
 
-                (_, P.Just pParams) -> do
+                (_, Just pParams) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Wallet"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing (P.Just pParams) shutdown
+                    mainLoop Nothing (Just pParams) shutdown
 
-                (P.Just walletNro, _) -> do
+                (Just walletNro, _) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Pool Params"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop (P.Just walletNro) P.Nothing shutdown
+                    mainLoop (Just walletNro) Nothing shutdown
 
                 (_, _) -> do
 
@@ -348,11 +348,11 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing P.Nothing shutdown
+                    mainLoop Nothing Nothing shutdown
 
-        P.Just 32 -> do
+        Just 32 -> do
             case (walletNro,  pParams) of
-                (P.Just walletNro, P.Just pParams) -> do
+                (Just walletNro, Just pParams) -> do
 
                     cMasterFundPool_Master  <- Simulator.activateContract (getWallet walletNro) (PAB.MasterFundPool MasterFundPoolParams{
                             mspPoolParam =  pParams,
@@ -369,23 +369,23 @@ mainLoop walletNro pParams shutdown = do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
-                    mainLoop (P.Just walletNro) (P.Just pParams) shutdown
+                    mainLoop (Just walletNro) (Just pParams) shutdown
 
-                (_, P.Just pParams) -> do
+                (_, Just pParams) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Wallet"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing (P.Just pParams) shutdown
+                    mainLoop Nothing (Just pParams) shutdown
 
-                (P.Just walletNro, _) -> do
+                (Just walletNro, _) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Pool Params"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop (P.Just walletNro) P.Nothing shutdown
+                    mainLoop (Just walletNro) Nothing shutdown
 
                 (_, _) -> do
 
@@ -393,12 +393,12 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing P.Nothing shutdown
+                    mainLoop Nothing Nothing shutdown
 
-        P.Just 41 -> do
+        Just 41 -> do
             
             case (walletNro,  pParams) of
-                (P.Just walletNro, P.Just pParams) -> do
+                (Just walletNro, Just pParams) -> do
 
                     let
                         uTxOutRefAt =  getUtxosListInPABSimulator blockchain (walletPaymentPubKeyHashAddress walletNro)
@@ -444,23 +444,23 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop  (P.Just walletNro) (P.Just pParams) shutdown
+                    mainLoop  (Just walletNro) (Just pParams) shutdown
 
-                (_, P.Just pParams) -> do
+                (_, Just pParams) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Wallet"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing (P.Just pParams) shutdown
+                    mainLoop Nothing (Just pParams) shutdown
 
-                (P.Just walletNro, _) -> do
+                (Just walletNro, _) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Pool Params"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop (P.Just walletNro) P.Nothing shutdown
+                    mainLoop (Just walletNro) Nothing shutdown
 
                 (_, _) -> do
 
@@ -468,12 +468,12 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing P.Nothing shutdown
+                    mainLoop Nothing Nothing shutdown
 
-        P.Just 42 -> do
+        Just 42 -> do
             
             case (walletNro,  pParams) of
-                (P.Just walletNro, P.Just pParams) -> do
+                (Just walletNro, Just pParams) -> do
 
                     let
                         uTxOutRefAt =  getUtxosListInPABSimulator blockchain (walletPaymentPubKeyHashAddress walletNro)
@@ -519,23 +519,23 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop  (P.Just walletNro) (P.Just pParams) shutdown
+                    mainLoop  (Just walletNro) (Just pParams) shutdown
 
-                (_, P.Just pParams) -> do
+                (_, Just pParams) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Wallet"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing (P.Just pParams) shutdown
+                    mainLoop Nothing (Just pParams) shutdown
 
-                (P.Just walletNro, _) -> do
+                (Just walletNro, _) -> do
 
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Elija Pool Params"
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop (P.Just walletNro) P.Nothing shutdown
+                    mainLoop (Just walletNro) Nothing shutdown
 
                 (_, _) -> do
 
@@ -543,8 +543,8 @@ mainLoop walletNro pParams shutdown = do
                     Simulator.logString @(Builtin PAB.ValidatorContracts) "Press return to continue..."
                     void $ liftIO P.getLine
 
-                    mainLoop P.Nothing P.Nothing shutdown
-        P.Just 99 -> do
+                    mainLoop Nothing Nothing shutdown
+        Just 99 -> do
 
             Simulator.logString @(Builtin PAB.ValidatorContracts) "Balances at the end of the simulation"
             --void $ liftIO P.getLine
@@ -593,7 +593,7 @@ myTrace2 = do
     Simulator.logString @(Builtin PAB.ValidatorContracts) $ "user1 PkhAddress = " ++ P.show (walletPaymentPubKeyHashAddress user1)
 
 
-    mainLoop P.Nothing P.Nothing shutdown
+    mainLoop Nothing Nothing shutdown
 
 
 

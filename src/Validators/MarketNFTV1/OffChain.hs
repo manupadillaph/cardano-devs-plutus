@@ -104,9 +104,9 @@ sell SellNFTParams{..} = do
 
     ledgerTx <- PlutusContract.submitTxConstraints OnChain.typedValidator tx
 
-    Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
+    Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
 
-    PlutusContract.logInfo @P.String P.$ TextPrintf.printf  "--------------------------- Sell Endpoint - Submited - Datum: %s - Value: %s ---------------------------" (P.show d) (P.show v)
+    PlutusContract.logInfo @P.String $ TextPrintf.printf  "--------------------------- Sell Endpoint - Submited - Datum: %s - Value: %s ---------------------------" (P.show d) (P.show v)
 
 buy :: forall w s. BuyNFTParams ->  PlutusContract.Contract w s DataText.Text ()
 buy BuyNFTParams{..} = do
@@ -116,7 +116,7 @@ buy BuyNFTParams{..} = do
     buyer <- PlutusContract.ownFirstPaymentPubKeyHash
 
     let
-        buyerAdds = Ledger.pubKeyHashAddress buyer P.Nothing
+        buyerAdds = Ledger.pubKeyHashAddress buyer Nothing
 
     utxosAtBuyer <- PlutusContract.utxosAt buyerAdds
     
@@ -124,24 +124,24 @@ buy BuyNFTParams{..} = do
 
     case utxo of
             
-            P.Nothing -> PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Buy Endpoint - Error - No Encontré NFT ---------------------------"
+            Nothing -> PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Buy Endpoint - Error - No Encontré NFT ---------------------------"
             
-            P.Just (oref, chainIndexTxOut) -> do
+            Just (oref, chainIndexTxOut) -> do
 
-                PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Buy Endpoint - Redeem Utxo: %s ---------------------------" (P.show oref)
+                PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Buy Endpoint - Redeem Utxo: %s ---------------------------" (P.show oref)
                 
                 let
 
-                    P.Just dOld = getDatumm chainIndexTxOut
+                    Just dOld = getDatumm chainIndexTxOut
 
                     (cs, tn) = LedgerValueV1.unAssetClass bpNFT
 
                     vGetNFT     = LedgerValueV1.singleton cs tn 1 P.<> LedgerAda.lovelaceValueOf minLovelace
 
-                    vGetADA     = LedgerAda.lovelaceValueOf P.$ T.dPrice dOld
+                    vGetADA     = LedgerAda.lovelaceValueOf $ T.dPrice dOld
 
                     redeemer = T.RedeemBuyerBuyNFT
-                    redeemerLedger  = LedgerApiV1.Redeemer P.$ PlutusTx.toBuiltinData redeemer
+                    redeemerLedger  = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData redeemer
 
                     lookups =
                         LedgerConstraints.plutusV1TypedValidatorLookups OnChain.typedValidator P.<>
@@ -155,11 +155,11 @@ buy BuyNFTParams{..} = do
                         LedgerConstraints.mustValidateIn (LedgerIntervalV1.from now)            P.<>
                         LedgerConstraints.mustSpendScriptOutput oref redeemerLedger
 
-                --PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Buy Endpoint ---------------------------" 
+                --PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Buy Endpoint ---------------------------" 
 
                 ledgerTx <- PlutusContract.submitTxConstraintsWith lookups tx
-                Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
-                PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Buy EndPoint - Submited -------------------------"
+                Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
+                PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Buy EndPoint - Submited -------------------------"
 
 
 getback :: forall w s. GetBackNFTParams ->  PlutusContract.Contract w s DataText.Text ()
@@ -170,7 +170,7 @@ getback GetBackNFTParams{..} = do
     seller <- PlutusContract.ownFirstPaymentPubKeyHash
 
     let
-        sellerAdds = Ledger.pubKeyHashAddress seller P.Nothing
+        sellerAdds = Ledger.pubKeyHashAddress seller Nothing
 
     utxosAtseller <- PlutusContract.utxosAt sellerAdds
 
@@ -178,21 +178,21 @@ getback GetBackNFTParams{..} = do
 
     case utxo of
 
-        P.Nothing ->PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- GetBack Endpoint - Error - No Encontré NFT ---------------------------"
+        Nothing ->PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- GetBack Endpoint - Error - No Encontré NFT ---------------------------"
 
-        P.Just (oref, chainIndexTxOut) -> do
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- GetBack Endpoint - Redeem Utxo: %s ---------------------------" (P.show oref)
+        Just (oref, chainIndexTxOut) -> do
+            PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- GetBack Endpoint - Redeem Utxo: %s ---------------------------" (P.show oref)
 
             let
 
-                --P.Just dOld = getDatumm chainIndexTxOut
+                --Just dOld = getDatumm chainIndexTxOut
 
                 (cs, tn) = LedgerValueV1.unAssetClass gbpNFT
 
                 vGetNFT     = LedgerValueV1.singleton cs tn 1 P.<> LedgerAda.lovelaceValueOf minLovelace
 
                 redeemer = T.RedeemSellerGetBackNFT
-                redeemerLedger  = LedgerApiV1.Redeemer P.$ PlutusTx.toBuiltinData redeemer
+                redeemerLedger  = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData redeemer
 
                 lookups =
                     LedgerConstraints.plutusV1TypedValidatorLookups OnChain.typedValidator P.<>
@@ -205,65 +205,65 @@ getback GetBackNFTParams{..} = do
                     LedgerConstraints.mustValidateIn (LedgerIntervalV1.from now)            P.<>
                     LedgerConstraints.mustSpendScriptOutput oref redeemerLedger
 
-            --PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Buy Endpoint ---------------------------" 
+            --PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Buy Endpoint ---------------------------" 
 
             ledgerTx <- PlutusContract.submitTxConstraintsWith lookups tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- GetBack EndPoint - Submited -------------------------"
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
+            PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- GetBack EndPoint - Submited -------------------------"
 
-getDatumm :: LedgerTx.ChainIndexTxOut -> P.Maybe T.ValidatorDatum
+getDatumm :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
 getDatumm chainIndexTxOut = do
     let
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum chainIndexTxOut
 
-    LedgerApiV1.Datum e <- P.snd datHashOrDatum
+    LedgerApiV1.Datum e <- snd datHashOrDatum
 
     case PlutusTx.fromBuiltinData e of
-        P.Nothing -> P.Nothing
-        P.Just d -> d
+        Nothing -> Nothing
+        Just d -> d
 
 getValueFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> LedgerValueV1.Value
 getValueFromChainIndexTxOut = LedgerTx._ciTxOutValue   
 
-findUtxoInValidatorWithNFT :: T.NFT -> PlutusContract.Contract w s DataText.Text (P.Maybe (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut))
+findUtxoInValidatorWithNFT :: T.NFT -> PlutusContract.Contract w s DataText.Text (Maybe (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut))
 findUtxoInValidatorWithNFT nft = do
     utxos <- PlutusContract.utxosAt OnChain.addressValidator
     let
-        xs = [(oref, o) |(oref, o) <- DataMap.toList utxos, LedgerValueV1.assetClassValueOf (getValueFromChainIndexTxOut o) nft P.== 1]
+        xs = [(oref, o) |(oref, o) <- DataMap.toList utxos, LedgerValueV1.assetClassValueOf (getValueFromChainIndexTxOut o) nft == 1]
     case xs of
-        [x] -> P.return P.$ P.Just x   
-        _   -> P.return P.Nothing
+        [x] -> return $ Just x   
+        _   -> return Nothing
 
 -- checkUTXO  :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Ledger.PaymentPubKeyHash -> Integer -> Bool
 -- checkUTXO (oref,o)  ppkh name = do
 --     case getDatumm (oref,o) of
---         P.Nothing -> P.False
---         P.Just T.ValidatorDatum{..}
---             | T.aCreator dData P.== ppkh P.&& T.aName dData P.== name -> P.True
---             | P.otherwise                                                              -> P.False
+--         Nothing -> False
+--         Just T.ValidatorDatum{..}
+--             | T.aCreator dData == ppkh && T.aName dData == name -> True
+--             | otherwise                                                              -> False
 
--- findUTXO :: [(LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)]  -> Ledger.PaymentPubKeyHash -> Integer -> P.Maybe LedgerApiV1.TxOutRef
--- findUTXO [] _ _ = P.Nothing --do  
+-- findUTXO :: [(LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)]  -> Ledger.PaymentPubKeyHash -> Integer -> Maybe LedgerApiV1.TxOutRef
+-- findUTXO [] _ _ = Nothing --do  
 -- findUTXO [(oref,o)]  ppkh name  = do
 --     if checkUTXO (oref, o) ppkh name then
---         P.return oref
+--         return oref
 --     else
---         P.Nothing
+--         Nothing
 -- findUTXO ((oref,o):xs) ppkh name
---     | checkUTXO (oref ,o)  ppkh name = P.return oref
---     | P.otherwise = findUTXO xs   ppkh name
+--     | checkUTXO (oref ,o)  ppkh name = return oref
+--     | otherwise = findUTXO xs   ppkh name
 
 
 -- getTxOutRefAndChainIndexTxOutFromTxOutRef :: LedgerApiV1.TxOutRef -> PlutusContract.Contract w s DataText.Text (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)
 -- getTxOutRefAndChainIndexTxOutFromTxOutRef get_oref= do
 --     utxos <- PlutusContract.utxosAt OnChain.addressValidator
 --     let
---         xs = [ (oref, o) | (oref, o) <- DataMap.toList utxos , get_oref P.== oref]
+--         xs = [ (oref, o) | (oref, o) <- DataMap.toList utxos , get_oref == oref]
 --     case xs of
---         [x] ->  P.return x
+--         [x] ->  return x
 
 endpoints :: PlutusContract.Contract () ValidatorSchema DataText.Text ()
-endpoints = PlutusContract.awaitPromise (sell' `PlutusContract.select` buy' `PlutusContract.select` getback') P.>> endpoints
+endpoints = PlutusContract.awaitPromise (sell' `PlutusContract.select` buy' `PlutusContract.select` getback') >> endpoints
   where
     sell' = PlutusContract.endpoint @"sell" sell
     buy' = PlutusContract.endpoint @"buy" buy

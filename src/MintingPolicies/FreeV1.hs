@@ -69,35 +69,35 @@ mint mp = do
         lookups = LedgerConstraints.plutusV1MintingPolicy policy
         tx      = LedgerConstraints.mustMintValue val
     ledgerTx <- PlutusContract.submitTxConstraintsWith @DataVoid.Void lookups tx
-    Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
-    PlutusContract.logInfo @P.String P.$ TextPrintf.printf "forged %s" (P.show val)
+    Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
+    PlutusContract.logInfo @P.String $ TextPrintf.printf "forged %s" (P.show val)
 
 endpoints :: PlutusContract.Contract () MintSchema DataText.Text ()
-endpoints = mint' P.>> endpoints
+endpoints = mint' >> endpoints
   where
-    mint' = PlutusContract.awaitPromise P.$ PlutusContract.endpoint @"mint" mint
+    mint' = PlutusContract.awaitPromise $ PlutusContract.endpoint @"mint" mint
 
 Playground.Contract.mkSchemaDefinitions ''MintSchema
 
 test :: P.IO ()
-test = TraceEmulator.runEmulatorTraceIO P.$ do
+test = TraceEmulator.runEmulatorTraceIO $ do
     let tn = "ABC"
     h1 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 1) endpoints
     h2 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 2) endpoints
-    TraceEmulator.callEndpoint @"mint" h1 P.$ MintParams
+    TraceEmulator.callEndpoint @"mint" h1 $ MintParams
         { 
             mpTokenName = tn,
             mpAmount    = 555
         }
-    TraceEmulator.callEndpoint @"mint" h2 P.$ MintParams
+    TraceEmulator.callEndpoint @"mint" h2 $ MintParams
         { 
             mpTokenName = tn,
             mpAmount    = 444
         }
-    Monad.void P.$ TraceEmulator.waitNSlots 1
-    TraceEmulator.callEndpoint @"mint" h1 P.$ MintParams
+    Monad.void $ TraceEmulator.waitNSlots 1
+    TraceEmulator.callEndpoint @"mint" h1 $ MintParams
         { 
             mpTokenName = tn,
             mpAmount    = -222
         }
-    Monad.void P.$ TraceEmulator.waitNSlots 1
+    Monad.void $ TraceEmulator.waitNSlots 1

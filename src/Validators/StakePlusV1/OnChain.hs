@@ -172,8 +172,8 @@ validateMasterFundPool pParams dPoolStateFromInputBeingValidated T.RedeemMasterF
 
     inputWithPoolStateAndPoolNFT :: (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)
     inputWithPoolStateAndPoolNFT =  case OnChainHelpers.getInputWithPoolStateAndPoolNFT [inputWithPoolState] rmfpPoolNFT of
-        P.Just inputWithPoolStateAndPoolNFT -> inputWithPoolStateAndPoolNFT
-        P.Nothing -> traceError "Validate Master Fund And Merge Pool Message: Can't find Pool NFT on Inputs."  
+        Just inputWithPoolStateAndPoolNFT -> inputWithPoolStateAndPoolNFT
+        Nothing -> traceError "Validate Master Fund And Merge Pool Message: Can't find Pool NFT on Inputs."  
 
     {- | Gets, if there is only one, the output with same PoolState Datum and Value than the input PoolState Datum plus 1 in the count of utxo with Pool State. -} 
     getOutputPoolStateDatumSameDatumAndValueThanInputPlus1CountUxto :: T.PoolNFT -> T.PoolStateTypo -> LedgerContextsV1.ScriptContext -> (LedgerApiV1.TxOut, T.PoolStateTypo)
@@ -343,16 +343,16 @@ validateMasterFundAndMergePool pParams dPoolStateFromInputBeingValidated T.Redee
             inputsWithPoolState = OnChainHelpers.getInputsWithPoolState ctx
             inputsWithPoolState_UtxoRef = OnChainHelpers.getInput_TxOutRef <$> inputsWithPoolState
 
-        if P.all (==True) [ input `elem` inputsWithPoolState_UtxoRef  | input <- inputsBeingConsumed] &&
-         P.all (==True) [ input `elem` inputsBeingConsumed  | input <- inputsWithPoolState_UtxoRef] then
+        if all (==True) [ input `elem` inputsWithPoolState_UtxoRef  | input <- inputsBeingConsumed] &&
+         all (==True) [ input `elem` inputsBeingConsumed  | input <- inputsWithPoolState_UtxoRef] then
             inputsWithPoolState
         else
             traceError "Validate Master Fund And Merge Pool Message: Not Matching redeemer UtxoRef to merge with inputs."  
 
     inputWithPoolStateAndPoolNFT :: (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)
     inputWithPoolStateAndPoolNFT =  case OnChainHelpers.getInputWithPoolStateAndPoolNFT inputsWithPoolState rmfampPoolNFT of
-        P.Just inputWithPoolStateAndPoolNFT -> inputWithPoolStateAndPoolNFT
-        P.Nothing -> traceError "Validate Master Fund: Can't find Pool NFT on Inputs."  
+        Just inputWithPoolStateAndPoolNFT -> inputWithPoolStateAndPoolNFT
+        Nothing -> traceError "Validate Master Fund: Can't find Pool NFT on Inputs."  
 
     outputWithPoolState :: (LedgerApiV1.TxOut, T.PoolStateTypo)
     outputWithPoolState =  do
@@ -482,8 +482,8 @@ validateMasterGetPool pParams dPoolStateFromInputBeingValidated T.RedeemMasterGe
 --             inputsWithPoolState = OnChainHelpers.getInputsWithPoolState ctx
 --             inputsWithPoolState_UtxoRef = OnChainHelpers.getInput_TxOutRef <$> inputsWithPoolState
 
---         if P.all (==True) [ input `elem` inputsWithPoolState_UtxoRef  | input <- inputsBeingConsumed] &&
---          P.all (==True) [ input `elem` inputsBeingConsumed  | input <- inputsWithPoolState_UtxoRef] then
+--         if all (==True) [ input `elem` inputsWithPoolState_UtxoRef  | input <- inputsBeingConsumed] &&
+--          all (==True) [ input `elem` inputsBeingConsumed  | input <- inputsWithPoolState_UtxoRef] then
 --             inputsWithPoolState
 --         else
 --             traceError "Validate Master Get Fund Pool Message: Not Matching redeemer UtxoRef to merge with inputs."  
@@ -698,7 +698,7 @@ validateUserInvest pParams dPoolStateFromInputBeingValidated T.RedeemUserInvestT
         let
             (_, outputUserState_Datum) = outputWithUserState
 
-            newOutputDatum = T.mkUserState  redeemerUser redeemerUserNFT redeemerInvest  redeemerCreatedAt redeemerDeadline 0 0 P.Nothing
+            newOutputDatum = T.mkUserState  redeemerUser redeemerUserNFT redeemerInvest  redeemerCreatedAt redeemerDeadline 0 0 Nothing
 
         newOutputDatum == T.UserState outputUserState_Datum
 
@@ -868,7 +868,7 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
                     compareValueOfInputs ::  (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)-> (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo) -> Ordering
                     compareValueOfInputs inputs1 inputs2
                         | (LedgerAda.fromValue ( LedgerApiV1.txOutValue (OnChainHelpers.getInput_TxOut inputs1)) > (LedgerAda.fromValue  ( LedgerApiV1.txOutValue ( OnChainHelpers.getInput_TxOut inputs2) ))) = LT
-                        | otherwise = P.GT
+                        | otherwise = GT
 
 
                      -- order the list of inputs by value
@@ -915,7 +915,7 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
                 else
                     traceError "Validate User Get Rewards Message: Error. Using too many Inputs"      
 
-    inputWithPoolStateAndPoolNFT :: P.Maybe (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)
+    inputWithPoolStateAndPoolNFT :: Maybe (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)
     inputWithPoolStateAndPoolNFT =  OnChainHelpers.getInputWithPoolStateAndPoolNFT inputsWithPoolState rugrPoolNFT 
 
     inputWithUserState :: (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.UserStateTypo)
@@ -939,7 +939,7 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
                 compareValueOfOutpus output1 output2
 
                     | (LedgerAda.fromValue ( LedgerApiV1.txOutValue (fst output1)) > LedgerAda.fromValue  ( LedgerApiV1.txOutValue ( fst output2)  )) = LT
-                    | otherwise = P.GT
+                    | otherwise = GT
 
                 -- ordering the outputs by value
                 outputsOrderedByValueWithPoolState = sortBy compareValueOfOutpus outputsWithPoolState
@@ -1024,7 +1024,7 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
 
         rugrUserNFT `elem` T.psUsersNFT (Helpers.fromJust $ Helpers.getPoolStateFromDatum newDummyDatum)
 
-        --P.any (==rugrUserNFT) (T.psUsersNFT newOutputDatum)
+        --any (==rugrUserNFT) (T.psUsersNFT newOutputDatum)
     
     correctClaimValue :: T.PoolParams -> T.Proffit -> LedgerApiV1.POSIXTime   -> LedgerContextsV1.ScriptContext -> Bool
     correctClaimValue pParams rugrClaim rugrClaimAt ctx = do
@@ -1042,14 +1042,14 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
     correctOutputWithNFTPoolState_Datum  ::  T.PoolNFT -> LedgerContextsV1.ScriptContext -> Bool
     correctOutputWithNFTPoolState_Datum redeemerPoolNFT ctx  = do
         case inputWithPoolStateAndPoolNFT of
-            P.Nothing -> True
-            P.Just inputWithPoolStateAndPoolNFT -> do
+            Nothing -> True
+            Just inputWithPoolStateAndPoolNFT -> do
                 let 
                     outputWithPoolStateAndPoolNFT = OnChainHelpers.getOutputWithPoolStateAndPoolNFT outputsWithPoolState rugrPoolNFT
 
                 case outputWithPoolStateAndPoolNFT of
-                    P.Nothing -> traceError "Validate User Get Rewards Message: Not found NFT in output Pool State."  
-                    P.Just outputWithPoolStateAndPoolNFT -> do
+                    Nothing -> traceError "Validate User Get Rewards Message: Not found NFT in output Pool State."  
+                    Just outputWithPoolStateAndPoolNFT -> do
                         let 
                             inputWithPoolStateAndPoolNFT_Datum = OnChainHelpers.getInput_Datum inputWithPoolStateAndPoolNFT
                             outputWithPoolStateAndPoolNFT_Datum = snd outputWithPoolStateAndPoolNFT
@@ -1065,7 +1065,7 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
 
     correctOutputsPoolState_DatumAndValues :: LedgerContextsV1.ScriptContext -> Bool
     correctOutputsPoolState_DatumAndValues ctx  = 
-            P.all correctOutputPoolState_DatumAndValue outputsWithPoolState
+            all correctOutputPoolState_DatumAndValue outputsWithPoolState
 
 
 
@@ -1102,7 +1102,7 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
                             (T.usDeadline  inputWithUserState_Datum )  
                             totalRewardsCashedOut
                             rewardsNotClaimed
-                            (P.Just rugrClaimAt)
+                            (Just rugrClaimAt)
 
         newOutputDatum == T.UserState outputUserState_Datum
 
@@ -1115,14 +1115,14 @@ validateUserGetRewards pParams _ T.RedeemUserGetRewardsTypo{..} ctx  =
 
             inputsWithPoolState_Values = [ LedgerApiV1.txOutValue inputTxOut | inputTxOut <- inputsWithPoolState_TxOut] 
 
-            valueInputsTotal = P.foldl (<>)  (LedgerAda.lovelaceValueOf 0) inputsWithPoolState_Values
+            valueInputsTotal = foldl (<>)  (LedgerAda.lovelaceValueOf 0) inputsWithPoolState_Values
 
 
             outputsWithPoolState_TxOut = fst <$> outputsWithPoolState
 
             outputsWithPoolState_Values = [ LedgerApiV1.txOutValue outputTxOut | outputTxOut <- outputsWithPoolState_TxOut] 
 
-            valueOutputsTotal = P.foldl (<>)  (LedgerAda.lovelaceValueOf 0) outputsWithPoolState_Values
+            valueOutputsTotal = foldl (<>)  (LedgerAda.lovelaceValueOf 0) outputsWithPoolState_Values
 
 
         valueInputsTotal == valueOutputsTotal <> LedgerAda.lovelaceValueOf rugrClaim

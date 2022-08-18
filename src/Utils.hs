@@ -53,6 +53,7 @@ import qualified Plutus.V1.Ledger.Credential         as LedgerCredentialV1
 import qualified Plutus.V1.Ledger.Value              as LedgerValueV1 (TokenName (..))
 import qualified PlutusTx.Builtins                   as TxBuiltins (toBuiltin)
 import qualified PlutusTx.Builtins.Internal          as TxBuiltinsInternal (BuiltinByteString (..))
+import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
 import qualified Wallet.Emulator.Wallet              as WalletEmulator      (WalletId (..)) --, Wallet (..)
 import qualified Wallet.Types                        as WalletTypes (ContractInstanceId (..))
@@ -60,36 +61,36 @@ import qualified Wallet.Types                        as WalletTypes (ContractIns
 --Modulo:
 
 credentialLedgerToPlutus :: LedgerCredential.Credential a LedgerCrypto.StandardCrypto -> LedgerCredentialV1.Credential
-credentialLedgerToPlutus (LedgerCredential.ScriptHashObj (LedgerHashes.ScriptHash h)) = LedgerApiV1.ScriptCredential P.$ LedgerApiV1.ValidatorHash P.$ TxBuiltins.toBuiltin P.$ CryptoHashClass.hashToBytes h
-credentialLedgerToPlutus (LedgerCredential.KeyHashObj (LedgerKeys.KeyHash h))       = LedgerApiV1.PubKeyCredential P.$ LedgerApiV1.PubKeyHash P.$ TxBuiltins.toBuiltin P.$ CryptoHashClass.hashToBytes h
+credentialLedgerToPlutus (LedgerCredential.ScriptHashObj (LedgerHashes.ScriptHash h)) = LedgerApiV1.ScriptCredential $ LedgerApiV1.ValidatorHash $ TxBuiltins.toBuiltin $ CryptoHashClass.hashToBytes h
+credentialLedgerToPlutus (LedgerCredential.KeyHashObj (LedgerKeys.KeyHash h))       = LedgerApiV1.PubKeyCredential $ LedgerApiV1.PubKeyHash $ TxBuiltins.toBuiltin $ CryptoHashClass.hashToBytes h
 
-stakeReferenceLedgerToPlutus :: LedgerCredential.StakeReference LedgerCrypto.StandardCrypto -> P.Maybe LedgerCredentialV1.StakingCredential
-stakeReferenceLedgerToPlutus (LedgerCredential.StakeRefBase x)                   = P.Just P.$ LedgerApiV1.StakingHash P.$ credentialLedgerToPlutus x
+stakeReferenceLedgerToPlutus :: LedgerCredential.StakeReference LedgerCrypto.StandardCrypto -> Maybe LedgerCredentialV1.StakingCredential
+stakeReferenceLedgerToPlutus (LedgerCredential.StakeRefBase x)                   = Just $ LedgerApiV1.StakingHash $ credentialLedgerToPlutus x
 stakeReferenceLedgerToPlutus (LedgerCredential.StakeRefPtr (LedgerCredential.Ptr (CardanoApi.SlotNo x) txIx certIx)) = 
     let 
       txIxInteger = P.toInteger (LedgerBaseTypes.txIxToInt txIx)
       certIxInteger = P.toInteger (LedgerBaseTypes.certIxToInt certIx)
-    in P.Just P.$ LedgerApiV1.StakingPtr (P.fromIntegral x) txIxInteger  certIxInteger
-stakeReferenceLedgerToPlutus LedgerCredential.StakeRefNull                       = P.Nothing
+    in Just $ LedgerApiV1.StakingPtr (P.fromIntegral x) txIxInteger  certIxInteger
+stakeReferenceLedgerToPlutus LedgerCredential.StakeRefNull                       = Nothing
 
-tryReadAddress :: P.String -> P.Maybe LedgerApiV1.Address
-tryReadAddress x = case CardanoApi.deserialiseAddress CardanoApi.AsAddressAny P.$ DataText.pack x of
-    P.Nothing                                      -> P.Nothing
-    P.Just (ApiShelley.AddressByron _)                        -> P.Nothing
-    P.Just (ApiShelley.AddressShelley (ApiShelley.ShelleyAddress _ p s)) -> P.Just LedgerApiV1.Address
+tryReadAddress :: P.String -> Maybe LedgerApiV1.Address
+tryReadAddress x = case CardanoApi.deserialiseAddress CardanoApi.AsAddressAny $ DataText.pack x of
+    Nothing                                      -> Nothing
+    Just (ApiShelley.AddressByron _)                        -> Nothing
+    Just (ApiShelley.AddressShelley (ApiShelley.ShelleyAddress _ p s)) -> Just LedgerApiV1.Address
         { 
           LedgerApiV1.addressCredential        = credentialLedgerToPlutus p, 
           LedgerApiV1.addressStakingCredential = stakeReferenceLedgerToPlutus s
         }
 
-tryReadWalletId :: P.String -> P.Maybe WalletEmulator.WalletId
-tryReadWalletId = DataAeson.decode P.. DataAeson.encode
+tryReadWalletId :: P.String -> Maybe WalletEmulator.WalletId
+tryReadWalletId = DataAeson.decode . DataAeson.encode
 
 unsafeReadWalletId :: P.String -> WalletEmulator.WalletId
-unsafeReadWalletId s = DataMaybe.fromMaybe (P.error P.$ "can't parse " P.++ s P.++ " as a WalletId") P.$ tryReadWalletId s
+unsafeReadWalletId s = DataMaybe.fromMaybe (P.error $ "can't parse " ++ s ++ " as a WalletId") $ tryReadWalletId s
 
 unsafeReadAddress :: P.String -> LedgerApiV1.Address
-unsafeReadAddress s = DataMaybe.fromMaybe (P.error P.$ "can't parse " P.++ s P.++ " as an address") P.$ tryReadAddress s
+unsafeReadAddress s = DataMaybe.fromMaybe (P.error $ "can't parse " ++ s ++ " as an address") $ tryReadAddress s
 
 unsafeReadTxOutRef :: P.String -> LedgerApiV1.TxOutRef
 unsafeReadTxOutRef s =
@@ -102,63 +103,63 @@ unsafeReadTxOutRef s =
           LedgerApiV1.txOutRefIdx = P.read y
         }
 
-getCredentials :: LedgerApiV1.Address -> P.Maybe (Ledger.PaymentPubKeyHash, P.Maybe Ledger.StakePubKeyHash)
+getCredentials :: LedgerApiV1.Address -> Maybe (Ledger.PaymentPubKeyHash, Maybe Ledger.StakePubKeyHash)
 getCredentials (LedgerApiV1.Address x y) = case x of
-    LedgerApiV1.ScriptCredential _   -> P.Nothing
+    LedgerApiV1.ScriptCredential _   -> Nothing
     LedgerApiV1.PubKeyCredential pkh ->
       let
         ppkh = Ledger.PaymentPubKeyHash pkh
       in
         case y of
-            P.Nothing                        -> P.Just (ppkh, P.Nothing)
-            P.Just (LedgerApiV1.StakingPtr _ _ _) -> P.Nothing
-            P.Just (LedgerApiV1.StakingHash h)           -> case h of
-                LedgerApiV1.ScriptCredential _    -> P.Nothing
-                LedgerApiV1.PubKeyCredential pkh' -> P.Just (ppkh, P.Just P.$ Ledger.StakePubKeyHash pkh')
+            Nothing                        -> Just (ppkh, Nothing)
+            Just (LedgerApiV1.StakingPtr _ _ _) -> Nothing
+            Just (LedgerApiV1.StakingHash h)           -> case h of
+                LedgerApiV1.ScriptCredential _    -> Nothing
+                LedgerApiV1.PubKeyCredential pkh' -> Just (ppkh, Just $ Ledger.StakePubKeyHash pkh')
 
 unsafePaymentPubKeyHash :: LedgerApiV1.Address -> Ledger.PaymentPubKeyHash
-unsafePaymentPubKeyHash addr = P.maybe (P.error P.$ "script address " P.++ P.show addr P.++ " does not contain a payment key") P.fst P.$ getCredentials addr
+unsafePaymentPubKeyHash addr = maybe (P.error $ "script address " ++ P.show addr ++ " does not contain a payment key") fst $ getCredentials addr
 
 unsafeStakePubKeyHash :: LedgerApiV1.Address -> Ledger.StakePubKeyHash
 unsafeStakePubKeyHash addr = case getCredentials addr of
-    P.Nothing           -> P.error P.$ "unexpected script address " P.++ P.show addr
-    P.Just (_, P.Nothing) -> P.error P.$ "addres " P.++ P.show addr P.++ " contains no stake component"
-    P.Just (_, P.Just x)  -> x
+    Nothing           -> P.error $ "unexpected script address " ++ P.show addr
+    Just (_, Nothing) -> P.error $ "addres " ++ P.show addr ++ " contains no stake component"
+    Just (_, Just x)  -> x
 
 cidToString :: WalletTypes.ContractInstanceId -> P.String
-cidToString = P.show P.. WalletTypes.unContractInstanceId
+cidToString = P.show . WalletTypes.unContractInstanceId
 
 unsafeTokenNameToHex :: LedgerValueV1.TokenName -> P.String
-unsafeTokenNameToHex = DataByteStringChar8.unpack P.. CardanoApi.serialiseToRawBytesHex P.. DataMaybe.fromJust P.. CardanoApi.deserialiseFromRawBytes CardanoApi.AsAssetName P.. getByteString P.. LedgerValueV1.unTokenName
+unsafeTokenNameToHex = DataByteStringChar8.unpack . CardanoApi.serialiseToRawBytesHex . DataMaybe.fromJust . CardanoApi.deserialiseFromRawBytes CardanoApi.AsAssetName . getByteString . LedgerValueV1.unTokenName
   where
     getByteString (TxBuiltinsInternal.BuiltinByteString bs) = bs
 
 pkhFromStr :: P.String -> LedgerApiV1.PubKeyHash   
 pkhFromStr s =         
     case LedgerBytes.fromHex (DataString.fromString s) of 
-        P.Right (LedgerBytes.LedgerBytes bytes) ->  LedgerApiV1.PubKeyHash bytes 
-        P.Left msg -> P.error P.$ "Could not convert from hex to bytes: " P.++ P.show msg
+        Right (LedgerBytes.LedgerBytes bytes) ->  LedgerApiV1.PubKeyHash bytes 
+        Left msg -> P.error $ "Could not convert from hex to bytes: " ++ P.show msg
 
 
 
--- pkhFromStr :: P.String ->  P.Maybe PubKeyHash   
+-- pkhFromStr :: P.String ->  Maybe PubKeyHash   
 -- pkhFromStr s =  do
 --   let 
 --     hex = LedgerBytes.fromHex (DataString.fromString s)
 --   case hex of
---     P.Right (LedgerBytes.LedgerBytes bytes) -> P.Just (PubKeyHash bytes )
---     P.Left msg -> P.Nothing
+--     Right (LedgerBytes.LedgerBytes bytes) -> Just (PubKeyHash bytes )
+--     Left msg -> Nothing
   
 
   --  case LedgerBytes.fromHex (DataString.fromString s) of 
   --   (LedgerBytes.LedgerBytes bytes) -> PubKeyHash bytes 
-  --   P.Nothing -> error P.$ "Could not convert from hex to bytes: " P.++ show s
+  --   Nothing -> error $ "Could not convert from hex to bytes: " ++ show s
     
 
 
     -- case LedgerBytes.fromHex (DataString.fromString s) of 
-    --     P.Right (LedgerBytes.LedgerBytes bytes) -> P.Right P.$ PubKeyHash bytes 
-    --     P.Left msg -> P.Left P.$ DataText.pack ("Could not convert from hex to bytes: " <> msg)
+    --     Right (LedgerBytes.LedgerBytes bytes) -> Right $ PubKeyHash bytes 
+    --     Left msg -> Left $ DataText.pack ("Could not convert from hex to bytes: " <> msg)
 
 
 
@@ -166,14 +167,14 @@ pkhFromStr s =
 -- contractActivationArgs :: WalletId -> a -> ContractActivationArgs a
 -- contractActivationArgs wid a = ContractActivationArgs
 --     { caID = a
---     , caWallet = P.Just P.$ Wallet {getWalletId = wid}
+--     , caWallet = Just $ Wallet {getWalletId = wid}
 --     }
 
 
 
 -- dataToScriptData :: Data -> ScriptData
--- dataToScriptData (Constr n xs) = ScriptDataConstructor n P.$ dataToScriptData P.<$> xs
+-- dataToScriptData (Constr n xs) = ScriptDataConstructor n $ dataToScriptData <$> xs
 -- dataToScriptData (Map xs)      = ScriptDataMap [(dataToScriptData x, dataToScriptData y) | (x, y) <- xs]
--- dataToScriptData (List xs)     = ScriptDataList P.$ dataToScriptData P.<$> xs
+-- dataToScriptData (List xs)     = ScriptDataList $ dataToScriptData <$> xs
 -- dataToScriptData (I n)         = ScriptDataNumber n
 -- dataToScriptData (B bs)        = ScriptDataBytes bs

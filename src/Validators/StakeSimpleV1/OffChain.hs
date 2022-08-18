@@ -81,7 +81,7 @@ masterCreatePool MasterCreatePoolParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "Time: %s" (P.show now)
 
     let 
-        masterAdds = Ledger.pubKeyHashAddress master P.Nothing
+        masterAdds = Ledger.pubKeyHashAddress master Nothing
     
     utxosMaster <- PlutusContract.utxosAt masterAdds
 
@@ -129,7 +129,7 @@ masterCreatePool MasterCreatePoolParams{..} = do
             LedgerConstraints.mustValidateIn validityRange
 
     submittedTx <- PlutusContract.submitTxConstraintsWith lookupsInit tx
-    Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId submittedTx
+    Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId submittedTx
 
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Master Create Pool ---------------------------------------------"  
@@ -156,7 +156,7 @@ masterFundPool MasterFundPoolParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "Time: %s" (P.show now)
 
     let 
-        masterAdds = Ledger.pubKeyHashAddress master P.Nothing
+        masterAdds = Ledger.pubKeyHashAddress master Nothing
 
     utxosAtMaster <- PlutusContract.utxosAt masterAdds
 
@@ -176,7 +176,7 @@ masterFundPool MasterFundPoolParams{..} = do
                 
                 valueFundForPoolState  = LedgerAda.lovelaceValueOf mspFund
 
-                valueTotalForPoolState = P.foldl (<>) valueFundForPoolState listValuesEnUtxosPoolStateList 
+                valueTotalForPoolState = foldl (<>) valueFundForPoolState listValuesEnUtxosPoolStateList 
 
                 dPoolState = T.mkPoolStateWithNewFundFromUtxoList utxosListAtScriptWithPoolState (T.ppPoolNFT mspPoolParam) master mspFund 
 
@@ -215,7 +215,7 @@ masterFundPool MasterFundPoolParams{..} = do
 
 
             submittedTx <- PlutusContract.submitTxConstraintsWith lookupsInit tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId submittedTx
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId submittedTx
 
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Master Fund Pool -- -------------------------------------------" 
@@ -265,7 +265,7 @@ masterGetBackFund MasterGetBackFundParams{..} = do
     --             -- LedgerConstraints.mustPayToPubKey master vGetADA  
 
     --         submittedTx <- PlutusContract.submitTxConstraintsWith lookupsInit tx
-    --         Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId submittedTx
+    --         Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId submittedTx
 
     --         PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     --         PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Master GetBack Fund -------------------------------------------" 
@@ -286,7 +286,7 @@ userInvest UserInvestParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "Time: %s" (P.show now)
 
     let 
-        userAdds = Ledger.pubKeyHashAddress user P.Nothing
+        userAdds = Ledger.pubKeyHashAddress user Nothing
 
     utxosAtUser <- PlutusContract.utxosAt userAdds
 
@@ -314,7 +314,7 @@ userInvest UserInvestParams{..} = do
 
                 -- Creates UserState Datum
 
-                dUserState = T.mkUserState user userNFT uipInvest uipCreatedAt uipDeadline 0 0 P.Nothing
+                dUserState = T.mkUserState user userNFT uipInvest uipCreatedAt uipDeadline 0 0 Nothing
 
                 -- Creates PoolState Datum with the New User
 
@@ -322,7 +322,7 @@ userInvest UserInvestParams{..} = do
 
                 listValuesEnUtxosPoolStateList = [ OffChainHelpers.getValueFromChainIndexTxOut $ snd utxo | utxo <- utxosListAtScriptWithPoolState] 
     
-                valueForPoolState = P.foldl (<>) (LedgerAda.lovelaceValueOf 0) listValuesEnUtxosPoolStateList 
+                valueForPoolState = foldl (<>) (LedgerAda.lovelaceValueOf 0) listValuesEnUtxosPoolStateList 
 
                 dPoolState = T.mkPoolStateWithNewUserInvestFromUtxoList utxosListAtScriptWithPoolState poolNFT userNFT
 
@@ -369,7 +369,7 @@ userInvest UserInvestParams{..} = do
                     LedgerConstraints.mustValidateIn validityRange
 
             submittedTx <- PlutusContract.submitTxConstraintsWith lookupsInit tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId submittedTx
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId submittedTx
 
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User Invest ----------------------------------------------------"  
@@ -419,7 +419,7 @@ userGetBackInvest UserGetBackInvestParams{..} = do
     --             -- LedgerConstraints.mustPayToPubKey user vGetADA  
 
     --         submittedTx <- PlutusContract.submitTxConstraintsWith lookupsInit tx
-    --         Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId submittedTx
+    --         Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId submittedTx
 
     --         PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
     --         PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User GetBack Invest --------------------------------------------"  
@@ -441,7 +441,7 @@ userGetRewards UserGetRewardsParams{..} = do
     PlutusContract.logInfo @P.String $ TextPrintf.printf "Time: %s" (P.show now)
     
     let 
-        userAdds = Ledger.pubKeyHashAddress user P.Nothing
+        userAdds = Ledger.pubKeyHashAddress user Nothing
 
         userNFTTxOutRef  = ugrpUserNFTTxOutRef
         userNFTTokenName  = ugrpUserNFTTokenName
@@ -501,7 +501,7 @@ userGetRewards UserGetRewardsParams{..} = do
                     (T.usDeadline dUserStateOLD)
                     (totalRewardsCashedOut)
                     (rewardsNotClaimed)
-                    (P.Just now)
+                    (Just now)
 
                 txOutRefUserState   = fst utxoAtScriptWithUserState
 
@@ -513,7 +513,7 @@ userGetRewards UserGetRewardsParams{..} = do
 
                 poolStateDatums = getPoolStateListFromUtxoList utxosListAtScriptWithPoolState 
 
-                valueForPoolState = P.foldl (<>) (negate (LedgerAda.lovelaceValueOf ugrpClaim)) listValuesEnUtxosPoolStateList 
+                valueForPoolState = foldl (<>) (negate (LedgerAda.lovelaceValueOf ugrpClaim)) listValuesEnUtxosPoolStateList 
 
     
                 dPoolState = T.mkPoolStateFromPoolStateList poolStateDatums poolNFT   
@@ -561,7 +561,7 @@ userGetRewards UserGetRewardsParams{..} = do
                     LedgerConstraints.mustValidateIn validityRange
 
             submittedTx <- PlutusContract.submitTxConstraintsWith lookupsInit tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId submittedTx
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId submittedTx
 
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------------------------------------------------------------------------"
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- User Get Rewards ----------------------------------------------------"  

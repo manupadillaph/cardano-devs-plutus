@@ -182,7 +182,7 @@ isPoolNFTInSomeOutputWithPoolState outputsWithPoolState redeemerPoolNFT ctx  = d
 
         outPutNFTQuantities = [LedgerValueV1.assetClassValueOf  outPutValue redeemerPoolNFT | outPutValue <- outputsWithPoolState_Values ]
 
-    1 `elem` outPutNFTQuantities --P.any (==1) outPutNFTQuantities
+    1 `elem` outPutNFTQuantities --any (==1) outPutNFTQuantities
 
 {-  Check if this the invest created at date is correct.  -}
 {-# INLINABLE correctInvestCreatedAt #-}
@@ -233,9 +233,9 @@ getOnwOutputs = LedgerContextsV1.getContinuingOutputs
 
 {- | Gets the datum attached to a utxo. -}
 {-# INLINABLE getDatumFromTxOut #-}
-getDatumFromTxOut :: PlutusTx.FromData T.ValidatorDatum => LedgerApiV1.TxOut -> LedgerContextsV1.ScriptContext -> P.Maybe T.ValidatorDatum
+getDatumFromTxOut :: PlutusTx.FromData T.ValidatorDatum => LedgerApiV1.TxOut -> LedgerContextsV1.ScriptContext -> Maybe T.ValidatorDatum
 getDatumFromTxOut o ctx = LedgerTxV1.txOutDatum o >>= (`LedgerContextsV1.findDatum` LedgerContextsV1.scriptContextTxInfo ctx)
-                   >>= PlutusTx.fromBuiltinData . LedgerScriptsV1.getDatum :: P.Maybe T.ValidatorDatum
+                   >>= PlutusTx.fromBuiltinData . LedgerScriptsV1.getDatum :: Maybe T.ValidatorDatum
 
 
 {-# INLINABLE getInput_TxOutRef #-}
@@ -275,7 +275,7 @@ getInputsWithPoolState ctx = do
 
 {- | Gets the input T.PoolState Datum with the Pool NFT. -}
 {-# INLINABLE getInputWithPoolStateAndPoolNFT #-}
-getInputWithPoolStateAndPoolNFT ::   [(LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)] -> T.PoolNFT -> P.Maybe (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)
+getInputWithPoolStateAndPoolNFT ::   [(LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)] -> T.PoolNFT -> Maybe (LedgerApiV1.TxOutRef, LedgerApiV1.TxOut, T.PoolStateTypo)
 getInputWithPoolStateAndPoolNFT  inputsWithPoolState redeemerPoolNFT = do
     let 
         inputsWithPoolState_TxOut = getInput_TxOut <$> inputsWithPoolState
@@ -285,12 +285,12 @@ getInputWithPoolStateAndPoolNFT  inputsWithPoolState redeemerPoolNFT = do
         inputsWithPoolStateAndPoolNFT = [(txOutRef,txOut,poolStateTypo) | (txOutRef,txOut,poolStateTypo) <- inputsWithPoolState , LedgerValueV1.assetClassValueOf (LedgerApiV1.txOutValue txOut) redeemerPoolNFT > 0]
 
     case inputsWithPoolStateAndPoolNFT of
-        [inputWithPoolStateAndPoolNFT] -> P.Just inputWithPoolStateAndPoolNFT
-        _ -> P.Nothing
+        [inputWithPoolStateAndPoolNFT] -> Just inputWithPoolStateAndPoolNFT
+        _ -> Nothing
 
 {- | Gets the output T.PoolState Datum with the Pool NFT. -}
 {-# INLINABLE getOutputWithPoolStateAndPoolNFT #-}
-getOutputWithPoolStateAndPoolNFT ::   [(LedgerApiV1.TxOut, T.PoolStateTypo)] -> T.PoolNFT -> P.Maybe (LedgerApiV1.TxOut, T.PoolStateTypo)
+getOutputWithPoolStateAndPoolNFT ::   [(LedgerApiV1.TxOut, T.PoolStateTypo)] -> T.PoolNFT -> Maybe (LedgerApiV1.TxOut, T.PoolStateTypo)
 getOutputWithPoolStateAndPoolNFT  outputsWithPoolState redeemerPoolNFT = do
     let 
         ouputsWithPoolState_TxOut = fst <$> outputsWithPoolState
@@ -300,8 +300,8 @@ getOutputWithPoolStateAndPoolNFT  outputsWithPoolState redeemerPoolNFT = do
         outputsWithPoolStateAndPoolNFT = [(txOut,poolStateTypo) | (txOut,poolStateTypo) <- outputsWithPoolState , LedgerValueV1.assetClassValueOf (LedgerApiV1.txOutValue txOut) redeemerPoolNFT > 0]
 
     case outputsWithPoolStateAndPoolNFT of
-        [outputWithPoolStateAndPoolNFT] -> P.Just outputWithPoolStateAndPoolNFT
-        _ -> P.Nothing
+        [outputWithPoolStateAndPoolNFT] -> Just outputWithPoolStateAndPoolNFT
+        _ -> Nothing
 
 
 {- | Gets the input UserState Datums of the tx ScriptContext. -}

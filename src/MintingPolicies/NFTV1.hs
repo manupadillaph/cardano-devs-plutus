@@ -78,7 +78,7 @@ policy oref tn = LedgerScriptsV1.mkMintingPolicyScript $
     PlutusTx.liftCode tn
 
 curSymbol :: LedgerApiV1.TxOutRef -> Ledger.TokenName -> LedgerValueV1.CurrencySymbol
-curSymbol oref tn = UtilsScriptsV1.scriptCurrencySymbol P.$ policy oref tn 
+curSymbol oref tn = UtilsScriptsV1.scriptCurrencySymbol $ policy oref tn 
 
 newtype MintParams = MintParams
     { 
@@ -93,7 +93,7 @@ mint mp = do
     pkh <- PlutusContract.ownFirstPaymentPubKeyHash
 
     let 
-        address = Ledger.pubKeyHashAddress pkh P.Nothing
+        address = Ledger.pubKeyHashAddress pkh Nothing
 
     utxos <- PlutusContract.utxosAt address
     
@@ -107,32 +107,32 @@ mint mp = do
                 tx      = LedgerConstraints.mustMintValue val P.<>
                           LedgerConstraints.mustSpendPubKeyOutput oref
             ledgerTx <- PlutusContract.submitTxConstraintsWith @DataVoid.Void lookups tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf "forged %s" (P.show val)
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
+            PlutusContract.logInfo @P.String $ TextPrintf.printf "forged %s" (P.show val)
 
 endpoints :: PlutusContract.Contract () MintSchema DataText.Text ()
-endpoints = mint' P.>> endpoints
+endpoints = mint' >> endpoints
   where
-    mint' = PlutusContract.awaitPromise P.$ PlutusContract.endpoint @"mint" mint
+    mint' = PlutusContract.awaitPromise $ PlutusContract.endpoint @"mint" mint
 
 Playground.Contract.mkSchemaDefinitions ''MintSchema
 
 test :: P.IO ()
-test = TraceEmulator.runEmulatorTraceIO P.$ do
+test = TraceEmulator.runEmulatorTraceIO $ do
     let tn = "ABC"
     h1 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 1) endpoints
     h2 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 2) endpoints
-    TraceEmulator.callEndpoint @"mint" h1 P.$ MintParams
+    TraceEmulator.callEndpoint @"mint" h1 $ MintParams
         { 
             mpTokenName = tn
         }
-    TraceEmulator.callEndpoint @"mint" h2 P.$ MintParams
+    TraceEmulator.callEndpoint @"mint" h2 $ MintParams
         { 
             mpTokenName = tn
         }
-    Monad.void P.$ TraceEmulator.waitNSlots 1
-    TraceEmulator.callEndpoint @"mint" h1 P.$ MintParams
+    Monad.void $ TraceEmulator.waitNSlots 1
+    TraceEmulator.callEndpoint @"mint" h1 $ MintParams
         { 
             mpTokenName = tn
         }
-    Monad.void P.$ TraceEmulator.waitNSlots 1
+    Monad.void $ TraceEmulator.waitNSlots 1

@@ -42,7 +42,7 @@ defaultWalletPaymentPubKeyHash :: PaymentPubKeyHash
 defaultWalletPaymentPubKeyHash = CW.paymentPubKeyHash (CW.fromWalletNumber $ CW.WalletNumber 1)
 
 defaultWalletPaymentPubKeyHashAddress :: Address
-defaultWalletPaymentPubKeyHashAddress = pubKeyHashAddress defaultWalletPaymentPubKeyHash P.Nothing
+defaultWalletPaymentPubKeyHashAddress = pubKeyHashAddress defaultWalletPaymentPubKeyHash Nothing
 
 benWalletPaymentPubKeyHash :: PaymentPubKeyHash
 benWalletPaymentPubKeyHash = CW.paymentPubKeyHash (CW.fromWalletNumber $ CW.WalletNumber 4)
@@ -94,8 +94,8 @@ main = void $ Simulator.runSimulationWith handlers $ do
     Simulator.waitNSlots 2
 
     lot <- flip Simulator.waitForState cidInit $ \json -> case (fromJSON json :: Result (Monoid.Last OffChain.Lottery)) of
-                    Success (Monoid.Last (P.Just lot))   -> P.Just lot
-                    _                                       -> P.Nothing
+                    Success (Monoid.Last (Just lot))   -> Just lot
+                    _                                       -> Nothing
     Simulator.logString @(Builtin StarterContracts) $ "Lotto found: " ++ show lot
     --liftIO $ LB.writeFile "lotto.json" $ encode lot
 

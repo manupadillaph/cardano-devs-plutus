@@ -51,8 +51,8 @@ data ValidatorDatum = ValidatorDatum
 
 instance P.Eq ValidatorDatum where
     {-# INLINABLE (==) #-}
-    a == b = (dSeller a P.== dSeller   b) P.&&
-             (dPrice a P.== dPrice b)
+    a == b = (dSeller a == dSeller   b) &&
+             (dPrice a == dPrice b)
 
 PlutusTx.unstableMakeIsData ''ValidatorDatum
 PlutusTx.makeLift ''ValidatorDatum

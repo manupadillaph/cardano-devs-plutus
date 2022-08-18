@@ -33,6 +33,7 @@ import qualified Ledger.TimeSlot                     as LedgerTimeSlot (slotToEn
 import qualified Playground.Contract                 as PlaygroundContract (IO) --, ensureKnownCurrencies, printSchemas, stage, printJson
 import qualified Plutus.Trace.Emulator               as TraceEmulator
 import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
+import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
 import qualified Wallet.Emulator.Wallet              as WalletEmulator
 
@@ -43,7 +44,7 @@ import qualified Validators.MarketNFTV1.OffChain    as OffChain
 -- Modulo:
 
 test :: PlaygroundContract.IO ()
-test = TraceEmulator.runEmulatorTraceIO P.$ do
+test = TraceEmulator.runEmulatorTraceIO $ do
 
 --     let deadline = slotToEndPOSIXTime def 6
 
@@ -55,19 +56,19 @@ test = TraceEmulator.runEmulatorTraceIO P.$ do
 --             spName = 55,
 --             spAdaQty   = 3000000
 --         }
---     Monad.void P.$ TraceEmulator.waitNSlots 7
+--     Monad.void $ TraceEmulator.waitNSlots 7
 --     TraceEmulator.callEndpoint @"get" h1 $ OffChain.GetParams { 
 --             gpName = 55,
 --             gpAdaQty    = 3000000
 --         }
---     Monad.void P.$ TraceEmulator.waitNSlots 6
+--     Monad.void $ TraceEmulator.waitNSlots 6
 --     TraceEmulator.callEndpoint @"get" h1 $ OffChain.GetParams{ 
 --             gpName = 56,
 --             gpAdaQty    = 3000000
 --         }
---     Monad.void P.$ TraceEmulator.waitNSlots 3
+--     Monad.void $ TraceEmulator.waitNSlots 3
 --     TraceEmulator.callEndpoint @"get" h1 $ OffChain.GetParams { 
 --             gpName = 55,
 --             gpAdaQty    = 3000000
 --         }
-    Monad.void P.$ TraceEmulator.waitNSlots 1
+    Monad.void $ TraceEmulator.waitNSlots 1

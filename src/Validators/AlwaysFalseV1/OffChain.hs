@@ -80,7 +80,7 @@ start StartParams{..} = do
     pkh <- PlutusContract.ownFirstPaymentPubKeyHash
     oref <- findUtxoInValidator pkh spName
     case oref of
-        P.Nothing -> do
+        Nothing -> do
             let a = T.ValidatorData
                     { 
                         aCreator  = pkh,
@@ -95,9 +95,9 @@ start StartParams{..} = do
                 v = LedgerAda.lovelaceValueOf spAdaQty
                 tx = LedgerConstraints.mustPayToTheScript d v
             ledgerTx <- PlutusContract.submitTxConstraints OnChain.typedValidator tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf  "--------------------------- Start Endpoint - Submited - Datum: %s - Value: %s ---------------------------" (P.show a) (P.show v)
-        _ -> PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Start Endpoint - Error - Ese nombre ya existe ---------------------------" 
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
+            PlutusContract.logInfo @P.String $ TextPrintf.printf  "--------------------------- Start Endpoint - Submited - Datum: %s - Value: %s ---------------------------" (P.show a) (P.show v)
+        _ -> PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Start Endpoint - Error - Ese nombre ya existe ---------------------------" 
 
 get :: forall w s. GetParams ->  PlutusContract.Contract w s DataText.Text ()
 get GetParams{..} = do
@@ -105,26 +105,26 @@ get GetParams{..} = do
     now <- PlutusContract.currentTime
     orefMaybe <- findUtxoInValidator pkh gpName
     case orefMaybe of
-        P.Nothing ->PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Get Endpoint - Error - Ese nombre no existe ---------------------------"
-        P.Just oref -> do
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Get Endpoint - Redeem Utxo: %s ---------------------------" (P.show oref)
+        Nothing ->PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Get Endpoint - Error - Ese nombre no existe ---------------------------"
+        Just oref -> do
+            PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Get Endpoint - Redeem Utxo: %s ---------------------------" (P.show oref)
             (oref2,o) <- getTxOutRefAndChainIndexTxOutFromTxOutRef oref
             let 
                 vGet       = gpAdaQty
                 
-                P.Just dOld = getDatumm (oref2,o) 
+                Just dOld = getDatumm (oref2,o) 
                 redeemerTipo1 = T.ValidatorRedeemer {
-                    rTipo = T.aName P.$ T.dData dOld
+                    rTipo = T.aName $ T.dData dOld
                 }
-                r  = LedgerApiV1.Redeemer P.$ PlutusTx.toBuiltinData redeemerTipo1
+                r  = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData redeemerTipo1
 
-                vChange       = T.aAdaQty (T.dData dOld) P.- vGet
+                vChange       = T.aAdaQty (T.dData dOld) - vGet
                 
                 a = T.ValidatorData
                     { 
                         aCreator  = pkh,
-                        aDeadline = T.aDeadline P.$ T.dData dOld,
-                        aName = T.aName P.$ T.dData dOld,
+                        aDeadline = T.aDeadline $ T.dData dOld,
+                        aName = T.aName $ T.dData dOld,
                         aAdaQty   = vChange
                     }
                 d = T.ValidatorDatum
@@ -140,69 +140,69 @@ get GetParams{..} = do
                   LedgerConstraints.unspentOutputs (DataMap.singleton oref2 o)
 
                 tx
-                 | vChange P.>= T.minLovelace = 
+                 | vChange >= T.minLovelace = 
                                     LedgerConstraints.mustPayToPubKey pkh vGetADA  P.<>
                                     LedgerConstraints.mustValidateIn (LedgerIntervalV1.from now) P.<>
                                     LedgerConstraints.mustSpendScriptOutput oref2 r P.<>
                                     LedgerConstraints.mustPayToTheScript d vChangeADA
 
-                 | P.otherwise =    LedgerConstraints.mustPayToPubKey pkh vGetADA  P.<>
+                 | otherwise =    LedgerConstraints.mustPayToPubKey pkh vGetADA  P.<>
                                     LedgerConstraints.mustValidateIn (LedgerIntervalV1.from now) P.<>
                                     LedgerConstraints.mustSpendScriptOutput oref2 r 
 
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Get Endpoint - Monto Anterior: %s - Get: %s - Cambio: %s ---------------------------" (P.show (T.aAdaQty (T.dData dOld))) (P.show vGet) (P.show vChange)
+            PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Get Endpoint - Monto Anterior: %s - Get: %s - Cambio: %s ---------------------------" (P.show (T.aAdaQty (T.dData dOld))) (P.show vGet) (P.show vChange)
 
             ledgerTx <- PlutusContract.submitTxConstraintsWith lookups tx
-            Monad.void P.$ PlutusContract.awaitTxConfirmed P.$ Ledger.getCardanoTxId ledgerTx
-            PlutusContract.logInfo @P.String P.$ TextPrintf.printf "--------------------------- Get EndPoint - Submited -------------------------"
+            Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
+            PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Get EndPoint - Submited -------------------------"
    
-getDatumm :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> P.Maybe T.ValidatorDatum
+getDatumm :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Maybe T.ValidatorDatum
 getDatumm (_, o) = do
     let 
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum o
-    LedgerApiV1.Datum e <- P.snd datHashOrDatum
+    LedgerApiV1.Datum e <- snd datHashOrDatum
     case PlutusTx.fromBuiltinData e of
-        P.Nothing -> P.Nothing
-        P.Just d -> d
+        Nothing -> Nothing
+        Just d -> d
 
 
 checkUTXO  :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Ledger.PaymentPubKeyHash -> Integer -> Bool
 checkUTXO (oref,o)  ppkh name = do
     case getDatumm (oref,o) of
-        P.Nothing -> P.False
-        P.Just T.ValidatorDatum{..}
-            | T.aCreator dData P.== ppkh P.&& T.aName dData P.== name -> P.True
-            | P.otherwise                                                                           -> P.False
+        Nothing -> False
+        Just T.ValidatorDatum{..}
+            | T.aCreator dData == ppkh && T.aName dData == name -> True
+            | otherwise                                                                           -> False
 
-findUTXO :: [(LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)]  -> Ledger.PaymentPubKeyHash -> Integer -> P.Maybe LedgerApiV1.TxOutRef
-findUTXO [] _ _ = P.Nothing --do  
+findUTXO :: [(LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)]  -> Ledger.PaymentPubKeyHash -> Integer -> Maybe LedgerApiV1.TxOutRef
+findUTXO [] _ _ = Nothing --do  
 findUTXO [(oref,o)]  ppkh name  = do
     if checkUTXO (oref, o) ppkh name then 
-        P.return oref
+        return oref
     else 
-        P.Nothing
+        Nothing
 findUTXO ((oref,o):xs) ppkh name  
-    | checkUTXO (oref ,o)  ppkh name = P.return oref
-    | P.otherwise = findUTXO xs   ppkh name
+    | checkUTXO (oref ,o)  ppkh name = return oref
+    | otherwise = findUTXO xs   ppkh name
 
-findUtxoInValidator :: Ledger.PaymentPubKeyHash -> Integer -> PlutusContract.Contract w s DataText.Text (P.Maybe LedgerApiV1.TxOutRef)
+findUtxoInValidator :: Ledger.PaymentPubKeyHash -> Integer -> PlutusContract.Contract w s DataText.Text (Maybe LedgerApiV1.TxOutRef)
 findUtxoInValidator ppkh name = do
     utxos <- PlutusContract.utxosAt OnChain.addressValidator
     let 
         xs = [ (oref, o) | (oref, o) <- DataMap.toList utxos ]
         out = findUTXO xs ppkh name
-    P.return out
+    return out
  
 getTxOutRefAndChainIndexTxOutFromTxOutRef :: LedgerApiV1.TxOutRef -> PlutusContract.Contract w s DataText.Text (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut)
 getTxOutRefAndChainIndexTxOutFromTxOutRef get_oref= do
     utxos <- PlutusContract.utxosAt OnChain.addressValidator
     let 
-        xs = [ (oref, o) | (oref, o) <- DataMap.toList utxos , get_oref P.== oref]
+        xs = [ (oref, o) | (oref, o) <- DataMap.toList utxos , get_oref == oref]
     case xs of
-        [x] ->  P.return x
+        [x] ->  return x
 
 endpoints :: PlutusContract.Contract () ValidatorSchema DataText.Text ()
-endpoints = PlutusContract.awaitPromise (start' `PlutusContract.select` get') P.>> endpoints
+endpoints = PlutusContract.awaitPromise (start' `PlutusContract.select` get') >> endpoints
   where
     start' = PlutusContract.endpoint @"start" start
     get' = PlutusContract.endpoint @"get" get

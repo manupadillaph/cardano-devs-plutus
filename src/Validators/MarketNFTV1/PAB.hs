@@ -31,6 +31,7 @@ import qualified Data.OpenApi.Schema                 as DataOpenApiSchema (ToSch
 import qualified GHC.Generics                        as GHCGenerics (Generic)
 import qualified Plutus.PAB.Effects.Contract.Builtin as PABEffectsContractBuiltin (Empty, HasDefinitions (..), SomeBuiltin (..), endpointsToSchemas)
 import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
+import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
 import qualified Prettyprinter                       (Pretty (..), viaShow)
 
@@ -53,11 +54,11 @@ instance PABEffectsContractBuiltin.HasDefinitions ValidatorContracts where
 
     getDefinitions        = [SellNFT exampleSellNFTParams, BuyNFT exampleBuyNFTParams, GetBackNFT exampleGetBackNFTParams]
 
-    getContract (SellNFT sp) = PABEffectsContractBuiltin.SomeBuiltin P.$ OffChain.sell         @() @PABEffectsContractBuiltin.Empty sp
-    getContract (BuyNFT bp)   = PABEffectsContractBuiltin.SomeBuiltin P.$ OffChain.buy         @() @PABEffectsContractBuiltin.Empty bp
-    getContract (GetBackNFT gbp)  = PABEffectsContractBuiltin.SomeBuiltin P.$ OffChain.getback @() @PABEffectsContractBuiltin.Empty gbp
+    getContract (SellNFT sp) = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.sell         @() @PABEffectsContractBuiltin.Empty sp
+    getContract (BuyNFT bp)   = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.buy         @() @PABEffectsContractBuiltin.Empty bp
+    getContract (GetBackNFT gbp)  = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.getback @() @PABEffectsContractBuiltin.Empty gbp
 
-    getSchema = P.const P.$ PABEffectsContractBuiltin.endpointsToSchemas @PABEffectsContractBuiltin.Empty
+    getSchema = const $ PABEffectsContractBuiltin.endpointsToSchemas @PABEffectsContractBuiltin.Empty
 
 exampleSellNFTParams :: OffChain.SellNFTParams
 exampleSellNFTParams = OffChain.SellNFTParams

@@ -80,58 +80,58 @@ import qualified Validators.StakeSimpleV1.Typos
 checkIntervalSize :: LedgerApiV1.Interval LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> Bool
 checkIntervalSize iv len =
     case getLowerBoundFromInterval iv of
-        P.Just t  -> LedgerIntervalV1.interval t (t + len) `LedgerIntervalV1.contains` iv
-        P.Nothing -> False
+        Just t  -> LedgerIntervalV1.interval t (t + len) `LedgerIntervalV1.contains` iv
+        Nothing -> False
 
 
 {-# INLINABLE getLowerBoundFromInterval #-}
-getLowerBoundFromInterval :: LedgerApiV1.Interval a -> P.Maybe a
+getLowerBoundFromInterval :: LedgerApiV1.Interval a -> Maybe a
 getLowerBoundFromInterval iv = case LedgerApiV1.ivFrom iv of
-    LedgerApiV1.LowerBound (LedgerApiV1.Finite lBound) _ -> P.Just lBound
-    _                            -> P.Nothing
+    LedgerApiV1.LowerBound (LedgerApiV1.Finite lBound) _ -> Just lBound
+    _                            -> Nothing
 
 
 {-# INLINABLE stringToBuiltinByteString #-}
 stringToBuiltinByteString :: P.String -> BuiltinByteString
 stringToBuiltinByteString = toBuiltin . DataText.pack
 
-{- | Function to return the P.Just value from a P.Maybe. -}
+{- | Function to return the Just value from a Maybe. -}
 {-# INLINABLE Helpers.fromJust #-}
-Helpers.fromJust :: P.Maybe a -> a
-Helpers.fromJust (P.Just valueInfo) = valueInfo
-Helpers.fromJust P.Nothing = traceError
-                   "Helpers.fromJust P.Nothing"
+Helpers.fromJust :: Maybe a -> a
+Helpers.fromJust (Just valueInfo) = valueInfo
+Helpers.fromJust Nothing = traceError
+                   "Helpers.fromJust Nothing"
                    
 
 {- | Try to get the PoolState Datum from a generic Datum. -}
 {-# INLINABLE getPoolStateFromDatum #-}
-getPoolStateFromDatum ::  P.Maybe ValidatorDatum -> P.Maybe PoolStateTypo
+getPoolStateFromDatum ::  Maybe ValidatorDatum -> Maybe PoolStateTypo
 getPoolStateFromDatum datum = case datum of
-    P.Just (PoolState dPoolState) -> do
+    Just (PoolState dPoolState) -> do
         -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm PoolState: %s" (P.show dPoolState)
-        P.Just dPoolState  
-    _ -> P.Nothing
+        Just dPoolState  
+    _ -> Nothing
 
 {- | Try to get the UserState Datum from a generic Datum. -}
 {-# INLINABLE getUserStateFromDatum #-}
-getUserStateFromDatum ::  P.Maybe ValidatorDatum -> P.Maybe UserStateTypo
+getUserStateFromDatum ::  Maybe ValidatorDatum -> Maybe UserStateTypo
 getUserStateFromDatum datum = case datum of
-    P.Just (UserState dUserState) -> do
+    Just (UserState dUserState) -> do
         -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm UserState: %s" (P.show dUserState)
-        P.Just dUserState  
-    _ -> P.Nothing
+        Just dUserState  
+    _ -> Nothing
 
 
 {- | Check if the Datum is a PoolState. -}
 {-# INLINABLE datumIsPoolState #-}
-datumIsPoolState :: P.Maybe ValidatorDatum -> Bool
-datumIsPoolState (P.Just (PoolState _)) = True
+datumIsPoolState :: Maybe ValidatorDatum -> Bool
+datumIsPoolState (Just (PoolState _)) = True
 datumIsPoolState _             = False
 
 {- | Check if the Datum is a UserState. -}
 {-# INLINABLE datumIsUserState #-}
-datumIsUserState :: P.Maybe ValidatorDatum -> Bool
-datumIsUserState (P.Just (UserState _)) = True
+datumIsUserState :: Maybe ValidatorDatum -> Bool
+datumIsUserState (Just (UserState _)) = True
 datumIsUserState _             = False
 
 
@@ -146,11 +146,11 @@ T.mkPoolStateWithNewFundFromPoolStateList poolStateDatums poolNFT master fund  =
         masterFunderOld =  find (\masterFunder -> T.mfMaster masterFunder == master) masterFunders
 
         masterFunderNew = case masterFunderOld of
-            P.Nothing -> 
+            Nothing -> 
                 -- traceError "Can't Find Master Funder In Datums"
                 -- TODO: deberia dejar el error de arriba, pero como quiero ver como funciona los controles OnChain dejo que cree un nuevo PoolState Datum con un master que no existe
                 T.mkMasterFunder master fund
-            P.Just MasterFunder{..}  -> 
+            Just MasterFunder{..}  -> 
                 T.mkMasterFunder master (T.mfFund  + fund)
 
     PoolState $ T.mkPoolStateTypo poolNFT (masterFunderNew:masterFunder_others) userNFTs
@@ -219,9 +219,9 @@ getOnwOutputs = LedgerContextsV1.getContinuingOutputs
 
 {- | Gets the datum attached to a utxo. -}
 {-# INLINABLE getDatumFromTxOut #-}
-getDatumFromTxOut :: PlutusTx.FromData ValidatorDatum => LedgerApiV1.TxOut -> LedgerContextsV1.ScriptContext -> P.Maybe ValidatorDatum
+getDatumFromTxOut :: PlutusTx.FromData ValidatorDatum => LedgerApiV1.TxOut -> LedgerContextsV1.ScriptContext -> Maybe ValidatorDatum
 getDatumFromTxOut o ctx = LedgerApiV1.txOutValue o >>= (`LedgerContextsV1.findDatum` LedgerContextsV1.scriptContextTxInfo ctx)
-                   >>= PlutusTx.fromBuiltinData . LedgerScriptsV1.getDatum :: P.Maybe ValidatorDatum
+                   >>= PlutusTx.fromBuiltinData . LedgerScriptsV1.getDatum :: Maybe ValidatorDatum
 
 
 {- | Gets the input PoolState Datums of the tx ScriptContext. -}
@@ -258,8 +258,8 @@ getSingleOwnOutputPoolStateDatum :: LedgerContextsV1.ScriptContext -> (LedgerApi
 getSingleOwnOutputPoolStateDatum ctx = 
     case getOnwOutputs ctx of
         [txOut] -> case getDatumFromTxOut txOut ctx of
-            P.Just (PoolState dPoolState)  -> (txOut, dPoolState)
-            P.Nothing   -> traceError "Wrong output PoolState Datum type."
+            Just (PoolState dPoolState)  -> (txOut, dPoolState)
+            Nothing   -> traceError "Wrong output PoolState Datum type."
         _   -> traceError "Expected exactly one output with PoolState Datum."
 
 {-# INLINABLE getDoubleOwnOutputsPoolStateAndUSerStateDatum #-}
@@ -267,10 +267,10 @@ getDoubleOwnOutputsPoolStateAndUSerStateDatum :: LedgerContextsV1.ScriptContext 
 getDoubleOwnOutputsPoolStateAndUSerStateDatum ctx = 
     case getOnwOutputs ctx of
         [txOut1,txOut2]-> case (getDatumFromTxOut txOut1 ctx, getDatumFromTxOut txOut2 ctx) of
-            (P.Just (PoolState dPoolState), P.Just (UserState dUserState) ) -> ((txOut1, dPoolState),(txOut2, dUserState))
-            (P.Just (UserState dUserState), P.Just (PoolState dPoolState) ) -> ((txOut2, dPoolState),(txOut1, dUserState))
-            (P.Nothing,_)   -> traceError "Wrong output PoolState Datum or UserState Datum type."
-            (_,P.Nothing)   -> traceError "Wrong output PoolState Datum or UserState Datum type."
+            (Just (PoolState dPoolState), Just (UserState dUserState) ) -> ((txOut1, dPoolState),(txOut2, dUserState))
+            (Just (UserState dUserState), Just (PoolState dPoolState) ) -> ((txOut2, dPoolState),(txOut1, dUserState))
+            (Nothing,_)   -> traceError "Wrong output PoolState Datum or UserState Datum type."
+            (_,Nothing)   -> traceError "Wrong output PoolState Datum or UserState Datum type."
         _   -> traceError "Expected exactly two output. One with PoolState Datum and other with UserState Datum"
 
 
@@ -310,11 +310,11 @@ msPerYearMi :: Integer
 msPerYearMi = msPerYear * 1_000_000
 
 {-# INLINABLE getRewardsPerInvest #-}
-getRewardsPerInvest :: P.Maybe LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> Invest  -> Proffit
+getRewardsPerInvest :: Maybe LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> LedgerApiV1.POSIXTime -> Invest  -> Proffit
 getRewardsPerInvest lastClaim now depTime invest =
     case lastClaim of
-        P.Nothing -> getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)
-        P.Just lClaim ->
+        Nothing -> getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)
+        Just lClaim ->
             getRewards $ LedgerApiV1.getPOSIXTime (now - lClaim)
             -- if lClaim < depTime
             -- then getRewards $ LedgerApiV1.getPOSIXTime (now - depTime)

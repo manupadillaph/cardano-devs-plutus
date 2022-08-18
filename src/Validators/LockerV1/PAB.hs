@@ -30,6 +30,7 @@ import qualified Data.Aeson                          as DataAeson (ToJSON, FromJ
 import qualified Data.OpenApi.Schema                 as DataOpenApiSchema (ToSchema)
 import qualified GHC.Generics                        as GHCGenerics (Generic)
 import qualified Plutus.PAB.Effects.Contract.Builtin as PABEffectsContractBuiltin (Empty, HasDefinitions (..), SomeBuiltin (..), endpointsToSchemas)
+import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
 import qualified Prettyprinter                       (Pretty (..), viaShow)
 
@@ -47,10 +48,10 @@ instance PABEffectsContractBuiltin.HasDefinitions ValidatorContracts where
 
     getDefinitions        = [Start exampleStartParams, Get exampleGetParams]
 
-    getContract (Start sp) = PABEffectsContractBuiltin.SomeBuiltin P.$ OffChain.start @() @PABEffectsContractBuiltin.Empty sp
-    getContract (Get gp)   = PABEffectsContractBuiltin.SomeBuiltin P.$ OffChain.get   @() @PABEffectsContractBuiltin.Empty gp
+    getContract (Start sp) = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.start @() @PABEffectsContractBuiltin.Empty sp
+    getContract (Get gp)   = PABEffectsContractBuiltin.SomeBuiltin $ OffChain.get   @() @PABEffectsContractBuiltin.Empty gp
 
-    getSchema = P.const P.$ PABEffectsContractBuiltin.endpointsToSchemas @PABEffectsContractBuiltin.Empty
+    getSchema = const $ PABEffectsContractBuiltin.endpointsToSchemas @PABEffectsContractBuiltin.Empty
 
 exampleStartParams :: OffChain.StartParams
 exampleStartParams = OffChain.StartParams

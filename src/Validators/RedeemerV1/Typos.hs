@@ -49,10 +49,10 @@ data ValidatorData = ValidatorData
 
 instance P.Eq ValidatorData where
     {-# INLINABLE (==) #-}
-    a == b = (aCreator   a P.== aCreator   b) P.&&
-             (aDeadline a P.== aDeadline b) P.&&
-             (aName a P.== aName b) P.&&  
-             (aAdaQty a P.== aAdaQty   b)
+    a == b = (aCreator   a == aCreator   b) &&
+             (aDeadline a == aDeadline b) &&
+             (aName a == aName b) &&  
+             (aAdaQty a == aAdaQty   b)
 
 PlutusTx.unstableMakeIsData ''ValidatorData
 PlutusTx.makeLift ''ValidatorData
