@@ -24,26 +24,26 @@ main = do
 
   putStrLn "Deploy Smart Contracts:"
 
-  putStrLn "1: write ValidatorLocker datum"
-  putStrLn "2: write ValidatorLocker redeemer"
+  putStrLn "1: write Validator LockerV1 datum"
+  putStrLn "2: write Validator LockerV1 redeemer"
 
-  putStrLn "3: write Validator Locker plutus cbor"
-  putStrLn "4: write Validator Locker hash"
-  putStrLn "5: write Validator AlwaysTrue plutus cbor"
-  putStrLn "6: write Validator AlwaysTrue hash"
+  putStrLn "3: write Validator LockerV1 plutus cbor"
+  putStrLn "4: write Validator LockerV1 hash"
+  putStrLn "5: write Validator AlwaysTrueV1 plutus cbor"
+  putStrLn "6: write Validator AlwaysTrueV1 hash"
   putStrLn "7: write Validator AlwaysFalseV1 plutus cbor"
   putStrLn "8: write Validator AlwaysFalseV1 hash"
-  putStrLn "9: write Validator Beneficiary plutus cbor"
-  putStrLn "10: write Validator Beneficiary hash"
-  putStrLn "11: write Validator Deadline plutus cbor"
-  putStrLn "12: write Validator Deadline hash"
-  putStrLn "13: write Validator Redeemer plutus cbor"
-  putStrLn "14: write Validator Redeemer hash"
+  putStrLn "9: write Validator BeneficiaryV1 plutus cbor"
+  putStrLn "10: write Validator BeneficiaryV1 hash"
+  putStrLn "11: write Validator DeadlineV1 plutus cbor"
+  putStrLn "12: write Validator DeadlineV1 hash"
+  putStrLn "13: write Validator RedeemerV1 plutus cbor"
+  putStrLn "14: write Validator RedeemerV1 hash"
 
-  putStrLn "15: write Minting PolicyFree"
-  putStrLn "16: write Minting PolicyNFT"
-  putStrLn "17: write Minting PolicyTokens"
-  putStrLn "18: write Minting PolicySigned"
+  putStrLn "15: write Minting PolicyFreeV1"
+  putStrLn "16: write Minting PolicyNFTV1"
+  putStrLn "17: write Minting PolicyTokensV1"
+  putStrLn "18: write Minting PolicySignedV1"
 
   opcion <- getLine
 
