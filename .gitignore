@@ -22,5 +22,5 @@ cabal.project.local
 cabal.project.local~
 .HTF/
 .ghc.environment.*
-_OLD/
-_old/
+**/_OLD
+**/_old
