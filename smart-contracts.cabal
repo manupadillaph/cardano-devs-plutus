@@ -10,95 +10,130 @@ License-files:       LICENSE
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Deploy
-                     , Validators.Locker
-                     , Validators.Locker.OffChain
-                     , Validators.Locker.OnChain
-                     , Validators.Locker.PAB
-                     , Validators.Locker.Test
-                     , Validators.Locker.Typos
-                     , Validators.AlwaysTrue
-                     , Validators.AlwaysTrue.OffChain
-                     , Validators.AlwaysTrue.OnChain
-                     , Validators.AlwaysTrue.PAB
-                     , Validators.AlwaysTrue.Test
-                     , Validators.AlwaysTrue.Typos
-                     , Validators.AlwaysFalse
-                     , Validators.AlwaysFalse.OffChain
-                     , Validators.AlwaysFalse.OnChain
-                     , Validators.AlwaysFalse.PAB
-                     , Validators.AlwaysFalse.Test
-                     , Validators.AlwaysFalse.Typos
-                     , Validators.Beneficiary
-                     , Validators.Beneficiary.OffChain
-                     , Validators.Beneficiary.OnChain
-                     , Validators.Beneficiary.PAB
-                     , Validators.Beneficiary.Test
-                     , Validators.Beneficiary.Typos
-                     , Validators.Deadline
-                     , Validators.Deadline.OffChain
-                     , Validators.Deadline.OnChain
-                     , Validators.Deadline.PAB
-                     , Validators.Deadline.Test
-                     , Validators.Deadline.Typos
+  exposed-modules:     
+                      Deploy
 
-                     , Validators.MarketNFT
-                     , Validators.MarketNFT.OffChain
-                     , Validators.MarketNFT.OnChain
-                     , Validators.MarketNFT.OnChainNFT
-                     , Validators.MarketNFT.PAB
-                     , Validators.MarketNFT.TestWithEmulator
-                     , Validators.MarketNFT.TestWithPABSimulator
-                     , Validators.MarketNFT.Typos
-                     , Validators.MarketNFT.OnChainHelpers
-                     , Validators.MarketNFT.OffChainHelpers
-                     , Validators.MarketNFT.Helpers
+                     , Validators.AlwaysTrueV1
+                     , Validators.AlwaysTrueV1.OffChain
+                     , Validators.AlwaysTrueV1.OnChain
+                     , Validators.AlwaysTrueV1.PAB
+                     , Validators.AlwaysTrueV1.TestWithEmulator
+                     , Validators.AlwaysTrueV1.Typos
 
-                     , Validators.Redeemer
-                     , Validators.Redeemer.OffChain
-                     , Validators.Redeemer.OnChain
-                     , Validators.Redeemer.PAB
-                     , Validators.Redeemer.Test
-                     , Validators.Redeemer.Typos
+                     , Validators.AlwaysFalseV1
+                     , Validators.AlwaysFalseV1.OffChain
+                     , Validators.AlwaysFalseV1.OnChain
+                     , Validators.AlwaysFalseV1.PAB
+                     , Validators.AlwaysFalseV1.TestWithEmulator
+                     , Validators.AlwaysFalseV1.Typos
+
+                     , Validators.BeneficiaryV1
+                     , Validators.BeneficiaryV1.OffChain
+                     , Validators.BeneficiaryV1.OnChain
+                     , Validators.BeneficiaryV1.PAB
+                     , Validators.BeneficiaryV1.TestWithEmulator
+                     , Validators.BeneficiaryV1.Typos
+
+                     , Validators.DeadlineV1
+                     , Validators.DeadlineV1.OffChain
+                     , Validators.DeadlineV1.OnChain
+                     , Validators.DeadlineV1.PAB
+                     , Validators.DeadlineV1.TestWithEmulator
+                     , Validators.DeadlineV1.Typos
+
+                     , Validators.MarketNFTV1
+                     , Validators.MarketNFTV1.OffChain
+                     , Validators.MarketNFTV1.OnChain
+                     , Validators.MarketNFTV1.PAB
+                     , Validators.MarketNFTV1.TestWithPABSimulator
+                     , Validators.MarketNFTV1.Typos
+
+                    --  , Validators.MarketNFTV2
+                    --  , Validators.MarketNFTV2.OffChain
+                    --  , Validators.MarketNFTV2.OnChain
+                    --  , Validators.MarketNFTV2.PAB
+                    --  , Validators.MarketNFTV2.TestWithPABSimulator
+                    --  , Validators.MarketNFTV2.Typos
+
+
+                     , Validators.RedeemerV1
+                     , Validators.RedeemerV1.OffChain
+                     , Validators.RedeemerV1.OnChain
+                     , Validators.RedeemerV1.PAB
+                     , Validators.RedeemerV1.TestWithEmulator
+                     , Validators.RedeemerV1.Typos
                      
-                     , Validators.StakeSimple
-                     , Validators.StakeSimple.OffChain
-                     , Validators.StakeSimple.OnChain
-                     , Validators.StakeSimple.OnChainNFT
-                     , Validators.StakeSimple.PAB
-                     , Validators.StakeSimple.TestWithEmulator
-                     , Validators.StakeSimple.TestWithPABSimulator
-                     , Validators.StakeSimple.Typos
-                     , Validators.StakeSimple.OnChainHelpers
-                     , Validators.StakeSimple.OffChainHelpers
-                     , Validators.StakeSimple.Helpers
+                     , Validators.LockerV1
+                     , Validators.LockerV1.OffChain
+                     , Validators.LockerV1.OnChain
+                     , Validators.LockerV1.PAB
+                     , Validators.LockerV1.TestWithEmulator
+                     , Validators.LockerV1.Typos
 
-                     , Validators.StakePlus
-                     , Validators.StakePlus.OffChain
-                     , Validators.StakePlus.OnChain
-                     , Validators.StakePlus.OnChainNFT
-                     , Validators.StakePlus.PAB
-                     , Validators.StakePlus.TestWithEmulator
-                     , Validators.StakePlus.TestWithPABSimulator
-                     , Validators.StakePlus.Typos
-                     , Validators.StakePlus.OnChainHelpers
-                     , Validators.StakePlus.OffChainHelpers
-                     , Validators.StakePlus.Helpers
+                    --  , Validators.StakeSimpleV1
+                    --  , Validators.StakeSimpleV1.OffChain
+                    --  , Validators.StakeSimpleV1.OnChain
+                    --  , Validators.StakeSimpleV1.OnChainNFT
+                    --  , Validators.StakeSimpleV1.PAB
+                    --  , Validators.StakeSimpleV1.TestWithEmulator
+                    --  , Validators.StakeSimpleV1.TestWithPABSimulator
+                    --  , Validators.StakeSimpleV1.Typos
+                    --  , Validators.StakeSimpleV1.OnChainHelpers
+                    --  , Validators.StakeSimpleV1.OffChainHelpers
+                    --  , Validators.StakeSimpleV1.Helpers
 
+                     , Validators.StakePlusV1
+                     , Validators.StakePlusV1.OffChain
+                     , Validators.StakePlusV1.OnChain
+                     , Validators.StakePlusV1.OnChainNFT
+                     , Validators.StakePlusV1.PAB
+                     , Validators.StakePlusV1.TestWithEmulator
+                     , Validators.StakePlusV1.TestWithPABSimulator
+                     , Validators.StakePlusV1.Typos
+                     , Validators.StakePlusV1.OnChainHelpers
+                     , Validators.StakePlusV1.OffChainHelpers
+                     , Validators.StakePlusV1.Helpers
+                     
+                     , MintingPolicies.FreeV1
+                     , MintingPolicies.NFTV1
+                     , MintingPolicies.SignedV1
+                     , MintingPolicies.TokensV1
 
-                     , MintingPolicies.Free
-                     , MintingPolicies.NFT
-                     , MintingPolicies.Plus
-                     , MintingPolicies.Signed
                      , Utils
 
   --------------------
-  -- IOG dependencies
+  -- Local components
   --------------------
+  build-depends:   plutus-script-utils >=1.0.0
+
+  -- --------------------------
+  -- -- Other IOG dependencies
+  -- --------------------------
+  -- build-depends:
+
+  -- ------------------------
+  -- -- Non-IOG dependencies
+  -- ------------------------
+  -- build-depends:
+  --   , aeson
+  --   , bytestring
+  --   , containers
+  --   , filepath
+  --   , serialise
+  --   , strict-containers
+  --   , text
+  --   , transformers
+  --   , transformers-except
+
+
   build-depends:
-                       cardano-api
+                     --  cardano-api
+                    cardano-api             >=1.35
+                     --, cardano-cli             >=1.35
                      , cardano-crypto-class
                      , cardano-ledger-core
+                     , cardano-ledger-alonzo
+                     , cardano-ledger-babbage
                      , cardano-ledger-shelley
                      , cardano-wallet-core
                      , data-default
@@ -107,13 +142,17 @@ library
                      , plutus-contract
                      -- , plutus-core
                      , plutus-ledger
-                     , plutus-ledger-api
+                     --, plutus-ledger-api
+                     , plutus-ledger-api       >=1.0.0
                      , plutus-ledger-constraints
                      --, plutus-script-utils
                      , plutus-pab
-                     , plutus-use-cases
-                     , plutus-tx
-                     , plutus-tx-plugin      
+                     --, plutus-use-cases
+                     , plutus-tx               >=1.0.0
+                     , plutus-tx-plugin        >=1.0.0 
+
+                        
+  
 
   ------------------------
   -- Non-IOG dependencies
@@ -125,6 +164,7 @@ library
                      , containers
                      , freer-extras
                      , freer-simple
+                     , filepath
                      -- , hashable
                      , lens
                      , openapi3
@@ -150,7 +190,8 @@ executable deploy-smart-contracts-manual
       app
   build-depends:
       base ^>=4.14.1.0,
-      smart-contracts
+      smart-contracts,
+      filepath
   default-language: Haskell2010
 
 executable deploy-smart-contracts-auto
@@ -159,7 +200,8 @@ executable deploy-smart-contracts-auto
       app
   build-depends:
       base ^>=4.14.1.0,
-      smart-contracts
+      smart-contracts,
+      filepath
   default-language: Haskell2010
 
 
@@ -186,8 +228,8 @@ executable utils-stake-key-hash
 
 
 
-executable pab-api-server
-  main-is: pab-api-server.hs
+executable pab-api-server-manual
+  main-is: pab-api-server-manual.hs
   hs-source-dirs:      app
   ghc-options:         -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:       aeson
@@ -199,7 +241,7 @@ executable pab-api-server
                      , plutus-ledger
                      , plutus-ledger-constraints
                      , plutus-pab
-                     , plutus-use-cases
+                     --, plutus-use-cases
                      , text
                      , smart-contracts
 
@@ -216,7 +258,7 @@ executable pab-api-server-auto
                      , plutus-ledger
                      , plutus-ledger-constraints
                      , plutus-pab
-                     , plutus-use-cases
+                     --, plutus-use-cases
                      , text
                      , smart-contracts
 

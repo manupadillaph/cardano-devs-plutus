@@ -11,15 +11,12 @@ while ! [[ $opcionMenuMint = "0" ]]; do
     printf "\nMINT TOKENS\n"
  
     echo "1: Elegir o Crear Wallet (${walletName})"  
-    echo "2: Mint Tokens Free"
-    echo "3: Mint Tokens NFT"
-    echo "4: Mint Tokens Plus"
-    echo "5: Mint Tokens Signed"
+    
+    echo "2: Mint Free"
+    echo "3: Mint NFT"
+    echo "4: Mint Tokens"
+    echo "5: Mint Signed"
 
-    echo "--"
-
-    echo "6: Token Metadata Creator"
-     
     echo "--"
     
     echo "0: Regresar al Menu Principal"
@@ -35,13 +32,13 @@ while ! [[ $opcionMenuMint = "0" ]]; do
         source "$FALCON_DEVS_SCRIPTS/main/main_elegir_crear_wallet.sh"    
     fi
 
-    if [[ $opcionMenuMint = "2" || $opcionMenuMint = "3" || $opcionMenuMint = "4" || $opcionMenuMint = "5" || $opcionMenuMint = "6" ]]; 
+    if [[ $opcionMenuMint = "2" || $opcionMenuMint = "3" || $opcionMenuMint = "4" || $opcionMenuMint = "5"   ]]; 
     then 
         if [[ $walletName = ""  ]]; then
             printf "\nDebe elegir wallet primero\n"
             echo; read -rsn1 -p "Press any key to continue . . ."; echo
         else
-
+        
             echo " "
             echo "Elija tx in: "
 
@@ -91,26 +88,27 @@ while ! [[ $opcionMenuMint = "0" ]]; do
                 fi 
 
                 if [[ $opcionMenuMint = "2" ]]; then 
-                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-free.sh" 
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-free.sh" 
                 fi
 
                 if [[ $opcionMenuMint = "3" ]]; then 
-                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-nft.sh"
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-nft.sh"
                 fi
 
                 if [[ $opcionMenuMint = "4" ]]; then 
-                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-plus.sh"
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-tokens.sh"
                 fi
 
                 if [[ $opcionMenuMint = "5" ]]; then 
-                    source "$FALCON_DEVS_SCRIPTS/mint/mint-token-signed.sh"  
-                fi
-
-                if [[ $opcionMenuMint = "6" ]]; then 
-                    source "$FALCON_DEVS_SCRIPTS/mint/token-metadata-creator.sh"  
+                    source "$FALCON_DEVS_SCRIPTS/mint/mint-signed.sh"  
                 fi
             fi
+        
+           
+
+           
         fi
     fi  
+  
 
 done

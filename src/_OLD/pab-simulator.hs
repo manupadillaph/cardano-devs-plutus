@@ -30,7 +30,7 @@ import           Plutus.PAB.Simulator                (SimulatorEffectHandlers)
 import qualified Plutus.PAB.Simulator                as Simulator
 import qualified Plutus.PAB.Webserver.Server         as PAB.Server
 import qualified Plutus.V1.Ledger.Slot               as Slot 
-import           Wallet.Emulator.Wallet              (Wallet, knownWallet)
+import qualified Wallet.Emulator.Wallet              as WalletEmulator              (Wallet, knownWallet)
 
 import           OffChain
 import           LottoContract                       (StarterContracts(..))
@@ -42,7 +42,7 @@ defaultWalletPaymentPubKeyHash :: PaymentPubKeyHash
 defaultWalletPaymentPubKeyHash = CW.paymentPubKeyHash (CW.fromWalletNumber $ CW.WalletNumber 1)
 
 defaultWalletPaymentPubKeyHashAddress :: Address
-defaultWalletPaymentPubKeyHashAddress = pubKeyHashAddress defaultWalletPaymentPubKeyHash Nothing
+defaultWalletPaymentPubKeyHashAddress = pubKeyHashAddress defaultWalletPaymentPubKeyHash P.Nothing
 
 benWalletPaymentPubKeyHash :: PaymentPubKeyHash
 benWalletPaymentPubKeyHash = CW.paymentPubKeyHash (CW.fromWalletNumber $ CW.WalletNumber 4)
@@ -94,8 +94,8 @@ main = void $ Simulator.runSimulationWith handlers $ do
     Simulator.waitNSlots 2
 
     lot <- flip Simulator.waitForState cidInit $ \json -> case (fromJSON json :: Result (Monoid.Last OffChain.Lottery)) of
-                    Success (Monoid.Last (Just lot))   -> Just lot
-                    _                                       -> Nothing
+                    Success (Monoid.Last (P.Just lot))   -> P.Just lot
+                    _                                       -> P.Nothing
     Simulator.logString @(Builtin StarterContracts) $ "Lotto found: " ++ show lot
     --liftIO $ LB.writeFile "lotto.json" $ encode lot
 

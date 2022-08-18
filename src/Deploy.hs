@@ -1,217 +1,279 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE DataKinds                  #-}
+{-# LANGUAGE DeriveAnyClass             #-}
+{-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE LambdaCase                 #-}
+{-# LANGUAGE MultiParamTypeClasses      #-}
+{-# LANGUAGE NoImplicitPrelude          #-}
+{-# LANGUAGE OverloadedStrings          #-}
+{-# LANGUAGE RecordWildCards            #-}
+{-# LANGUAGE ScopedTypeVariables        #-}
+{-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE TypeOperators              #-}
+{-# LANGUAGE RankNTypes                 #-}
+{-# LANGUAGE TupleSections              #-}
+{-# LANGUAGE AllowAmbiguousTypes        #-}
+{-# LANGUAGE NumericUnderscores         #-}
 
 module Deploy
-    ( writeUnit
-    , writeRedeemer
-    , writeDatum
-    , writeValidatorLockerHash
-    , writeValidatorLocker
-    , writeValidatorAlwaysTrueHash
-    , writeValidatorAlwaysTrue
-    , writeValidatorAlwaysFalseHash
-    , writeValidatorAlwaysFalse
-    , writeValidatorBeneficiaryHash
-    , writeValidatorBeneficiary
-    , writeValidatorDeadlineHash
-    , writeValidatorDeadline
-    , writeValidatorRedeemerHash
-    , writeValidatorRedeemer
-    , writeMintingPolicyFree
-    , writeMintingPolicyNFT
-    , writeMintingPolicyPlus
-    , writeMintingPolicySignedAddr
-    , writeMintingPolicySignedPkh
+    ( 
+      writeUnit
+
+    -- , writeRedeemer
+    -- , writeDatum
+
+    , writeValidatorLockerV1Hash
+    , writeValidatorLockerV1
+    , writeValidatorAlwaysTrueV1Hash
+    , writeValidatorAlwaysTrueV1
+    , writeValidatorAlwaysFalseV1Hash
+    , writeValidatorAlwaysFalseV1
+    , writeValidatorBeneficiaryV1Hash
+    , writeValidatorBeneficiaryV1
+    , writeValidatorDeadlineV1Hash
+    , writeValidatorDeadlineV1
+    , writeValidatorRedeemerV1Hash
+    , writeValidatorRedeemerV1
+
+    , writeValidatorMarketNFTV1Hash
+    , writeValidatorMarketNFTV1
+
+    , writeMintingPolicyFreeV1
+    , writeMintingPolicyNFTV1
+    , writeMintingPolicySignedV1Addr
+    , writeMintingPolicySignedV1Pkh
+    , writeMintingPolicyTokensV1
+
     ) where
 
-import           Cardano.Api
-import           Cardano.Api.Shelley   (PlutusScript (..))
-import           Codec.Serialise       (serialise)
-import           Data.Aeson            (encode,ToJSON, FromJSON)
-import qualified Data.ByteString.Lazy  as LBS
-import qualified Data.ByteString.Short as SBS
-import           PlutusTx              (Data (..))
+--Import Externos
+
+import qualified Cardano.Api                         as CardanoApi 
+import qualified Cardano.Api.Shelley                 as ApiShelley (PlutusScript (..), PlutusScriptV1)
+import qualified Codec.Serialise                     as CodecSerialise (serialise)
+import qualified Data.Aeson                          as DataAeson (encode) --,ToJSON, FromJSON
+import qualified Data.ByteString.Lazy                as LBS
+import qualified Data.ByteString.Short               as SBS
+import qualified Data.String                         as DataString (IsString(fromString))
+--import qualified Data.Map                            as DataMap
+import qualified Ledger                              (PaymentPubKeyHash(..))
+import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
 import qualified PlutusTx
-import           Plutus.V1.Ledger.Credential as Plutus
-import           Plutus.V1.Ledger.Crypto     as Plutus
-import qualified Ledger                      as Plutus
+import qualified System.Directory                    as SystemDirectory          
+import qualified System.FilePath.Posix               as SystemFilePathPosix            
+import qualified Prelude                             as P
 
-import  Prelude              as P
+--Import Internos
 
-import           Data.String (IsString(fromString))
-import           Data.Either (fromRight)
-import           Data.Text (Text, pack)
-import           Ledger 
-import           Ledger.Bytes (LedgerBytes(LedgerBytes), fromHex)
+import qualified Validators.LockerV1
+import qualified Validators.AlwaysTrueV1
+import qualified Validators.AlwaysFalseV1
+import qualified Validators.BeneficiaryV1
+import qualified Validators.DeadlineV1
+import qualified Validators.RedeemerV1
+import qualified Validators.MarketNFTV1
 
-import qualified Data.ByteString.Char8 as BS 
-import Data.Char                   (chr)
+import qualified MintingPolicies.FreeV1              (policy)
+import qualified MintingPolicies.NFTV1               (policy)
+import qualified MintingPolicies.SignedV1            (policy)
+import qualified MintingPolicies.TokensV1            (policy)
 
-import  qualified        Plutus.V1.Ledger.Scripts as SC
+import qualified Utils                               (unsafeReadTxOutRef, unsafeReadAddress, unsafePaymentPubKeyHash, pkhFromStr)
 
-import qualified Validators.Locker
-import qualified Validators.AlwaysTrue
-import qualified Validators.AlwaysFalse
-import qualified Validators.Beneficiary
-import qualified Validators.Deadline
-import qualified Validators.Redeemer
+--Modulo:
 
-import qualified MintingPolicies.Free (policy)
-import qualified MintingPolicies.NFT (policy)
-import qualified MintingPolicies.Plus (policy)
-import qualified MintingPolicies.Signed (policy)
+dataToScriptData :: PlutusTx.Data -> CardanoApi.ScriptData
+dataToScriptData (PlutusTx.Constr n xs) = CardanoApi.ScriptDataConstructor n P.$ dataToScriptData P.<$> xs
+dataToScriptData (PlutusTx.Map xs)      = CardanoApi.ScriptDataMap [(dataToScriptData x, dataToScriptData y) | (x, y) <- xs]
+dataToScriptData (PlutusTx.List xs)     = CardanoApi.ScriptDataList P.$ dataToScriptData P.<$> xs
+dataToScriptData (PlutusTx.I n)         = CardanoApi.ScriptDataNumber n
+dataToScriptData (PlutusTx.B bs)        = CardanoApi.ScriptDataBytes bs
 
-import Utils         (unsafeReadTxOutRef,unsafeReadAddress, unsafePaymentPubKeyHash,pkhFromStr)
+writeJSON :: PlutusTx.ToData a => P.FilePath -> a -> P.IO ()
+writeJSON file = LBS.writeFile file P.. DataAeson.encode P.. CardanoApi.scriptDataToJson CardanoApi.ScriptDataJsonDetailedSchema P.. dataToScriptData P.. PlutusTx.toData
 
-stringToBS :: String -> BS.ByteString
-stringToBS str = BS.pack str
+writeUnit :: P.String -> P.IO ()
+writeUnit path = writeJSON (path P.++ "/unit.json") ()
 
-stringToLBS :: String -> LBS.ByteString
-stringToLBS str = LBS.fromStrict (stringToBS str)
+--Writing Validators to disk
 
-bsToString :: LBS.ByteString -> String
-bsToString bs = map (chr . fromEnum) . LBS.unpack $ bs
+getScriptUnValidatorV1 :: LedgerScriptsV1.Validator -> LedgerScriptsV1.Script
+getScriptUnValidatorV1  = LedgerScriptsV1.unValidatorScript 
 
-dataToScriptData :: Data -> ScriptData
-dataToScriptData (Constr n xs) = ScriptDataConstructor n $ dataToScriptData <$> xs
-dataToScriptData (Map xs)      = ScriptDataMap [(dataToScriptData x, dataToScriptData y) | (x, y) <- xs]
-dataToScriptData (List xs)     = ScriptDataList $ dataToScriptData <$> xs
-dataToScriptData (I n)         = ScriptDataNumber n
-dataToScriptData (B bs)        = ScriptDataBytes bs
+getScriptShortBsV1 :: LedgerScriptsV1.Script -> SBS.ShortByteString
+getScriptShortBsV1 = SBS.toShort P.. LBS.toStrict P.. CodecSerialise.serialise 
 
-writeJSON :: PlutusTx.ToData a => FilePath -> a -> IO ()
-writeJSON file = LBS.writeFile file . encode . scriptDataToJson ScriptDataJsonDetailedSchema . dataToScriptData . PlutusTx.toData
+getScriptSerialisedV1 :: SBS.ShortByteString -> ApiShelley.PlutusScript ApiShelley.PlutusScriptV1
+getScriptSerialisedV1 = ApiShelley.PlutusScriptSerialised 
 
-
-writeUnit :: String -> IO ()
-writeUnit path = writeJSON (path ++ "/unit.json") ()
-
-writeRedeemer :: String -> String -> Integer -> IO ()
-writeRedeemer path file opcion = do
+writeValidatorV1 :: P.String -> P.String -> LedgerScriptsV1.Validator -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorV1 path file codeValidator =  do
     let 
-        redeemer = Validators.Locker.ValidatorRedeemer { 
-            Validators.Locker.rTipo = opcion
-        }
-        opcionStr = P.show opcion
-    writeJSON (path ++ "/" ++ file ++ ".json") redeemer
+        --v1dir = "V1"
+        scriptUnValidatorV1 = getScriptUnValidatorV1 codeValidator
+        scriptShortBsV1 = getScriptShortBsV1 scriptUnValidatorV1
+        scriptSerialisedV1 = getScriptSerialisedV1 scriptShortBsV1           
+    SystemDirectory.createDirectoryIfMissing P.True path --SystemFilePathPosix.</> v1dir
+    CardanoApi.writeFileTextEnvelope (path SystemFilePathPosix.</> file) P.Nothing scriptSerialisedV1
 
+getScriptMintingPolicyV1 :: LedgerScriptsV1.MintingPolicy -> LedgerScriptsV1.Script
+getScriptMintingPolicyV1  = LedgerScriptsV1.getMintingPolicy
 
-
-writeDatum:: String -> String -> String -> Integer -> Integer -> Integer-> IO ()
-writeDatum path file creator deadline name qty = do
+writeMintingPolicyV1 :: P.String -> P.String -> LedgerScriptsV1.MintingPolicy -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicyV1 path file policy =  do
     let 
-        pkh = pkhFromStr creator
+        --v1dir = "V1"
+        scriptMintingPolicyV1 = getScriptMintingPolicyV1 policy
+        scriptShortBsV1 = getScriptShortBsV1 scriptMintingPolicyV1
+        scriptSerialisedV1 = getScriptSerialisedV1 scriptShortBsV1           
+    SystemDirectory.createDirectoryIfMissing P.True path --SystemFilePathPosix.</> v1dir
+    CardanoApi.writeFileTextEnvelope (path SystemFilePathPosix.</> file) P.Nothing scriptSerialisedV1
+
+---------------------------
+
+writeValidatorLockerV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorLockerV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.LockerV1.codeValidator  
+
+writeValidatorLockerV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorLockerV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.LockerV1.hashValidator
+
+-- -- writeValidatorLockerAddress :: P.String -> P.String -> P.IO ()
+-- -- writeValidatorLockerAddress path file = do
+-- --     writeJSON  (path SystemFilePathPosix.</> file P.++ ".addr") (Validators.LockerV1.addressValidator)
+
+writeValidatorAlwaysFalseV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorAlwaysFalseV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.AlwaysFalseV1.codeValidator  
+
+writeValidatorAlwaysFalseV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorAlwaysFalseV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.AlwaysFalseV1.hashValidator
+
+writeValidatorAlwaysTrueV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorAlwaysTrueV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.AlwaysTrueV1.codeValidator  
+
+writeValidatorAlwaysTrueV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorAlwaysTrueV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.AlwaysTrueV1.hashValidator
+
+writeValidatorBeneficiaryV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorBeneficiaryV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.BeneficiaryV1.codeValidator  
+
+writeValidatorBeneficiaryV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorBeneficiaryV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.BeneficiaryV1.hashValidator
+
+writeValidatorDeadlineV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorDeadlineV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.DeadlineV1.codeValidator  
+
+writeValidatorDeadlineV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorDeadlineV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.DeadlineV1.hashValidator
+
+writeValidatorRedeemerV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorRedeemerV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.RedeemerV1.codeValidator  
+
+writeValidatorRedeemerV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorRedeemerV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.RedeemerV1.hashValidator
+
+writeValidatorMarketNFTV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeValidatorMarketNFTV1 path file = do
+    writeValidatorV1 path (file P.++ ".plutus") Validators.MarketNFTV1.codeValidator  
+
+writeValidatorMarketNFTV1Hash :: P.String -> P.String -> P.IO ()
+writeValidatorMarketNFTV1Hash path file = do
+    writeJSON (path SystemFilePathPosix.</> file P.++ ".hash") Validators.MarketNFTV1.hashValidator
+
+--Writing Minting Policies to disk
+
+writeMintingPolicyFreeV1 :: P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicyFreeV1 path file  = do
+    let p    = MintingPolicies.FreeV1.policy
+    writeMintingPolicyV1 path (file P.++ ".plutus") p 
+
+writeMintingPolicyNFTV1 :: P.String -> P.String ->  P.String ->  P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicyNFTV1 path file oref' tn' = do
+    let oref = Utils.unsafeReadTxOutRef oref'
+        tn   = DataString.fromString tn'
+        p    = MintingPolicies.NFTV1.policy oref tn
+    writeMintingPolicyV1 path (file P.++ ".plutus") p 
+
+writeMintingPolicySignedV1Addr ::  P.String -> P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicySignedV1Addr path file addr' = do
+    let pkh  = Utils.unsafePaymentPubKeyHash P.$ Utils.unsafeReadAddress addr'
+        p    = MintingPolicies.SignedV1.policy pkh
+    writeMintingPolicyV1 path (file P.++ ".plutus") p 
+
+writeMintingPolicySignedV1Pkh ::  P.String -> P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicySignedV1Pkh path file pkh' = do
+    let pkh  =  Ledger.PaymentPubKeyHash P.$ Utils.pkhFromStr pkh'
+        p    = MintingPolicies.SignedV1.policy pkh
+    writeMintingPolicyV1 path (file P.++ ".plutus") p 
+
+writeMintingPolicyTokensV1 :: P.String -> P.String -> P.String -> P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicyTokensV1 path file oref' tn' amt' = do
+    let oref = Utils.unsafeReadTxOutRef oref'
+        tn   = DataString.fromString tn'
+        amt  = P.read amt'
+        p    = MintingPolicies.TokensV1.policy oref tn amt
+    writeMintingPolicyV1 path (file P.++ ".plutus") p 
+
+
+-- stringToBS :: P.String -> BS.ByteString
+-- stringToBS str = BS.pack str
+
+-- stringToLBS :: P.String -> LBS.ByteString
+-- stringToLBS str = LBS.fromStrict (stringToBS str)
+
+-- bsToString :: LBS.ByteString -> P.String
+-- bsToString bs = map (chr P.. fromEnum) P.. LBS.unpack P.$ bs
+
+
+-- writeMintingPolicy :: P.FilePath -> LedgerScriptsV1.MintingPolicy -> P.IO (P.Either (CardanoApi.FileError ()) ())
+-- writeMintingPolicy file = CardanoApi.writeFileTextEnvelope @(ApiShelley.PlutusScript ApiShelley.PlutusScriptV1) file P.Nothing P.. ApiShelley.PlutusScriptSerialised P.. SBS.toShort P.. LBS.toStrict P.. CodecSerialise.serialise P.. LedgerScriptsV1.getMintingPolicy
+
+
+-- writeRedeemer :: P.String -> P.String -> Integer -> P.IO ()
+-- writeRedeemer path file opcion = do
+--     let 
+--         redeemer = Validators.LockerV1.ValidatorRedeemer { 
+--             Validators.LockerV1.rTipo = opcion
+--         }
+--         opcionStr = P.show opcion
+--     writeJSON (path SystemFilePathPosix.</> file P.++ ".json") redeemer
+
+
+
+-- writeDatum:: P.String -> P.String -> P.String -> Integer -> Integer -> Integer-> P.IO ()
+-- writeDatum path file creator deadline name qty = do
+--     let 
+--         pkh = Utils.pkhFromStr creator
     
-        datum = Validators.Locker.ValidatorDatum {
-            Validators.Locker.dData = Validators.Locker.ValidatorData{
-                    Validators.Locker.aCreator =  Ledger.PaymentPubKeyHash pkh
-                    , Validators.Locker.aDeadline    = fromInteger  deadline
-                    , Validators.Locker.aName = name
-                    , Validators.Locker.aAdaQty  = qty 
-                }
-            }
+--         datum = Validators.LockerV1.ValidatorDatum {
+--             Validators.LockerV1.dData = Validators.LockerV1.ValidatorData{
+--                     Validators.LockerV1.T.aCreator =  Ledger.PaymentPubKeyHash pkh
+--                     , Validators.LockerV1.aDeadline    = fromInteger  deadline
+--                     , Validators.LockerV1.aName = name
+--                     , Validators.LockerV1.aAdaQty  = qty 
+--                 }
+--             }
 
-    writeJSON (path ++ "/" ++ file ++ ".json") datum
+--     writeJSON (path SystemFilePathPosix.</> file P.++ ".json") datum
 
+-- writeValidator :: P.FilePath -> Ledger.Validator -> P.IO (P.Either (CardanoApi.FileError ()) ())
+-- writeValidator file = CardanoApi.writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file P.Nothing P.. PlutusScriptSerialised P.. SBS.toShort P.. LBS.toStrict P.. serialise P.. Ledger.unValidatorScript
 
-writeValidator :: FilePath -> Ledger.Validator -> IO (Either (FileError ()) ())
-writeValidator file = writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file Nothing . PlutusScriptSerialised . SBS.toShort . LBS.toStrict . serialise . Ledger.unValidatorScript
+-- writeValidator1 :: P.FilePath -> Ledger.Validator -> P.IO (P.Either (CardanoApi.FileError ()) ())
+-- writeValidator1 file = CardanoApi.writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file P.Nothing P.. PlutusScriptSerialised P.. SBS.toShort P.. LBS.toStrict P.. serialise P.. Ledger.unValidatorScript
 
-writeValidatorLocker :: String -> String -> IO (Either (FileError ()) ())
-writeValidatorLocker path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Locker.codeValidator  
-
-writeValidatorLockerHash :: String ->String -> IO ()
-writeValidatorLockerHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Locker.hashValidator
-
--- writeValidatorLockerAddress :: String -> String -> IO ()
--- writeValidatorLockerAddress path file = do
---     writeJSON  (path ++ "/" ++ file ++ ".addr") (Validators.Locker.addressValidator)
-
-
-writeValidatorAlwaysTrue :: String -> String -> IO (Either (FileError ()) ())
-writeValidatorAlwaysTrue path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.AlwaysTrue.codeValidator  
-
-writeValidatorAlwaysTrueHash :: String ->String -> IO ()
-writeValidatorAlwaysTrueHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.AlwaysTrue.hashValidator
-
-    
-writeValidatorAlwaysFalse :: String -> String -> IO (Either (FileError ()) ())
-writeValidatorAlwaysFalse path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.AlwaysFalse.codeValidator  
-
-writeValidatorAlwaysFalseHash :: String ->String -> IO ()
-writeValidatorAlwaysFalseHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.AlwaysFalse.hashValidator
-
-
-writeValidatorBeneficiary :: String -> String -> IO (Either (FileError ()) ())
-writeValidatorBeneficiary path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Beneficiary.codeValidator  
-
-writeValidatorBeneficiaryHash :: String ->String -> IO ()
-writeValidatorBeneficiaryHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Beneficiary.hashValidator
-
-    
-writeValidatorDeadline :: String -> String -> IO (Either (FileError ()) ())
-writeValidatorDeadline path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Deadline.codeValidator  
-
-writeValidatorDeadlineHash :: String ->String -> IO ()
-writeValidatorDeadlineHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Deadline.hashValidator
-
-
-    
-writeValidatorRedeemer :: String -> String -> IO (Either (FileError ()) ())
-writeValidatorRedeemer path file = do
-    writeValidator (path ++ "/" ++ file ++ ".plutus") Validators.Redeemer.codeValidator  
-
-writeValidatorRedeemerHash :: String ->String -> IO ()
-writeValidatorRedeemerHash path file = do
-    writeJSON (path ++ "/" ++ file ++ ".hash") Validators.Redeemer.hashValidator
-
-
-
-
-writeMintingPolicy :: FilePath -> Plutus.MintingPolicy -> IO (Either (FileError ()) ())
-writeMintingPolicy file = writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file Nothing . PlutusScriptSerialised . SBS.toShort . LBS.toStrict . serialise . Plutus.getMintingPolicy
-
-
-writeMintingPolicyFree :: String -> String -> IO (Either (FileError ()) ())
-writeMintingPolicyFree path file  = do
-    let   p    = MintingPolicies.Free.policy
-    writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
-
-writeMintingPolicyNFT :: String -> String ->  String ->  String -> IO (Either (FileError ()) ())
-writeMintingPolicyNFT path file oref' tn' = do
-    let oref = unsafeReadTxOutRef oref'
-        tn   = fromString tn'
-        p    = MintingPolicies.NFT.policy oref tn
-    writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
-
-
-writeMintingPolicyPlus :: String -> String -> String -> String -> String -> IO (Either (FileError ()) ())
-writeMintingPolicyPlus path file oref' tn' amt' = do
-    let oref = unsafeReadTxOutRef oref'
-        tn   = fromString tn'
-        amt  = read amt'
-        p    = MintingPolicies.Plus.policy oref tn amt
-    writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
-
-
-writeMintingPolicySignedAddr ::  String -> String -> String -> IO (Either (FileError ()) ())
-writeMintingPolicySignedAddr path file addr' = do
-    let pkh = unsafePaymentPubKeyHash $ unsafeReadAddress addr'
-        p    = MintingPolicies.Signed.policy 112 pkh
-    writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 
-
-writeMintingPolicySignedPkh ::  String -> String -> String -> IO (Either (FileError ()) ())
-writeMintingPolicySignedPkh path file pkh' = do
-    let pkh =  Ledger.PaymentPubKeyHash $ pkhFromStr pkh'
-        p    = MintingPolicies.Signed.policy 111 pkh
-    writeMintingPolicy (path ++ "/" ++ file ++ ".plutus") p 

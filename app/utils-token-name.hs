@@ -1,13 +1,14 @@
-module Main
-    ( main
-    ) where
+module Main where
 
-import Data.String        (IsString (..))
-import System.Environment (getArgs)
-import Utils       (unsafeTokenNameToHex)
+import           Data.String              (IsString (..))
+import           System.Environment       (getArgs)
+
+import qualified Utils                    (unsafeTokenNameToHex)
+
+--Modulo: 
 
 main :: IO ()
 main = do
     [tn'] <- getArgs
     let tn = fromString tn'
-    putStrLn $ unsafeTokenNameToHex tn
+    putStrLn $ Utils.unsafeTokenNameToHex tn

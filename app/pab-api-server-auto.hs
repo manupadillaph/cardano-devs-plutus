@@ -6,22 +6,21 @@
 {-# LANGUAGE TypeApplications   #-}
 {-# LANGUAGE TypeFamilies       #-}
 
-module Main
-    ( main
-    ) where
+module Main where
 
 import qualified Plutus.PAB.Effects.Contract.Builtin as Builtin
 import           Plutus.PAB.Run                      (runWith)
 
-import qualified          Validators.Locker.PAB                    (ValidatorContracts )
-import qualified          Validators.AlwaysTrue.PAB                    (ValidatorContracts )
-import qualified          Validators.AlwaysFalse.PAB                    (ValidatorContracts )
-import qualified          Validators.Beneficiary.PAB                    (ValidatorContracts )
-import qualified          Validators.Deadline.PAB                    (ValidatorContracts )
-import qualified          Validators.Redeemer.PAB                    (ValidatorContracts )
--- import qualified          Validators.StakeSimple.PAB                    (ValidatorContracts )
+import qualified Validators.LockerV1.PAB             (ValidatorContracts )
+import qualified Validators.AlwaysTrueV1.PAB         (ValidatorContracts )
+import qualified Validators.AlwaysFalseV1.PAB        (ValidatorContracts )
+import qualified Validators.BeneficiaryV1.PAB        (ValidatorContracts )
+import qualified Validators.DeadlineV1.PAB           (ValidatorContracts )
+import qualified Validators.RedeemerV1.PAB           (ValidatorContracts )
+-- import qualified Validators.StakePlusV1.PAB         (ValidatorContracts )
+-- import qualified Validators.StakeSimpleV1.PAB       (ValidatorContracts )
 
-
+--Modulo: 
 
 main :: IO ()
 main = do
@@ -30,7 +29,7 @@ main = do
 
     -- putStrLn "1: Locker"
     -- putStrLn "2: AlwaysTrue"
-    -- putStrLn "3: AlwaysFalse"
+    -- putStrLn "3: AlwaysFalseV1"
     -- putStrLn "4: Beneficiary"
     -- putStrLn "5: Deadline"
     -- putStrLn "6: Redeemer"
@@ -40,19 +39,19 @@ main = do
 
     case read opcion of
         1 -> do
-            runWith (Builtin.handleBuiltin @Validators.Locker.PAB.ValidatorContracts)
+            runWith (Builtin.handleBuiltin @Validators.LockerV1.PAB.ValidatorContracts)
         2 -> do
-            runWith (Builtin.handleBuiltin @Validators.AlwaysTrue.PAB.ValidatorContracts)
+            runWith (Builtin.handleBuiltin @Validators.AlwaysTrueV1.PAB.ValidatorContracts)
         3 -> do
-            runWith (Builtin.handleBuiltin @Validators.AlwaysFalse.PAB.ValidatorContracts)
+            runWith (Builtin.handleBuiltin @Validators.AlwaysFalseV1.PAB.ValidatorContracts)
         4 -> do
-            runWith (Builtin.handleBuiltin @Validators.Beneficiary.PAB.ValidatorContracts)
+            runWith (Builtin.handleBuiltin @Validators.BeneficiaryV1.PAB.ValidatorContracts)
         5 -> do
-            runWith (Builtin.handleBuiltin @Validators.Deadline.PAB.ValidatorContracts)
+            runWith (Builtin.handleBuiltin @Validators.DeadlineV1.PAB.ValidatorContracts)
         6 -> do
-            runWith (Builtin.handleBuiltin @Validators.Redeemer.PAB.ValidatorContracts)
+            runWith (Builtin.handleBuiltin @Validators.RedeemerV1.PAB.ValidatorContracts)
         -- 7 -> do
-        --     runWith (Builtin.handleBuiltin @Validators.StakeSimple.PAB.ValidatorContracts)
+        --     runWith (Builtin.handleBuiltin @Validators.StakeSimpleV1.PAB.ValidatorContracts)
         _ -> main 
 
 

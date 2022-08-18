@@ -1,11 +1,12 @@
-module Main
-    ( main
-    ) where
+module Main where
 
-import System.Environment (getArgs)
-import Utils      (unsafeReadAddress, unsafePaymentPubKeyHash)
+import           System.Environment       (getArgs)
+
+import qualified Utils                    (unsafeReadAddress, unsafePaymentPubKeyHash)
+
+--Modulo: 
 
 main :: IO ()
 main = do
     [addr'] <- getArgs
-    print $ unsafePaymentPubKeyHash $ unsafeReadAddress addr'
+    print $ Utils.unsafePaymentPubKeyHash $ Utils.unsafeReadAddress addr'

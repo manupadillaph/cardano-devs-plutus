@@ -73,8 +73,24 @@ else
 
         fi 
 
-        $CARDANO_NODE/cardano-cli query protocol-parameters \
-            --out-file $FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json --$TESTNET_MAGIC 
+        ppFile=$FALCON_DEVS_HASKELL_FILES/config/tx/protocol-$CARDANO_NODE_NETWORK.json
+    
+        if [[ -f "$ppFile" ]]
+        then
+            echo "Protocol File: $ppFile"
+            echo "Existe... desea actualizarlo (y/n)?"
+            read -n 1 -s opcion
+            if [[ $opcion = "y" ]]; then 
+                $CARDANO_NODE/cardano-cli query protocol-parameters \
+                        --out-file $ppFile --$TESTNET_MAGIC 
+            fi
+        else
+            echo "Protocol File: $ppFile"
+            echo "No Existe... Creandolo..."
+
+            $CARDANO_NODE/cardano-cli query protocol-parameters \
+                        --out-file $ppFile --$TESTNET_MAGIC 
+        fi
 
         $CARDANO_NODE/cardano-cli query tip --$TESTNET_MAGIC | jq -r .slot >$FALCON_DEVS_HASKELL_FILES/config/tx/tip.slot
 
@@ -139,7 +155,7 @@ else
                 --tx-out "$walletTxOutArrayForChangeOfTokens" \
                 --required-signer-hash $walletSig \
                 --required-signer=$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey \
-                --protocol-params-file $FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json \
+                --protocol-params-file $ppFile \    
                 --invalid-before ${tipSlot} \
                 --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body 
        
@@ -158,7 +174,7 @@ else
                 --tx-out "$walletTxOutArrayForChangeOfTokens" \
                 --required-signer-hash $walletSig \
                 --required-signer=$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey \
-                --protocol-params-file $FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json \
+                --protocol-params-file $ppFile \  
                 --invalid-before ${tipSlot} \
                 --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body 
         else
@@ -173,7 +189,7 @@ else
                 --tx-in-collateral $walletTxIn \
                 --required-signer-hash $walletSig \
                 --required-signer=$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey \
-                --protocol-params-file $FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json \
+                --protocol-params-file $ppFile \  
                 --invalid-before ${tipSlot} \
                 --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body 
 
@@ -191,7 +207,7 @@ else
                 --tx-in-collateral $walletTxIn \
                 --required-signer-hash $walletSig \
                 --required-signer=$FALCON_DEVS_HASKELL_FILES/wallets/${walletName}.skey \
-                --protocol-params-file $FALCON_DEVS_HASKELL_FILES/config/tx/protocol.json \
+                --protocol-params-file $ppFile \  
                 --invalid-before ${tipSlot} \
                 --out-file $FALCON_DEVS_HASKELL_FILES/transacciones/${scriptName}.body 
         fi

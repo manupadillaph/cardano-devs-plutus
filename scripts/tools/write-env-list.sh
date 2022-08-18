@@ -7,11 +7,6 @@ PLUTUS_APPS=$SOURCE/tools/plutus-apps
 export PLUTUS_APPS
 
 
-FALCON_DEVS=$SOURCE/copyRepos/Falcon-Devs
-export FALCON_DEVS
-
-FALCON_DEVS_HASKELL=$FALCON_DEVS/cardano-falcon-stakepol-devs-haskell
-export FALCON_DEVS_HASKELL
 
 FALCON_DEVS_FRONTEND=$FALCON_DEVS/cardano-falcon-stakepol-devs-reactjs-server-frontend
 export FALCON_DEVS_FRONTEND
@@ -19,8 +14,6 @@ export FALCON_DEVS_FRONTEND
 FALCON_DEVS_BACKEND=$FALCON_DEVS/cardano-falcon-stakepol-devs-nodejs-server-backend
 export FALCON_DEVS_BACKEND
 
-FALCON_DEVS_SCRIPTS=$FALCON_DEVS_HASKELL/scripts
-export FALCON_DEVS_SCRIPTS
 
 FALCON_DEVS_HASKELL_FILES=$FALCON_DEVS_HASKELL/files
 export FALCON_DEVS_HASKELL_FILES
@@ -77,13 +70,15 @@ export BACK2CWD
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-testnetonly
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-testnetonly
 #CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.2
-CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-linux
-export CARDANO_NODE
 
-CARDANO_NODE_PORT=3001
-export CARDANO_NODE_PORT
 
 if [[ $CARDANO_NODE_NETWORK = "TESTNET" ]]; then
+
+    CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.2
+    export CARDANO_NODE
+
+    CARDANO_NODE_PORT=3001
+    export CARDANO_NODE_PORT
 
     CARDANO_NODE_DB_PATH=$CARDANO_NODE/db-testnet
     export CARDANO_NODE_DB_PATH 
@@ -103,10 +98,26 @@ if [[ $CARDANO_NODE_NETWORK = "TESTNET" ]]; then
     CARDANO_BYRON=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-node-testnet/testnet-byron-genesis.json
     export CARDANO_BYRON
 
-    TESTNET_MAGIC="testnet-magic 1097911063"
+    #TESTNET_MAGIC="testnet-magic 1097911063"
+    TESTNET_MAGIC="testnet-magic 1097911063"  
     export TESTNET_MAGIC
 
+    CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config-testnet.TEMPLATE.json
+    export CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG
+
+    CARDANO_CHAIN_INDEX_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config-testnet.json
+    export CARDANO_CHAIN_INDEX_CONFIG
+
+    CARDANO_CHAIN_INDEX_DB=$SOURCE/tools/cardano-chain-index/chain-index-testnet.db
+    export CARDANO_CHAIN_INDEX_DB
+
 else 
+
+    CARDANO_NODE=$SOURCE/tools/cardano-node-1.35.3-linux
+    export CARDANO_NODE
+
+    CARDANO_NODE_PORT=3001
+    export CARDANO_NODE_PORT
 
     CARDANO_NODE_DB_PATH=$CARDANO_NODE/db-mainnet
     export CARDANO_NODE_DB_PATH 
@@ -138,20 +149,22 @@ else
     TESTNET_MAGIC="mainnet"
     export TESTNET_MAGIC
 
+    CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config-mainnet.TEMPLATE.json
+    export CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG
+
+    CARDANO_CHAIN_INDEX_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config-mainnet.json
+    export CARDANO_CHAIN_INDEX_CONFIG
+
+    CARDANO_CHAIN_INDEX_DB=$SOURCE/tools/cardano-chain-index/chain-index-mainnet.db
+    export CARDANO_CHAIN_INDEX_DB
+
 fi
 
 
 CARDANO_WALLET=$SOURCE/tools/cardano-wallet-v2022-07-01-linux64
 export CARDANO_WALLET
 
-CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config.TEMPLATE.json
-export CARDANO_CHAIN_INDEX_TEMPLATE_CONFIG
 
-CARDANO_CHAIN_INDEX_CONFIG=$FALCON_DEVS_HASKELL_FILES_CONFIG/cardano-chain-index/chain-index-config.json
-export CARDANO_CHAIN_INDEX_CONFIG
-
-CARDANO_CHAIN_INDEX_DB=$SOURCE/tools/cardano-chain-index/chain-index.db
-export CARDANO_CHAIN_INDEX_DB
 
 CARDANO_PAB_SERVER_TEMPLATE_CONFIG=$FALCON_DEVS_HASKELL_FILES/config/pab/pab-config.TEMPLATE.yml
 export CARDANO_PAB_SERVER_TEMPLATE_CONFIG

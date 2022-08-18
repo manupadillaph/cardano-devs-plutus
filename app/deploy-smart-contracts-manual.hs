@@ -1,13 +1,12 @@
 module Main where
 
-import System.Environment  
-import Data.List  
-import  Prelude              as P
+import           Control.Exception (throwIO)
+import           Data.List  
+import           System.Environment  
 
-import Control.Exception    (throwIO)
+import qualified Deploy
 
-import Deploy
-
+--Modulo: 
 
 main :: IO ()
 main = do
@@ -32,8 +31,8 @@ main = do
   putStrLn "4: write Validator Locker hash"
   putStrLn "5: write Validator AlwaysTrue plutus cbor"
   putStrLn "6: write Validator AlwaysTrue hash"
-  putStrLn "7: write Validator AlwaysFalse plutus cbor"
-  putStrLn "8: write Validator AlwaysFalse hash"
+  putStrLn "7: write Validator AlwaysFalseV1 plutus cbor"
+  putStrLn "8: write Validator AlwaysFalseV1 hash"
   putStrLn "9: write Validator Beneficiary plutus cbor"
   putStrLn "10: write Validator Beneficiary hash"
   putStrLn "11: write Validator Deadline plutus cbor"
@@ -43,130 +42,128 @@ main = do
 
   putStrLn "15: write Minting PolicyFree"
   putStrLn "16: write Minting PolicyNFT"
-  putStrLn "17: write Minting PolicyPlus"
+  putStrLn "17: write Minting PolicyTokens"
   putStrLn "18: write Minting PolicySigned"
 
   opcion <- getLine
 
   case read opcion of
-    1 -> do
-      putStrLn "Ingrese path:"
-      path <- getLine
-      putStrLn "Ingrese nombre para el archivo Datum:"
-      filename <- getLine
-      putStrLn "Ingrese creator:"
-      creator <- getLine
-      putStrLn "Ingrese deadline:"
-      deadline <- getLine
-      putStrLn "Ingrese name:"
-      name <- getLine
-      putStrLn "Ingrese qty:"
-      qty <- getLine
-      Deploy.writeDatum path filename creator (read deadline) (read name) (read qty)
-      putStrLn "Datum File Hecho en:"
-      putStrLn filename
-    2 -> do
-      putStrLn "Ingrese path:"
-      path <- getLine
-      putStrLn "Ingrese nombre para el archivo Redeemer:"
-      filename <- getLine
-      putStrLn "Ingrese redeemer (1 o 2):"
-      opcion <- getLine
-      Deploy.writeRedeemer path filename (read opcion)
-      putStrLn "Redeemer File Hecho en:"
-      putStrLn filename  
+    -- 1 -> do
+    --   putStrLn "Ingrese path:"
+    --   path <- getLine
+    --   putStrLn "Ingrese nombre para el archivo Datum:"
+    --   filename <- getLine
+    --   putStrLn "Ingrese creator:"
+    --   creator <- getLine
+    --   putStrLn "Ingrese deadline:"
+    --   deadline <- getLine
+    --   putStrLn "Ingrese name:"
+    --   name <- getLine
+    --   putStrLn "Ingrese qty:"
+    --   qty <- getLine
+    --   Deploy.writeDatum path filename creator (read deadline) (read name) (read qty)
+    --   putStrLn "Datum File Hecho en:"
+    --   putStrLn filename
+    -- 2 -> do
+    --   putStrLn "Ingrese path:"
+    --   path <- getLine
+    --   putStrLn "Ingrese nombre para el archivo Redeemer:"
+    --   filename <- getLine
+    --   putStrLn "Ingrese redeemer (1 o 2):"
+    --   opcion <- getLine
+    --   Deploy.writeRedeemer path filename (read opcion)
+    --   putStrLn "Redeemer File Hecho en:"
+    --   putStrLn filename  
     3 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorLocker path file
+      Deploy.writeValidatorLockerV1 path file
       putStrLn "Script File Hecho"
     4 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorLockerHash path file
+      Deploy.writeValidatorLockerV1Hash path file
       putStrLn "Hash File Hecho"
     5 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorAlwaysTrue path file
+      Deploy.writeValidatorAlwaysTrueV1 path file
       putStrLn "Script File Hecho"
     6 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorAlwaysTrueHash path file
+      Deploy.writeValidatorAlwaysTrueV1Hash path file
       putStrLn "Hash File Hecho"
     7 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorAlwaysFalse path file
+      Deploy.writeValidatorAlwaysFalseV1 path file
       putStrLn "Script File Hecho"
     8 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorAlwaysFalseHash path file
+      Deploy.writeValidatorAlwaysFalseV1Hash path file
       putStrLn "Hash File Hecho"
     9 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorBeneficiary path file
+      Deploy.writeValidatorBeneficiaryV1 path file
       putStrLn "Script File Hecho"
     10 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorBeneficiaryHash path file
+      Deploy.writeValidatorBeneficiaryV1Hash path file
       putStrLn "Hash File Hecho"
     11 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorDeadline path file
+      Deploy.writeValidatorDeadlineV1 path file
       putStrLn "Script File Hecho"
     12 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorDeadlineHash path file
+      Deploy.writeValidatorDeadlineV1Hash path file
       putStrLn "Hash File Hecho"
     13 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorRedeemer path file
+      Deploy.writeValidatorRedeemerV1 path file
       putStrLn "Script File Hecho"
     14 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      Deploy.writeValidatorRedeemerHash path file
+      Deploy.writeValidatorRedeemerV1Hash path file
       putStrLn "Hash File Hecho"
-
-
     15 -> do
       putStrLn "Ingrese path:"
       path <- getLine
       putStrLn "Ingrese nombre del script:"
       file <- getLine
-      e <- Deploy.writeMintingPolicyFree path file
+      e <- Deploy.writeMintingPolicyFreeV1 path file
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
@@ -179,7 +176,7 @@ main = do
       oref' <- getLine
       putStrLn "Ingrese Token Name:"
       tn' <- getLine
-      e <- Deploy.writeMintingPolicyNFT path file oref' tn' 
+      e <- Deploy.writeMintingPolicyNFTV1 path file oref' tn' 
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
@@ -194,7 +191,7 @@ main = do
       tn' <- getLine
       putStrLn "Ingrese Amount:"
       amt' <- getLine
-      e <- Deploy.writeMintingPolicyPlus path file  oref' tn' amt'
+      e <- Deploy.writeMintingPolicyTokensV1 path file  oref' tn' amt'
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
@@ -205,12 +202,10 @@ main = do
       file <- getLine
       putStrLn "Ingrese Wallet Addr para calcular PKH:"
       addr' <- getLine
-      e <- Deploy.writeMintingPolicySignedAddr path file addr'
+      e <- Deploy.writeMintingPolicySignedV1Addr path file addr'
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
-
-
     19 -> do
       putStrLn "Ingrese path:"
       path <- getLine
@@ -218,7 +213,7 @@ main = do
       file <- getLine
       putStrLn "Ingrese Wallet PKH:"
       pkh' <- getLine
-      e <- Deploy.writeMintingPolicySignedPkh path file pkh'
+      e <- Deploy.writeMintingPolicySignedV1Pkh path file pkh'
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
