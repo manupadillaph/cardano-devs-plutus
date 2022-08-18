@@ -61,7 +61,7 @@ main = do
       name <- getLine
       putStrLn "Ingrese qty:"
       qty <- getLine
-      Deploy.writeLockerDatum path filename creator (read deadline) (read name) (read qty)
+      Deploy.writeValidatorLockerV1Datum path filename creator (read deadline) (read name) (read qty)
       putStrLn "Datum File Hecho en:"
       putStrLn filename
     2 -> do
@@ -71,7 +71,7 @@ main = do
       filename <- getLine
       putStrLn "Ingrese redeemer (1 o 2):"
       opcion <- getLine
-      Deploy.writeLockerRedeemer path filename (read opcion)
+      Deploy.writeValidatorLockerV1Redeemer path filename (read opcion)
       putStrLn "Redeemer File Hecho en:"
       putStrLn filename  
     3 -> do

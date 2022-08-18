@@ -23,8 +23,8 @@ module Deploy
     ( 
       writeUnit
 
-    , writeLockerRedeemer
-    , writeLockerDatum
+    , writeValidatorLockerV1Redeemer
+    , writeValidatorLockerV1Datum
 
     , writeValidatorLockerV1Hash
     , writeValidatorLockerV1
@@ -148,8 +148,8 @@ writeValidatorLockerV1Hash path file = do
 -- -- writeValidatorLockerAddress path file = do
 -- --     writeJSON  (path SystemFilePathPosix.</> file ++ ".addr") (Validators.LockerV1.addressValidator)
 
-writeLockerRedeemer :: P.String -> P.String -> Integer -> P.IO ()
-writeLockerRedeemer path file opcion = do
+writeValidatorLockerV1Redeemer :: P.String -> P.String -> Integer -> P.IO ()
+writeValidatorLockerV1Redeemer path file opcion = do
     let 
         redeemer = Validators.LockerV1.ValidatorRedeemer { 
             Validators.LockerV1.rTipo = opcion
@@ -157,8 +157,8 @@ writeLockerRedeemer path file opcion = do
         opcionStr = P.show opcion
     writeJSON (path SystemFilePathPosix.</> file ++ ".json") redeemer
 
-writeLockerDatum:: P.String -> P.String -> P.String -> Integer -> Integer -> Integer-> P.IO ()
-writeLockerDatum path file creator deadline name qty = do
+writeValidatorLockerV1Datum:: P.String -> P.String -> P.String -> Integer -> Integer -> Integer-> P.IO ()
+writeValidatorLockerV1Datum path file creator deadline name qty = do
     let 
         pkh = Utils.pkhFromStr creator
     
