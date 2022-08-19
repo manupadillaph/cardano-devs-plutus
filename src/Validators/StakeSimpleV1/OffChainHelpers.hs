@@ -22,53 +22,7 @@
 --{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
 module Validators.StakeSimpleV1.OffChainHelpers where
-
--- import           Control.Monad        hiding (fmap)
--- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
--- import           Data.List.NonEmpty   (NonEmpty (..))
--- import           Data.Map             as Map
--- import           Data.Text            (pack, Text)
--- import           Data.String  
--- import qualified GHC.Generics                        as GHCGenerics (Generic)
--- import           Ledger               hiding (singleton)
--- import qualified Ledger.Constraints   as Constraints
--- import qualified Ledger.Typed.Scripts as Scripts
--- import           LedgerValueV1.Value         as Value
--- import           Ledger.Ada           as Ada
--- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
--- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
--- import           Playground.Types     (KnownCurrency (..))
--- import           Plutus.Contract
--- import qualified PlutusTx
--- import           PlutusTx.Prelude     hiding (unless)
--- import qualified Prelude              as P 
--- import qualified Schema                              (ToSchema)
--- import     qualified      Data.OpenApi.Schema         (ToSchema)
--- import           Text.Printf          (printf)
--- import Data.Typeable
-
--- import          Plutus.Trace.Emulator  as Emulator
--- import          Wallet.Emulator.Wallet
--- import          Data.Default
--- import          Ledger.TimeSlot 
-
--- --Import Nuevos
-
--- import          Control.Lens
-
--- import PlutusTx.Builtins
-
--- import qualified Data.Map as Map
--- import Ledger 
--- import Ledger.Index
--- import qualified Plutus.Trace.Emulator  as Trace
--- import qualified Data.List
-
--- --Import Internos
--- import qualified Validators.StakeSimpleV1.Typos 
--- --import qualified Validators.StakeSimpleV1.OnChainHelpers 
--- import qualified Validators.StakeSimpleV1.Helpers     
-
+ 
 --Import Externos
 
 import qualified Control.Lens                        as Lens    
@@ -105,9 +59,10 @@ getDatumFromChainIndexTxOut scriptChainIndexTxOut = do
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum scriptChainIndexTxOut
 
     LedgerApiV1.Datum e <- snd datHashOrDatum
-
-    case PlutusTx.fromBuiltinData e of
+    
+    case (LedgerApiV1.fromBuiltinData e :: Maybe T.ValidatorDatum) of    
         Nothing -> Nothing
+        
         Just (T.PoolState dPoolState) -> do
             -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm Master: %s" (P.show dPoolState)
             Just (T.PoolState dPoolState)   

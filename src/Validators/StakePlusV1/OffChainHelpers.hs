@@ -52,16 +52,16 @@ getValueFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> LedgerValueV1.Value
 getValueFromChainIndexTxOut = LedgerTx._ciTxOutValue 
 
 {- | Try to get the generic Datum from a ChainIndexTxOut. -}
-getDatumm :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
-getDatumm chainIndexTxOut = do
+getDatum :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
+getDatum chainIndexTxOut = do
     let
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum chainIndexTxOut
 
     LedgerApiV1.Datum e <- snd datHashOrDatum
-
-    case PlutusTx.fromBuiltinData e of
+    
+    case (LedgerApiV1.fromBuiltinData e :: Maybe T.ValidatorDatum) of    
         Nothing -> Nothing
-        Just d -> d
+        d -> d
 
 {- | Try to get the generic Datum from a ChainIndexTxOut. -}
 getDatumFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
@@ -71,8 +71,8 @@ getDatumFromChainIndexTxOut scriptChainIndexTxOut = do
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum scriptChainIndexTxOut
 
     LedgerApiV1.Datum e <- snd datHashOrDatum
-
-    case PlutusTx.fromBuiltinData e of
+    
+    case (LedgerApiV1.fromBuiltinData e :: Maybe T.ValidatorDatum) of    
         Nothing -> Nothing
         Just (T.PoolState dPoolState) -> do
             -- PlutusContract.logInfo @P.String $ TextPrintf.printf "Encontrado Datumm Master: %s" (P.show dPoolState)

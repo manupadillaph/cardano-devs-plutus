@@ -29,61 +29,19 @@ module Validators.StakeSimpleV1.OnChain
         addressValidator
     ) where
 
--- import           Control.Monad        hiding (fmap)
--- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
--- import           Data.List.NonEmpty   (NonEmpty (..))
--- import           Data.Map             as Map
--- import           Data.Text            (pack, Text)
--- import           Data.String  
--- import qualified GHC.Generics                        as GHCGenerics (Generic)
--- import           Ledger               hiding (singleton)
--- import qualified Ledger.Constraints   as Constraints
--- import qualified Ledger.Typed.Scripts as Scripts
--- import           LedgerValueV1.Value         as Value
--- import           Ledger.Ada           as Ada
--- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
--- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
--- import           Playground.Types     (KnownCurrency (..))
--- import           Plutus.Contract
--- import qualified PlutusTx
--- import           PlutusTx.Prelude     hiding (unless)
--- import qualified Prelude              as P 
--- import qualified Schema                              (ToSchema)
--- import     qualified      Data.OpenApi.Schema         (ToSchema)
--- import           Text.Printf          (printf)
--- import Data.Typeable
-
--- import          Plutus.Trace.Emulator  as Emulator
--- import          Wallet.Emulator.Wallet
--- import          Data.Default
--- import          Ledger.TimeSlot 
-
--- --Import Nuevos
-
-
--- --Import Internos
--- import qualified Validators.StakeSimpleV1.Typos 
--- import qualified Validators.StakeSimpleV1.Helpers 
--- import qualified Validators.StakeSimpleV1.OnChainHelpers 
--- import qualified Validators.StakeSimpleV1.OnChainNFT     (mintingNFTPolicy)
-
 --Import Externos
 
-import qualified Ledger.Ada                          as LedgerAda
 import qualified Plutus.Script.Utils.V1.Typed.Scripts          as UtilsTypedScriptsV1
 import qualified Plutus.Script.Utils.V1.Typed.Scripts.Validators as UtilsTypedScriptsValidatorsV1
 import qualified Plutus.V1.Ledger.Address            as LedgerAddressV1
-import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
 import qualified Plutus.V1.Ledger.Contexts           as LedgerContextsV1 (ScriptContext, TxInfo, scriptContextTxInfo) --txSignedBy, getContinuingOutputs, findDatum
 import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
-import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import qualified PlutusTx
 import           PlutusTx.Prelude                    hiding (unless)
-import qualified Prelude                             as P
+--import qualified Prelude                             as P
 
 --Import Internos
 
-import qualified Validators.StakeSimpleV1.Helpers        as Helpers
 import qualified Validators.StakeSimpleV1.OnChainHelpers as OnChainHelpers
 import qualified Validators.StakeSimpleV1.Typos          as T
 

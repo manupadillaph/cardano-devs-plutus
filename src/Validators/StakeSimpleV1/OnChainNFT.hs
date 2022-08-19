@@ -21,28 +21,6 @@
 
 module Validators.StakeSimpleV1.OnChainNFT where
 
--- import qualified Control.Monad                       as Monad (void)
--- import           Data.Aeson             (DataAeson.ToJSON, DataAeson.FromJSON)
--- import qualified Data.Map               as Map
--- import           Data.Text              (Text)
--- import           Data.Void              (Void)
--- import           GHC.Generics           (Generic)
--- import  Plutus.Contract                     as PlutusContract 
--- import           Plutus.Trace.Emulator  as Emulator
--- import qualified PlutusTx
--- import           PlutusTx.Prelude       hiding (Semigroup(..), unless)
--- import           Ledger                 hiding (mint, singleton)
--- import           Ledger.Constraints     as Constraints
--- import qualified Ledger.Typed.Scripts   as Scripts
--- import           LedgerValueV1.Value           as Value
--- import           Prelude                (IO, Semigroup (..), Show (..), String)
--- import           Text.Printf            (printf)
--- import qualified Wallet.Emulator.Wallet              as WalletEmulator
-
--- --Import Internos
--- import qualified Validators.StakeSimpleV1.Typos 
--- import qualified Validators.StakeSimpleV1.Helpers 
-
 --Import Internos
 
 import qualified Plutus.Script.Utils.V1.Typed.Scripts.MonetaryPolicies as UtilsTypedScriptsMintingV1

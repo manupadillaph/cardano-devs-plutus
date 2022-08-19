@@ -23,102 +23,6 @@
 
 module Validators.StakeSimpleV1.TestWithPABSimulator where
 
--- import           Control.Monad        hiding (fmap)
--- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
--- import           Data.List.NonEmpty   (NonEmpty (..))
--- import           Data.Map             as Map
--- import           Data.Text            (pack, Text)
--- import           Data.String  
--- import qualified GHC.Generics                        as GHCGenerics (Generic)
--- import           Ledger               hiding (singleton)
--- import qualified Ledger.Constraints   as Constraints
--- import qualified Ledger.Typed.Scripts as Scripts
--- import           LedgerValueV1.Value         as Value
--- import           Ledger.Ada           as Ada
--- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
--- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
--- import           Playground.Types     (KnownCurrency (..))
--- import           Plutus.Contract
--- import qualified PlutusTx
--- import           PlutusTx.Prelude     hiding (unless)
--- import qualified Prelude              as P 
--- import qualified Schema                              (ToSchema)
--- import qualified Data.OpenApi.Schema         (ToSchema)
--- import           Text.Printf          (printf)
--- import           Data.Typeable
-
--- import           Plutus.Trace.Emulator  as Emulator
--- import qualified Wallet.Emulator.Wallet              as WalletEmulator
--- --import          Data.Default
--- import           Ledger.TimeSlot 
-
---Import Nuevos
-
---import           Control.Monad.Freer.Extras as Extras
---import           Data.Void
-
-
--- import           Control.Monad                       (void)
--- import           Control.Monad.Freer                 (interpret)
--- import           Control.Monad.IO.Class              (MonadIO (..))
--- import           Data.Aeson                          (Result (..), fromJSON)
--- import qualified Data.Default                        (def)
--- import qualified Data.Monoid                         as Monoid
--- import           LedgerAddressV1.Address                      (Address, Ledger.PaymentPubKeyHash, pubKeyHashAddress)
--- import           Ledger.CardanoWallet   qualified as CW
--- import qualified Ledger.TimeSlot                     as TimeSlot
--- import           Plutus.PAB.Effects.Contract.Builtin (Builtin, BuiltinHandler(contractHandler))
--- import qualified Plutus.PAB.Effects.Contract.Builtin as Builtin
--- import           Plutus.PAB.Simulator                (SimulatorEffectHandlers)
--- import qualified Plutus.PAB.Simulator                as Simulator
--- import qualified Plutus.PAB.Webserver.Server         as PAB.Server
--- import qualified Plutus.V1.Ledger.Slot               as Ledger.Slot
--- import qualified Wallet.Emulator.Wallet              as WalletEmulator              (Wallet, knownWallet)
-
-
--- import           Playground.Contract  (IO)
--- import qualified Prelude                             as P
--- import           PlutusTx.Prelude                    hiding (unless)
--- import           Ledger                              hiding (singleton)
--- import           Plutus.V1.Ledger.Value
--- import qualified Plutus.Trace.Emulator  as Trace
--- import           Data.Map             as Map
--- import           Control.Lens
--- import           Plutus.Contract
--- import           Data.Text            (pack, Text)
-
-
--- import Wallet.TraceEmulator.Chain qualified as Chain
--- import Wallet.TraceEmulator.Chain (ChainControlEffect, ChainState)
-
--- import Control.Concurrent.STM (STM, TMVar, TVar)
--- import Control.Concurrent.STM qualified as STM
--- import Ledger (Address, Ledger.Slot, TxId, TxOutRef)
-
--- import Data.Time.Clock.POSIX
--- import Data.Time.Format
--- import System.Locale
--- import Data.Time.Clock
--- import Data.Fixed
--- import Data.Time.Format.ISO8601
-
--- import MonadFreerInternal
--- import Plutus.PAB.Core
-
--- import System.Directory
--- import Data.Aeson
--- import qualified Data.ByteString.Lazy as B
--- import Data.String.Utils
--- import Text.Read
-
--- --Import Internos
--- import          Validators.StakeSimpleV1.OffChain
--- import          Validators.StakeSimpleV1.Typos
--- import          Validators.StakeSimpleV1.OffChainHelpers
--- import          Validators.StakeSimpleV1.OnChainNFT     (mintingNFTPolicy)
--- import          Validators.StakeSimpleV1.Helpers
--- import          Validators.StakeSimpleV1.PAB
-
 --Import Externos
 
 import qualified Control.Concurrent.STM              as ConcurrentSTM (atomically)
@@ -139,7 +43,7 @@ import qualified Ledger
 import qualified Ledger.Blockchain                   as LedgerBlockchain (value)
 import qualified Ledger.CardanoWallet                as LedgerCardanoWallet
 import qualified Ledger.TimeSlot                     as LedgerTimeSlot
-import qualified Playground.Contract                 as PlaygroundContract (IO)
+--import qualified Playground.Contract                 as PlaygroundContract (IO)
 import qualified Prelude                             as P
 import qualified Plutus.PAB.Core                     as PABCore (PABEffects)
 import qualified Plutus.PAB.Effects.Contract.Builtin as PABEffectsContractBuiltin (Builtin, BuiltinHandler(contractHandler),handleBuiltin)
@@ -202,10 +106,10 @@ getFormatTime posixTime = do
 
 
 
-getJSON :: P.String -> PlaygroundContract.IO DataByteString.ByteString
+getJSON :: P.String -> P.IO DataByteString.ByteString
 getJSON file = DataByteString.readFile $ path ++ file
 
-writeJSON :: P.String -> DataByteString.ByteString -> PlaygroundContract.IO  ()
+writeJSON :: P.String -> DataByteString.ByteString -> P.IO ()
 writeJSON file   = DataByteString.writeFile $  path ++ file
 
 
@@ -609,14 +513,11 @@ mainLoop walletNro pParams shutdown = do
         _ -> mainLoop walletNro pParams shutdown
 
 
+testWithPABSimulator :: P.IO ()
+testWithPABSimulator  = Monad.void $ PABSimulator.runSimulationWith handlers traceWithPABSimulator
 
-
-
-test2 :: P.IO ()
-test2  = Monad.void $ PABSimulator.runSimulationWith handlers myTrace2
-
-myTrace2  ::  MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)))  ()
-myTrace2 = do
+traceWithPABSimulator  ::  MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)))  ()
+traceWithPABSimulator = do
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Starting plutus-starter PAB webserver on port 8080. Press enter to exit."
     shutdown <- PABServer.startServerDebug
 
@@ -640,172 +541,4 @@ myTrace2 = do
 
 
     mainLoop Nothing Nothing shutdown
-
-
-
-    -- blockchain <- PABSimulator.blockchain
-
-    -- let 
-
-    --     uTxOutRefAtMaster1 =  getUtxosListInPABSimulator blockchain (walletPaymentPubKeyHashAddress master1)
-
-    --     poolNFTTxOutRef = head uTxOutRefAtMaster1
-    --     idTxOut = LedgerApiV1.txOutRefId poolNFTTxOutRef
-    --     indexTxOut = LedgerApiV1.txOutRefIdx  poolNFTTxOutRef
-
-    --     poolNFTTokenName =  LedgerValueV1.TokenName (indexTxOut `consByteString`  LedgerApiV1.getTxId  idTxOut  )
-    --     poolNFTCurrencySymbol = Helpers.curSymbol OnChainNFT.mintingNFTPolicy 
-
-    --     poolNFT = LedgerValueV1.assetClass poolNFTCurrencySymbol  poolNFTTokenName
-
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "poolNFTTxOutRef: " ++ P.show poolNFTTxOutRef
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "poolNFTTokenName: " ++ P.show poolNFTTokenName
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "poolNFTCurrencySymbol: " ++ P.show poolNFTCurrencySymbol
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "poolNFT: " ++ P.show poolNFT 
-
-    -- let
-    --     uTxOutRefAtUser1 =  getUtxosListInPABSimulator blockchain (walletPaymentPubKeyHashAddress user1)
-
-    --     user1NFTTxOutRef = head uTxOutRefAtUser1
-    --     user1IdTxOut = LedgerApiV1.txOutRefId user1NFTTxOutRef
-    --     user1IndexTxOut = LedgerApiV1.txOutRefIdx  user1NFTTxOutRef
-
-    --     user1NFTTokenName =  LedgerValueV1.TokenName (user1IndexTxOut `consByteString`  LedgerApiV1.getTxId  user1IdTxOut  )
-    --     user1NFTCurrencySymbol = Helpers.curSymbol OnChainNFT.mintingNFTPolicy 
-
-    --     userNFT = LedgerValueV1.assetClass user1NFTCurrencySymbol user1NFTTokenName
-
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "user1NFTTxOutRef: " ++ P.show user1NFTTxOutRef
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "user1NFTTokenName: " ++ P.show user1NFTTokenName
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "user1NFTCurrencySymbol: " ++ P.show user1NFTCurrencySymbol
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "userNFT: " ++ P.show userNFT 
-
-    -- let
-    --     deadlinePool  = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def 100
-
-    --     pParams = PoolParams
-    --         { 
-    --             T.ppMasters = [walletPaymentPubKeyHash master1, walletPaymentPubKeyHash master2] , 
-    --             T.ppInterest = 10 , 
-    --             T.ppMinumunInvest   = 5_000_000 , 
-    --             T.ppMinumunCompoundInvest    = 3_000_000 , 
-    --             T.ppDeadline  = deadlinePool , 
-    --             T.ppPoolNFT = poolNFT , 
-    --             T.ppCurSymbolForMintingNFTPolicy = poolNFTCurrencySymbol,
-    --             T.ppValidTimeRange = 10_000,
-    --             T.ppMinimunClaim = 3_000_000
-    --         }
-
-
-
-    -- --cidInit <- PABSimulator.activateContract defaultWallet InitLottoContract
-    -- -- Monad.void $ PABSimulator.callEndpointOnInstance cidInit "init" sp
-    -- -- PABSimulator.waitNSlots 2
-    -- --activateContractWalletMaster1 <- TraceEmulator.activateContractWallet master1 OffChain.endpoints
-
-    -- -- MasterCreatePool T.MasterCreatePoolParams |
-    -- -- MasterFundPool T.MasterFundPoolParams |
-    -- -- MasterGetBackFund T.MasterGetBackFundParams |
-    -- -- UserInvest T.UserInvestParams |
-    -- -- UserGetBackInvest T.UserGetBackInvestParams |
-    -- -- UserGetRewards T.UserGetRewardsParams |
-    -- -- UserInvestRewards T.UserInvestRewardsParams
-
-    -- cMasterCreatePool_Master1  <- PABSimulator.activateContract (getWallet master1) (PAB.MasterCreatePool T.MasterCreatePoolParams{  
-    --             mcpPoolParam = pParams, 
-    --             mcpPoolNFTTokenName = poolNFTTokenName,
-    --             mcpPoolNFTTxOutRef = poolNFTTxOutRef,
-    --             mcpFund   = 100_000_000
-    --         })
-
-    -- PABSimulator.waitUntilFinished  cMasterCreatePool_Master1
-
-    -- slot <- PABSimulator.currentSlot >>= MonadIOClass.liftIO . ConcurrentSTM.atomically
-    -- let posixTime = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def slot
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "slot: " ++  P.show slot 
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "time: " ++  P.show posixTime
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "format time: " ++  getFormatTime posixTime
-
-    -- --PABSimulator.waitNSlots 2
-    -- --PABSimulator.waitUntilSlot 5
-
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
-    -- Monad.void $ MonadIOClass.liftIO P.getLine
-
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Invest ?"
-    -- opcion <- MonadIOClass.liftIO P.getLine
-
-    -- case P.read opcion of
-    --     1 -> do
-    --         let 
-    --             createdAtInvest = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def slot
-    --             deadlineInvest = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def (slot+50)
-
-    --         cUserInvest_User1  <- PABSimulator.activateContract (getWallet user1) (PAB.UserInvest T.UserInvestParams{  
-    --                 uipPoolParam = pParams,
-    --                 uiUserNFTTokenName = user1NFTTokenName,
-    --                 uiUserNFTTxOutRef = user1NFTTxOutRef,
-    --                 uipCreatedAt = createdAtInvest,
-    --                 uipDeadline = deadlineInvest,
-    --                 uipInvest   = 6_000_000
-    --             })
-
-    --         PABSimulator.waitUntilFinished cUserInvest_User1
-    --         --PABSimulator.waitNSlots 5
-
-    --         slot <- PABSimulator.currentSlot >>= MonadIOClass.liftIO . ConcurrentSTM.atomically
-    --         let posixTime = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def slot
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "slot: " ++  P.show slot 
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "time: " ++  P.show posixTime
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "format time: " ++  getFormatTime posixTime
-
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
-    --         Monad.void $ MonadIOClass.liftIO P.getLine
-
-
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Invest ?"
-    -- opcion <- MonadIOClass.liftIO P.getLine
-
-    -- case P.read opcion of
-    --     1 -> do
-    --         let 
-    --             createdAtInvest = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def slot
-    --             deadlineInvest = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def (slot+50)
-
-    --         cUserInvest_User1  <- PABSimulator.activateContract (getWallet user1) (PAB.UserInvest T.UserInvestParams{  
-    --                 uipPoolParam = pParams,
-    --                 uiUserNFTTokenName = user1NFTTokenName,
-    --                 uiUserNFTTxOutRef = user1NFTTxOutRef,
-    --                 uipCreatedAt = createdAtInvest,
-    --                 uipDeadline = deadlineInvest,
-    --                 uipInvest   = 6_000_000
-    --             })
-
-    --         PABSimulator.waitUntilFinished cUserInvest_User1
-    --         --PABSimulator.waitNSlots 5
-
-    --         slot <- PABSimulator.currentSlot >>= MonadIOClass.liftIO . ConcurrentSTM.atomically
-    --         let posixTime = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def slot
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "slot: " ++  P.show slot 
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "time: " ++  P.show posixTime
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "format time: " ++  getFormatTime posixTime
-
-    --         PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
-    --         Monad.void $ MonadIOClass.liftIO P.getLine
-
-    -- -- Pressing enter results in the balances being printed
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Balances at the end of the simulation"
-    -- --Monad.void $ MonadIOClass.liftIO P.getLine
-
-    -- balances <- PABSimulator.currentBalances
-    -- PABSimulator.logBalances @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) balances
-
-    -- slot <- PABSimulator.currentSlot >>= MonadIOClass.liftIO . ConcurrentSTM.atomically
-    -- let posixTime = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def slot
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "slot: " ++  P.show slot 
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "time: " ++  P.show posixTime
-    -- PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "format time: " ++  getFormatTime posixTime
-
-    -- shutdown
-
 

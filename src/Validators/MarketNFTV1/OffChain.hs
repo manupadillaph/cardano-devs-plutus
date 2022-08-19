@@ -132,7 +132,7 @@ buy BuyNFTParams{..} = do
                 
                 let
 
-                    Just dOld = getDatumm chainIndexTxOut
+                    Just dOld = getDatum chainIndexTxOut
 
                     (cs, tn) = LedgerValueV1.unAssetClass bpNFT
 
@@ -185,7 +185,7 @@ getback GetBackNFTParams{..} = do
 
             let
 
-                --Just dOld = getDatumm chainIndexTxOut
+                --Just dOld = getDatum chainIndexTxOut
 
                 (cs, tn) = LedgerValueV1.unAssetClass gbpNFT
 
@@ -211,16 +211,16 @@ getback GetBackNFTParams{..} = do
             Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- GetBack EndPoint - Submited -------------------------"
 
-getDatumm :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
-getDatumm chainIndexTxOut = do
+getDatum :: LedgerTx.ChainIndexTxOut -> Maybe T.ValidatorDatum
+getDatum chainIndexTxOut = do
     let
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum chainIndexTxOut
 
     LedgerApiV1.Datum e <- snd datHashOrDatum
-
-    case PlutusTx.fromBuiltinData e of
+    
+    case (LedgerApiV1.fromBuiltinData e :: Maybe T.ValidatorDatum) of    
         Nothing -> Nothing
-        Just d -> d
+        d -> d
 
 getValueFromChainIndexTxOut :: LedgerTx.ChainIndexTxOut -> LedgerValueV1.Value
 getValueFromChainIndexTxOut = LedgerTx._ciTxOutValue   
@@ -236,7 +236,7 @@ findUtxoInValidatorWithNFT nft = do
 
 -- checkUTXO  :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Ledger.PaymentPubKeyHash -> Integer -> Bool
 -- checkUTXO (oref,o)  ppkh name = do
---     case getDatumm (oref,o) of
+--     case getDatum (oref,o) of
 --         Nothing -> False
 --         Just T.ValidatorDatum{..}
 --             | T.aCreator dData == ppkh && T.aName dData == name -> True

@@ -55,10 +55,10 @@ main = do
   putStrLn "143: write Validator Stake Plus V1 cbor"
   putStrLn "144: write Validator Stake Plus V1 hash"
 
-  putStrLn "15: write Minting PolicyFreeV1"
-  putStrLn "16: write Minting PolicyNFTV1"
-  putStrLn "17: write Minting PolicyTokensV1"
-  putStrLn "18: write Minting PolicySignedV1"
+  putStrLn "15: write Minting Policy Free V1"
+  putStrLn "16: write Minting Policy NFT V1"
+  putStrLn "17: write Minting Policy Tokens V1"
+  putStrLn "18: write Minting Policy Signed V1"
 
   opcion <- getLine
 
@@ -173,6 +173,133 @@ main = do
       file <- getLine
       Deploy.writeValidatorRedeemerV1Hash path file
       putStrLn "Hash File Hecho"
+
+    121 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Datum:"
+      filename <- getLine
+      putStrLn "Ingrese creator:"
+      creator <- getLine
+      putStrLn "Ingrese deadline:"
+      deadline <- getLine
+      putStrLn "Ingrese name:"
+      name <- getLine
+      putStrLn "Ingrese qty:"
+      qty <- getLine
+      Deploy.writeValidatorMarketNFTV1Datum path filename creator (read deadline) (read name) (read qty)
+      putStrLn "Datum File Hecho en:"
+      putStrLn filename
+    122 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Redeemer:"
+      filename <- getLine
+      putStrLn "Ingrese redeemer (1 o 2):"
+      opcion <- getLine
+      Deploy.writeValidatorMarketNFTV1Redeemer path filename (read opcion)
+      putStrLn "Redeemer File Hecho en:"
+      putStrLn filename  
+    123 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      Deploy.writeValidatorMarketNFTV1 path file
+      putStrLn "Script File Hecho"
+    124 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      Deploy.writeValidatorMarketNFTV1Hash path file
+      putStrLn "Hash File Hecho"
+
+
+    131 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Datum:"
+      filename <- getLine
+      putStrLn "Ingrese creator:"
+      creator <- getLine
+      putStrLn "Ingrese deadline:"
+      deadline <- getLine
+      putStrLn "Ingrese name:"
+      name <- getLine
+      putStrLn "Ingrese qty:"
+      qty <- getLine
+      Deploy.writeValidatorStakeSimpleV1Datum path filename creator (read deadline) (read name) (read qty)
+      putStrLn "Datum File Hecho en:"
+      putStrLn filename
+    132 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Redeemer:"
+      filename <- getLine
+      putStrLn "Ingrese redeemer (1 o 2):"
+      opcion <- getLine
+      Deploy.writeValidatorStakeSimpleV1Redeemer path filename (read opcion)
+      putStrLn "Redeemer File Hecho en:"
+      putStrLn filename  
+    133 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      Deploy.writeValidatorStakeSimpleV1 path file
+      putStrLn "Script File Hecho"
+    134 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      Deploy.writeValidatorStakeSimpleV1Hash path file
+      putStrLn "Hash File Hecho"
+
+
+    141 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Datum:"
+      filename <- getLine
+      putStrLn "Ingrese creator:"
+      creator <- getLine
+      putStrLn "Ingrese deadline:"
+      deadline <- getLine
+      putStrLn "Ingrese name:"
+      name <- getLine
+      putStrLn "Ingrese qty:"
+      qty <- getLine
+      Deploy.writeValidatorStakePlusV1Datum path filename creator (read deadline) (read name) (read qty)
+      putStrLn "Datum File Hecho en:"
+      putStrLn filename
+    142 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre para el archivo Redeemer:"
+      filename <- getLine
+      putStrLn "Ingrese redeemer (1 o 2):"
+      opcion <- getLine
+      Deploy.writeValidatorStakePlusV1Redeemer path filename (read opcion)
+      putStrLn "Redeemer File Hecho en:"
+      putStrLn filename  
+    143 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      Deploy.writeValidatorStakePlusV1 path file
+      putStrLn "Script File Hecho"
+    144 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      Deploy.writeValidatorStakePlusV1Hash path file
+      putStrLn "Hash File Hecho"
+
+
     15 -> do
       putStrLn "Ingrese path:"
       path <- getLine

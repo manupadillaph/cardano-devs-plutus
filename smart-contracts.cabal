@@ -12,33 +12,35 @@ library
   hs-source-dirs:      src
   exposed-modules:     
                       Deploy
+                     , TestWithPABSimulator
+                     , TestWithTraceEmulator
 
                      , Validators.AlwaysTrueV1
                      , Validators.AlwaysTrueV1.OffChain
                      , Validators.AlwaysTrueV1.OnChain
                      , Validators.AlwaysTrueV1.PAB
-                     , Validators.AlwaysTrueV1.TestWithEmulator
+                     , Validators.AlwaysTrueV1.TestWithTraceEmulator
                      , Validators.AlwaysTrueV1.Typos
 
                      , Validators.AlwaysFalseV1
                      , Validators.AlwaysFalseV1.OffChain
                      , Validators.AlwaysFalseV1.OnChain
                      , Validators.AlwaysFalseV1.PAB
-                     , Validators.AlwaysFalseV1.TestWithEmulator
+                     , Validators.AlwaysFalseV1.TestWithTraceEmulator
                      , Validators.AlwaysFalseV1.Typos
 
                      , Validators.BeneficiaryV1
                      , Validators.BeneficiaryV1.OffChain
                      , Validators.BeneficiaryV1.OnChain
                      , Validators.BeneficiaryV1.PAB
-                     , Validators.BeneficiaryV1.TestWithEmulator
+                     , Validators.BeneficiaryV1.TestWithTraceEmulator
                      , Validators.BeneficiaryV1.Typos
 
                      , Validators.DeadlineV1
                      , Validators.DeadlineV1.OffChain
                      , Validators.DeadlineV1.OnChain
                      , Validators.DeadlineV1.PAB
-                     , Validators.DeadlineV1.TestWithEmulator
+                     , Validators.DeadlineV1.TestWithTraceEmulator
                      , Validators.DeadlineV1.Typos
 
                      , Validators.MarketNFTV1
@@ -60,14 +62,14 @@ library
                      , Validators.RedeemerV1.OffChain
                      , Validators.RedeemerV1.OnChain
                      , Validators.RedeemerV1.PAB
-                     , Validators.RedeemerV1.TestWithEmulator
+                     , Validators.RedeemerV1.TestWithTraceEmulator
                      , Validators.RedeemerV1.Typos
                      
                      , Validators.LockerV1
                      , Validators.LockerV1.OffChain
                      , Validators.LockerV1.OnChain
                      , Validators.LockerV1.PAB
-                     , Validators.LockerV1.TestWithEmulator
+                     , Validators.LockerV1.TestWithTraceEmulator
                      , Validators.LockerV1.Typos
 
                      , Validators.StakeSimpleV1
@@ -75,7 +77,7 @@ library
                      , Validators.StakeSimpleV1.OnChain
                      , Validators.StakeSimpleV1.OnChainNFT
                      , Validators.StakeSimpleV1.PAB
-                     , Validators.StakeSimpleV1.TestWithEmulator
+                     , Validators.StakeSimpleV1.TestWithTraceEmulator
                      , Validators.StakeSimpleV1.TestWithPABSimulator
                      , Validators.StakeSimpleV1.Typos
                      , Validators.StakeSimpleV1.OnChainHelpers
@@ -87,7 +89,7 @@ library
                      , Validators.StakePlusV1.OnChain
                      , Validators.StakePlusV1.OnChainNFT
                      , Validators.StakePlusV1.PAB
-                     , Validators.StakePlusV1.TestWithEmulator
+                     , Validators.StakePlusV1.TestWithTraceEmulator
                      , Validators.StakePlusV1.TestWithPABSimulator
                      , Validators.StakePlusV1.Typos
                      , Validators.StakePlusV1.OnChainHelpers
@@ -159,6 +161,7 @@ library
                     
   default-language:    Haskell2010
   ghc-options:         -Wall -fobject-code -fno-ignore-interface-pragmas -fno-omit-interface-pragmas -fno-strictness -fno-spec-constr -fno-specialise
+
 
 executable deploy-manual
   main-is: deploy-manual.hs
@@ -238,7 +241,43 @@ executable pab-api-server-auto
                      , text
                      , smart-contracts
 
+executable pab-simulator
+  main-is: pab-simulator.hs
+  hs-source-dirs:
+      app
+  build-depends:
+      , base ^>= 4.14.1.0
+      , data-default
+      , freer-extras
+      , freer-simple
+      , plutus-contract
+      , plutus-ledger
+      , plutus-ledger-constraints
+      , plutus-pab
+      --, plutus-use-cases
+      , text
+      , smart-contracts
+      , filepath
+  default-language: Haskell2010
 
+executable trace-emulator
+  main-is: trace-emulator.hs
+  hs-source-dirs:
+      app
+  build-depends:
+      , base ^>= 4.14.1.0
+      , data-default
+      , freer-extras
+      , freer-simple
+      , plutus-contract
+      , plutus-ledger
+      , plutus-ledger-constraints
+      , plutus-pab
+      --, plutus-use-cases
+      , text
+      , smart-contracts
+      , filepath
+  default-language: Haskell2010
 
 executable spec
   main-is: Spec.hs

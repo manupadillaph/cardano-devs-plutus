@@ -23,59 +23,14 @@
 
 module Validators.StakeSimpleV1.OffChain where
 
--- import           Control.Monad        hiding (fmap)
--- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
--- import           Data.List.NonEmpty   (NonEmpty (..))
--- import           Data.Map             as Map
--- import           Data.Text            (pack, Text)
--- import           Data.String  
--- import qualified GHC.Generics                        as GHCGenerics (Generic)
--- import           Ledger               hiding (singleton)
--- import qualified Ledger.Constraints   as Constraints
--- import qualified Ledger.Typed.Scripts as Scripts
--- import           LedgerValueV1.Value         as Value
--- import           Ledger.Ada           as Ada
--- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
--- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
--- import           Playground.Types     (KnownCurrency (..))
--- import           Plutus.Contract
--- import qualified PlutusTx
--- import           PlutusTx.Prelude     hiding (unless)
--- import qualified Prelude              as P 
--- import qualified Schema                              (ToSchema)
--- import     qualified      Data.OpenApi.Schema         (ToSchema)
--- import           Text.Printf          (printf)
--- import Data.Typeable
-
--- import          Plutus.Trace.Emulator  as Emulator
--- import          Wallet.Emulator.Wallet
--- import          Data.Default
--- import          Ledger.TimeSlot 
-
--- --Import Nuevos
-
--- import           Data.Void            (Void)
-
-
--- --Import Internos
--- import qualified Validators.StakeSimpleV1.Typos  
--- import qualified Validators.StakeSimpleV1.OffChainHelpers     
--- import qualified Validators.StakeSimpleV1.Helpers     
--- import qualified Validators.StakeSimpleV1.OnChain     (typedValidator, codeValidator, addressValidator)
--- import qualified Validators.StakeSimpleV1.OnChainNFT     (mintingNFTPolicy)
-
-
 --Import Externos
 
-import qualified Cardano.Api                         as CardanoApi  
-import qualified Cardano.Api.Shelley                 as ApiShelley
 import qualified Control.Monad                       as Monad (void)
 import qualified Data.Map                            as DataMap
 import qualified Data.Text                           as DataText ( Text)
 import qualified Ledger                              (getCardanoTxId, pubKeyHashAddress) --PaymentPubKeyHash, --POSIXTime(POSIXTime), --, unPaymentPubKeyHash, valuePaidTo, Slot(Slot)
 import qualified Ledger.Ada                          as LedgerAda
 import qualified Ledger.Constraints                  as LedgerConstraints
-import qualified Ledger.Tx                           as LedgerTx (ChainIndexTxOut (..))
 import qualified Playground.Contract                 (mkSchemaDefinitions)
 import qualified Plutus.Contract                     as PlutusContract
 import qualified Plutus.V1.Ledger.Api                as LedgerApiV1

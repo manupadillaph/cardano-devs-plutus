@@ -110,7 +110,7 @@ get GetParams{..} = do
             let 
                 vGet       = gpAdaQty
                 
-                Just dOld = getDatumm (oref2,o) 
+                Just dOld = getDatum (oref2,o) 
                 redeemerTipo1 = T.ValidatorRedeemer {
                     rTipo = T.aName $ T.dData dOld
                 }
@@ -154,19 +154,21 @@ get GetParams{..} = do
             Monad.void $ PlutusContract.awaitTxConfirmed $ Ledger.getCardanoTxId ledgerTx
             PlutusContract.logInfo @P.String $ TextPrintf.printf "--------------------------- Get EndPoint - Submited -------------------------"
    
-getDatumm :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Maybe T.ValidatorDatum
-getDatumm (_, o) = do
+getDatum :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Maybe T.ValidatorDatum
+getDatum (_, o) = do
     let 
         datHashOrDatum = LedgerTx._ciTxOutScriptDatum o
+
     LedgerApiV1.Datum e <- snd datHashOrDatum
-    case PlutusTx.fromBuiltinData e of
+    
+    case (LedgerApiV1.fromBuiltinData e :: Maybe T.ValidatorDatum) of    
         Nothing -> Nothing
-        Just d -> d
+        d -> d
 
 
 checkUTXO  :: (LedgerApiV1.TxOutRef, LedgerTx.ChainIndexTxOut) -> Ledger.PaymentPubKeyHash -> Integer -> Bool
 checkUTXO (oref,o)  ppkh name = do
-    case getDatumm (oref,o) of
+    case getDatum (oref,o) of
         Nothing -> False
         Just T.ValidatorDatum{..}
             | T.aCreator dData == ppkh && T.aName dData == name -> True

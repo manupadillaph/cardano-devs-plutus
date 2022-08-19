@@ -21,7 +21,7 @@
 
 --{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Validators.AlwaysFalseV1.TestWithEmulator where
+module Validators.AlwaysFalseV1.TestWithTraceEmulator where
 
 --Import Externos
 
@@ -30,7 +30,7 @@ import qualified Data.Default                        as DataDefault (def)
 import qualified Data.Map                            as DataMap
 import qualified Ledger.Ada                          as LedgerAda 
 import qualified Ledger.TimeSlot                     as LedgerTimeSlot (slotToEndPOSIXTime)    
-import qualified Playground.Contract                 as PlaygroundContract (IO) --, ensureKnownCurrencies, printSchemas, stage, printJson
+--import qualified Playground.Contract                 as PlaygroundContract (IO) --, ensureKnownCurrencies, printSchemas, stage, printJson
 import qualified Plutus.Trace.Emulator               as TraceEmulator
 import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import           PlutusTx.Prelude                    hiding (unless)
@@ -43,8 +43,8 @@ import qualified Validators.AlwaysFalseV1.OffChain   as OffChain
 
 -- Modulo:
 
-test :: PlaygroundContract.IO ()
-test = TraceEmulator.runEmulatorTraceIO' DataDefault.def emCfg myTrace
+testWithTraceEmulator :: P.IO ()
+testWithTraceEmulator = TraceEmulator.runEmulatorTraceIO' DataDefault.def emCfg traceWithEmulator
 
 emCfg :: TraceEmulator.EmulatorConfig
 emCfg = TraceEmulator.EmulatorConfig (Left $ DataMap.fromList [(WalletEmulator.knownWallet w, v) | w <- [1 .. 1]]) DataDefault.def 
@@ -52,8 +52,8 @@ emCfg = TraceEmulator.EmulatorConfig (Left $ DataMap.fromList [(WalletEmulator.k
     v :: LedgerValueV1.Value
     v = LedgerAda.lovelaceValueOf 2000_000_000 
 
-myTrace :: TraceEmulator.EmulatorTrace ()
-myTrace = do
+traceWithEmulator :: TraceEmulator.EmulatorTrace ()
+traceWithEmulator = do
     let deadline = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def 6
 
     h1 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 1) OffChain.endpoints
@@ -80,9 +80,9 @@ myTrace = do
             gpAdaQty    = 3000000
         }
     Monad.void $ TraceEmulator.waitNSlots 1
-
-test2 :: PlaygroundContract.IO ()
-test2 = TraceEmulator.runEmulatorTraceIO $ do
+    
+testWithTraceEmulator2 :: P.IO ()
+testWithTraceEmulator2 = TraceEmulator.runEmulatorTraceIO $ do
 
     let deadline = LedgerTimeSlot.slotToEndPOSIXTime DataDefault.def 6
 

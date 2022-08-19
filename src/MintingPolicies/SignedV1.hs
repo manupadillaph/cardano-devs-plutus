@@ -96,8 +96,8 @@ endpoints = mint' >> endpoints
 
 Playground.Contract.mkSchemaDefinitions ''MintSchema
 
-test :: P.IO ()
-test = TraceEmulator.runEmulatorTraceIO $ do
+testWithTraceEmulator ::  P.IO ()
+testWithTraceEmulator = TraceEmulator.runEmulatorTraceIO $ do
     let tn = "ABC"
     h1 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 1) endpoints
     h2 <- TraceEmulator.activateContractWallet (WalletEmulator.knownWallet 2) endpoints

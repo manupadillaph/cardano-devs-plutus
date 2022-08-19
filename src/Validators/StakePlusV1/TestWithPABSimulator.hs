@@ -43,7 +43,7 @@ import qualified Ledger
 import qualified Ledger.Blockchain                   as LedgerBlockchain (value)
 import qualified Ledger.CardanoWallet                as LedgerCardanoWallet
 import qualified Ledger.TimeSlot                     as LedgerTimeSlot
-import qualified Playground.Contract                 as PlaygroundContract (IO)
+--import qualified Playground.Contract                 as PlaygroundContract (IO)
 import qualified Prelude                             as P
 import qualified Plutus.PAB.Core                     as PABCore (PABEffects)
 import qualified Plutus.PAB.Effects.Contract.Builtin as PABEffectsContractBuiltin (Builtin, BuiltinHandler(contractHandler),handleBuiltin)
@@ -56,7 +56,9 @@ import qualified Plutus.V1.Ledger.Tx                 as LedgerTxV1 (txOutDatum)
 import qualified PlutusTx.Builtins.Internal          as TxBuiltinsInternal hiding (head,consByteString)
 import qualified PlutusTx.Eq                         as PlutusTxEq
 import           PlutusTx.Prelude                    hiding (unless)
-import qualified System.Directory                    as SystemDirectory 
+import qualified System.Directory                    as SystemDirectory      
+import qualified System.Environment                  as SystemEnvironment (lookupEnv)  
+import qualified System.FilePath.Posix               as SystemFilePathPosix  
 import qualified Text.Read                           as TextRead (readMaybe)
 import qualified Wallet.Emulator.Wallet              as WalletEmulator    
 
@@ -106,10 +108,10 @@ getFormatTime posixTime = do
 
 
 
-getJSON :: P.String -> PlaygroundContract.IO DataByteString.ByteString
+getJSON :: P.String -> P.IO DataByteString.ByteString
 getJSON file = DataByteString.readFile $ path ++ file
 
-writeJSON :: P.String -> DataByteString.ByteString -> PlaygroundContract.IO  ()
+writeJSON :: P.String -> DataByteString.ByteString -> P.IO ()
 writeJSON file   = DataByteString.writeFile $  path ++ file
 
 
@@ -224,6 +226,7 @@ crearPoolParams walletNro pParams shutdown = do
                         T.ppInterest = 10 ,
                         T.ppMinumunInvest   = 5_000_000 ,
                         T.ppMinumunCompoundInvest    = 3_000_000 ,
+                        T.ppMaximunInvest = 50_000_000 ,
                         T.ppDeadline  = deadlinePool ,
                         T.ppPoolNFT = poolNFT ,
                         T.ppPoolNFTTxOutRef  = poolNFTTxOutRef ,
@@ -239,7 +242,19 @@ crearPoolParams walletNro pParams shutdown = do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Ingrese un nombre para guardar el Pool:"
             opcionPool <- MonadIOClass.liftIO P.getLine
-            MonadIOClass.liftIO $ writeJSON ("files/stakePlus/" ++ opcionPool ++ ".json" ) (DataAeson.encode pParams)
+
+            basePathFilesMaybe <- MonadIOClass.liftIO $ SystemEnvironment.lookupEnv "PLUTUS_DEVS_SCRIPTS_FILES" 
+
+            let 
+                basePathFiles = case basePathFilesMaybe of
+                    Nothing -> "files/stakePlus"
+                    Just path -> path SystemFilePathPosix.</> "stakePlus"  
+            
+            MonadIOClass.liftIO $ SystemDirectory.createDirectoryIfMissing True basePathFiles --SystemFilePathPosix.</> v1dir
+
+            MonadIOClass.liftIO $ writeJSON (basePathFiles SystemFilePathPosix.</> "poolParams-" ++ opcionPool ++ ".json" ) (DataAeson.encode pParams)
+
+            PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "Guardado en :" ++ P.show (basePathFiles SystemFilePathPosix.</> "poolParams-" ++ opcionPool ++ ".json")
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
@@ -565,7 +580,17 @@ investInPool walletNro pParams shutdown = do
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Ingrese un nombre para guardar el Invest Params:"
             nombreInvest <- MonadIOClass.liftIO P.getLine
-            MonadIOClass.liftIO $ writeJSON ("files/stakePlus/invest-" ++ nombreInvest ++ ".json" ) (DataAeson.encode userInvestParams)
+
+            basePathFilesMaybe <- MonadIOClass.liftIO $ SystemEnvironment.lookupEnv "PLUTUS_DEVS_SCRIPTS_FILES" 
+            let 
+                basePathFiles = case basePathFilesMaybe of
+                    Nothing -> "files/stakePlus"
+                    Just path -> path SystemFilePathPosix.</> "stakePlus"  
+            
+            MonadIOClass.liftIO $ SystemDirectory.createDirectoryIfMissing True basePathFiles --SystemFilePathPosix.</> v1dir
+            MonadIOClass.liftIO $ writeJSON (basePathFiles SystemFilePathPosix.</> "userInvestParams-" ++ nombreInvest ++ ".json" ) (DataAeson.encode userInvestParams)
+            
+            PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) $ "Guardado en :" ++ P.show (basePathFiles SystemFilePathPosix.</> "userInvestParams-" ++ nombreInvest ++ ".json")
 
             PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Press return to continue..."
             Monad.void $ MonadIOClass.liftIO P.getLine
@@ -912,15 +937,17 @@ mainLoop walletNro pParams shutdown = do
 
         _ -> mainLoop walletNro pParams shutdown
 
+-- test2 :: P.IO ()
+-- test2  = Monad.void $ PABSimulator.runSimulationWith handlers myTrace2
 
+-- myTrace2  ::  MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)))  ()
+-- myTrace2
 
+testWithPABSimulator :: P.IO ()
+testWithPABSimulator  = Monad.void $ PABSimulator.runSimulationWith handlers traceWithPABSimulator
 
-
-test2 :: PlaygroundContract.IO ()
-test2  = Monad.void $ PABSimulator.runSimulationWith handlers myTrace2
-
-myTrace2  ::  MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)))  ()
-myTrace2 = do
+traceWithPABSimulator  ::  MonadFreerInternal.Eff (PABCore.PABEffects (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) (PABSimulator.SimulatorState (PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts)))  ()
+traceWithPABSimulator = do
     PABSimulator.logString @(PABEffectsContractBuiltin.Builtin PAB.ValidatorContracts) "Starting plutus-starter PAB webserver on port 8080. Press enter to exit."
     shutdown <- PABServer.startServerDebug
 

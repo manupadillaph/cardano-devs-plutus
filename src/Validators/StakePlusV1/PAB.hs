@@ -41,11 +41,11 @@ import qualified Data.Aeson                          as DataAeson (ToJSON, FromJ
 import qualified Data.OpenApi.Schema                 as DataOpenApiSchema (ToSchema)
 import qualified GHC.Generics                        as GHCGenerics (Generic)
 import qualified Plutus.PAB.Effects.Contract.Builtin as PABEffectsContractBuiltin (Empty, HasDefinitions (..), SomeBuiltin (..), endpointsToSchemas)
-import qualified Plutus.V1.Ledger.Address            as LedgerAddressV1
+--import qualified Plutus.V1.Ledger.Address            as LedgerAddressV1
 import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
 import qualified Prettyprinter                       (Pretty (..), viaShow)
-import qualified Wallet.Emulator.Wallet              as WalletEmulator (knownWallet, mockWalletAddress)
+--import qualified Wallet.Emulator.Wallet              as WalletEmulator (knownWallet, mockWalletAddress)
 
 --Import Internos
 

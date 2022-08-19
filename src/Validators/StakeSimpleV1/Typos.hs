@@ -23,37 +23,6 @@
 
 module Validators.StakeSimpleV1.Typos where
 
--- import           Control.Monad        hiding (fmap)
--- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
--- import           Data.LisNonEmpty   (NonEmpty (..))
--- import           Data.Map             as Map
--- import           Data.Text            (pack, Text)
--- import           Data.String  
--- import qualified GHC.Generics                        as GHCGenerics (Generic)
--- import           Ledger               hiding (singleton)
--- import qualified Ledger.Constraints   as Constraints
--- import qualified Ledger.Typed.Scripts as Scripts
--- import           LedgerValueV1.Value         as Value
--- import           Ledger.Ada           as Ada
--- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
--- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
--- import           Playground.Types     (KnownCurrency (..))
--- import           Plutus.Contract
--- import qualified PlutusTx
--- import           PlutusTx.Prelude     hiding (unless)
--- import qualified Prelude              as P 
--- import qualified Schema                              (ToSchema)
--- import qualified      Data.OpenApi.Schema         (ToSchema)
--- import           TexPrintf          (printf)
--- import Data.Typeable
-
--- import          Plutus.Trace.Emulator  as Emulator
--- import          WalleEmulator.Wallet
--- import          Data.Default
--- import          Ledger.TimeSlot 
-
--- --Import Nuevos
-
 --Import Externos
 
 import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)

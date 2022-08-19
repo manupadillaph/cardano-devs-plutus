@@ -23,58 +23,12 @@
 
 module Validators.StakeSimpleV1.OnChainHelpers where
 
--- import           Control.Monad        hiding (fmap)
--- import qualified Data.Aeson                          as DataAeson (ToJSON, FromJSON)
--- import           Data.List.NonEmpty   (NonEmpty (..))
--- import           Data.Map             as Map
--- import           Data.Text            (pack, Text)
--- import           Data.String  
--- import qualified GHC.Generics                        as GHCGenerics (Generic)
--- --import           Ledger               hiding (singleton)
--- import qualified Ledger.Constraints   as Constraints
--- import qualified Ledger.Typed.Scripts as Scripts
--- import           LedgerValueV1.Value         as Value
--- import           Ledger.Ada           as Ada
--- import           Playground.Contract  (IO, ensureKnownCurrencies, printSchemas, stage, printJson)
--- import           Playground.TH        (mkKnownCurrencies, mkSchemaDefinitions)
--- import           Playground.Types     (KnownCurrency (..))
--- import           Plutus.Contract
--- import qualified PlutusTx
--- import           PlutusTx.Prelude     hiding (unless)
--- import qualified Prelude              as P 
--- import qualified Schema                              (ToSchema)
--- import     qualified      Data.OpenApi.Schema         (ToSchema)
--- import           Text.Printf          (printf)
--- import Data.Typeable
-
--- import          Plutus.Trace.Emulator  as Emulator
--- import          Wallet.Emulator.Wallet
--- import          Data.Default
--- import          Ledger.TimeSlot 
-
--- --Import Nuevos
-
--- import          Control.Lens
-
--- import PlutusTx.Builtins
-
--- import qualified Data.Map as Map
--- import Ledger 
--- import Ledger.Index
--- import qualified Plutus.Trace.Emulator  as Trace
--- import qualified Data.List
-
--- --Import Internos
--- import qualified Validators.StakeSimpleV1.Typos 
--- import qualified Validators.StakeSimpleV1.Helpers 
--- import qualified Validators.StakeSimpleV1.OnChainNFT     (mintingNFTPolicy)
-
 --Import Externos
 
 import qualified Ledger                              (unPaymentPubKeyHash, valuePaidTo) --PaymentPubKeyHash, getCardanoTxId, pubKeyHashAddress, 
 import qualified Ledger.Ada                          as LedgerAda
 import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
-import qualified Plutus.V1.Ledger.Contexts           as LedgerContextsV1 (ScriptContext, TxInfo, scriptContextTxInfo, txSignedBy, getContinuingOutputs) --, findDatum
+import qualified Plutus.V1.Ledger.Contexts           as LedgerContextsV1 (ScriptContext, TxInfo, txSignedBy) --, findDatum, getContinuingOutputs, scriptContextTxInfo
 import qualified Plutus.V1.Ledger.Interval           as LedgerIntervalV1 (contains, interval, from, member) --, 
 import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import           PlutusTx.Prelude                    hiding (unless)

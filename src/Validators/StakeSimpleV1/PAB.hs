@@ -29,25 +29,7 @@
 {-# LANGUAGE DerivingStrategies  #-} 
 
 
-module Validators.StakeSimpleV1.PAB
-    ( 
-        ValidatorContracts (..)
-    ) 
-    where
-
--- import           Data.Aeson                          (DataAeson.ToJSON, DataAeson.FromJSON)
--- import           Data.OpenApi.Schema                 (ToSchema)
--- import           GHC.Generics                        (Generic)
--- import           Ledger                              (Address)
--- import           Plutus.PAB.Effects.Contract.Builtin (Empty, PABEffectsContractBuiltin.HasDefinitions (..), SomeBuiltin (..), endpointsToSchemas)
--- import           Prettyprinter                       (Pretty (..), viaShow)
--- import qualified Wallet.Emulator.Wallet              as WalletEmulator              (knownWallet, mockWalletAddress)
-
--- --Import Nuevos
-
--- --Import Internos
--- import qualified Validators.StakeSimpleV1.OffChain   
--- import qualified Validators.StakeSimpleV1.Typos   
+module Validators.StakeSimpleV1.PAB where
 
 --Import Internos
 

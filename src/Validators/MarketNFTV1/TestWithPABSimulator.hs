@@ -26,25 +26,25 @@ module Validators.MarketNFTV1.TestWithPABSimulator where
 --Import Externos:
 
 import qualified Control.Monad                       as Monad (void)
-import qualified Data.Default                        as DataDefault (def) 
-import qualified Data.Map                            as DataMap
-import qualified Ledger.Ada                          as LedgerAda 
-import qualified Ledger.TimeSlot                     as LedgerTimeSlot (slotToEndPOSIXTime)    
-import qualified Playground.Contract                 as PlaygroundContract (IO) --, ensureKnownCurrencies, printSchemas, stage, printJson
+--import qualified Data.Default                        as DataDefault (def) 
+--import qualified Data.Map                            as DataMap
+--import qualified Ledger.Ada                          as LedgerAda 
+--import qualified Ledger.TimeSlot                     as LedgerTimeSlot (slotToEndPOSIXTime)    
+--import qualified Playground.Contract                 as PlaygroundContract (IO) --, ensureKnownCurrencies, printSchemas, stage, printJson
 import qualified Plutus.Trace.Emulator               as TraceEmulator
-import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
+--import qualified Plutus.V1.Ledger.Value              as LedgerValueV1
 import           PlutusTx.Prelude                    hiding (unless)
 import qualified Prelude                             as P
-import qualified Wallet.Emulator.Wallet              as WalletEmulator
+--import qualified Wallet.Emulator.Wallet              as WalletEmulator
 
 --Import Internos:
 
-import qualified Validators.MarketNFTV1.OffChain    as OffChain
+--import qualified Validators.MarketNFTV1.OffChain    as OffChain
 
 -- Modulo:
 
-test :: PlaygroundContract.IO ()
-test = TraceEmulator.runEmulatorTraceIO $ do
+testWithPABSimulator :: P.IO ()
+testWithPABSimulator = TraceEmulator.runEmulatorTraceIO $ do
 
 --     let deadline = slotToEndPOSIXTime def 6
 

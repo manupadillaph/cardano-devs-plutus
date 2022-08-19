@@ -21,8 +21,7 @@
 
 --{-# OPTIONS_GHC -fno-warn-unused-imports #-}
 
-module Validators.StakePlusV1.TestWithEmulator
-    where
+module Validators.StakeSimpleV1.TestWithTraceEmulator where
 
 --Import Externos
 
@@ -41,16 +40,16 @@ import qualified Wallet.Emulator.Wallet              as WalletEmulator
 
 --Import Internos
 
-import qualified Validators.StakePlusV1.Helpers         as Helpers
-import qualified Validators.StakePlusV1.OffChain        as OffChain       
-import qualified Validators.StakePlusV1.OffChainHelpers as OffChainHelpers         
-import qualified Validators.StakePlusV1.OnChainNFT      as OnChainNFT (mintingNFTPolicy)
-import qualified Validators.StakePlusV1.Typos           as T 
+import qualified Validators.StakeSimpleV1.Helpers         as Helpers
+import qualified Validators.StakeSimpleV1.OffChain        as OffChain       
+import qualified Validators.StakeSimpleV1.OffChainHelpers as OffChainHelpers         
+import qualified Validators.StakeSimpleV1.OnChainNFT      as OnChainNFT (mintingNFTPolicy)
+import qualified Validators.StakeSimpleV1.Typos           as T 
 
 -- Modulo:
 
-test :: Integer -> P.IO ()
-test opcion = TraceEmulator.runEmulatorTraceIO' DataDefault.def emCfg (myTrace opcion)
+testWithEmulator :: Integer -> P.IO ()
+testWithEmulator opcion = TraceEmulator.runEmulatorTraceIO' DataDefault.def emCfg (traceWithEmulator opcion)
 
 emCfg :: TraceEmulator.EmulatorConfig
 emCfg = TraceEmulator.EmulatorConfig (Left $ DataMap.fromList [(WalletEmulator.knownWallet w, v) | w <- [1 .. 3]]) DataDefault.def 
@@ -59,8 +58,8 @@ emCfg = TraceEmulator.EmulatorConfig (Left $ DataMap.fromList [(WalletEmulator.k
     v = LedgerAda.lovelaceValueOf 2000_000_000 
 
 
-myTrace :: Integer -> TraceEmulator.EmulatorTrace ()
-myTrace opcion = do
+traceWithEmulator :: Integer -> TraceEmulator.EmulatorTrace ()
+traceWithEmulator opcion = do
 
     let 
         master1 = WalletEmulator.knownWallet 1
@@ -138,19 +137,19 @@ myTrace opcion = do
             Monad.void $ TraceEmulator.waitNSlots 1
 
             TraceEmulator.callEndpoint @"masterCreatePool" activateContractWalletMaster1 $ T.MasterCreatePoolParams{  
-                T.pmcpPoolParam = pParams, 
-                T.pmcpPoolNFTTokenName = poolNFTTokenName,
-                T.pmcpPoolNFTTxOutRef = poolNFTTxOutRef,
-                T.pmcpFund   = 100_000_000
+                mcpPoolParam = pParams, 
+                mcpPoolNFTTokenName = poolNFTTokenName,
+                mcpPoolNFTTxOutRef = poolNFTTxOutRef,
+                mcpFund   = 100_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
 
             TraceEmulator.callEndpoint @"masterFundPool" activateContractWalletMaster2 $ T.MasterFundPoolParams{  
-                T.pmfpPoolParam = pParams, 
+                mspPoolParam = pParams, 
                 -- mspPoolNFTTokenName = poolNFTTokenName,
                 -- mspPoolNFTTxOutRef = poolNFTTxOutRef,
-                T.pmfpFund   = 50_000_000
+                mspFund   = 50_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
@@ -160,20 +159,20 @@ myTrace opcion = do
             Monad.void $ TraceEmulator.waitNSlots 1
 
             TraceEmulator.callEndpoint @"masterCreatePool" activateContractWalletMaster1 $ T.MasterCreatePoolParams{  
-                T.pmcpPoolParam = pParams, 
-                T.pmcpPoolNFTTokenName = poolNFTTokenName,
-                T.pmcpPoolNFTTxOutRef = poolNFTTxOutRef,
-                T.pmcpFund   = 100_000_000
+                mcpPoolParam = pParams, 
+                mcpPoolNFTTokenName = poolNFTTokenName,
+                mcpPoolNFTTxOutRef = poolNFTTxOutRef,
+                mcpFund   = 100_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
 
             TraceEmulator.callEndpoint @"userInvest" activateContractWalletUser1 $ T.UserInvestParams{  
-                T.puiPoolParam = pParams,
-                T.puiUserNFTTokenName = user1NFTTokenName,
-                T.puiUserNFTTxOutRef = user1NFTTxOutRef,
-                T.puiDeadline = deadlineInvest,
-                T.puiInvest   = 6_000_000
+                uipPoolParam = pParams,
+                uiUserNFTTokenName = user1NFTTokenName,
+                uiUserNFTTxOutRef = user1NFTTxOutRef,
+                uipDeadline = deadlineInvest,
+                uipInvest   = 6_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
@@ -183,29 +182,29 @@ myTrace opcion = do
             Monad.void $ TraceEmulator.waitNSlots 1
 
             TraceEmulator.callEndpoint @"masterCreatePool" activateContractWalletMaster1 $ T.MasterCreatePoolParams{  
-                T.pmcpPoolParam = pParams, 
-                T.pmcpPoolNFTTokenName = poolNFTTokenName,
-                T.pmcpPoolNFTTxOutRef = poolNFTTxOutRef,
-                T.pmcpFund   = 100_000_000
+                mcpPoolParam = pParams, 
+                mcpPoolNFTTokenName = poolNFTTokenName,
+                mcpPoolNFTTxOutRef = poolNFTTxOutRef,
+                mcpFund   = 100_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
 
             TraceEmulator.callEndpoint @"userInvest" activateContractWalletUser1 $ T.UserInvestParams{  
-                T.puiPoolParam = pParams,
-                T.puiUserNFTTokenName = user1NFTTokenName,
-                T.puiUserNFTTxOutRef = user1NFTTxOutRef,
-                T.puiDeadline = deadlineInvest,
-                T.puiInvest   = 10_000_000
+                uipPoolParam = pParams,
+                uiUserNFTTokenName = user1NFTTokenName,
+                uiUserNFTTxOutRef = user1NFTTxOutRef,
+                uipDeadline = deadlineInvest,
+                uipInvest   = 10_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 100
 
             TraceEmulator.callEndpoint @"userGetRewards" activateContractWalletUser1 $ T.UserGetRewardsParams{  
-                T.pugrPoolParam = pParams,
-                T.pugrUserNFTTokenName = user1NFTTokenName,
-                T.pugrUserNFTTxOutRef = user1NFTTxOutRef,
-                T.pugrClaim  = 3_000_000
+                ugrpPoolParam = pParams,
+                ugrpUserNFTTokenName = user1NFTTokenName,
+                ugrpUserNFTTxOutRef = user1NFTTxOutRef,
+                ugrpClaim  = 3_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
@@ -215,87 +214,87 @@ myTrace opcion = do
             Monad.void $ TraceEmulator.waitNSlots 1
 
             TraceEmulator.callEndpoint @"masterCreatePool" activateContractWalletMaster1 $ T.MasterCreatePoolParams{  
-                T.pmcpPoolParam = pParams, 
-                T.pmcpPoolNFTTokenName = poolNFTTokenName,
-                T.pmcpPoolNFTTxOutRef = poolNFTTxOutRef,
-                T.pmcpFund   = 100_000_000
+                mcpPoolParam = pParams, 
+                mcpPoolNFTTokenName = poolNFTTokenName,
+                mcpPoolNFTTxOutRef = poolNFTTxOutRef,
+                mcpFund   = 100_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
 
             TraceEmulator.callEndpoint @"userInvest" activateContractWalletUser1 $ T.UserInvestParams{  
-                T.puiPoolParam = pParams,
-                T.puiUserNFTTokenName = user1NFTTokenName,
-                T.puiUserNFTTxOutRef = user1NFTTxOutRef,
-                T.puiDeadline = deadlineInvest,
-                T.puiInvest   = 10_000_000
+                uipPoolParam = pParams,
+                uiUserNFTTokenName = user1NFTTokenName,
+                uiUserNFTTxOutRef = user1NFTTxOutRef,
+                uipDeadline = deadlineInvest,
+                uipInvest   = 10_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 75
 
             TraceEmulator.callEndpoint @"userGetRewards" activateContractWalletUser1 $ T.UserGetRewardsParams{  
-                T.pugrPoolParam = pParams,
-                T.pugrUserNFTTokenName = user1NFTTokenName,
-                T.pugrUserNFTTxOutRef = user1NFTTxOutRef,
-                T.pugrClaim  = 4_000_000
+                ugrpPoolParam = pParams,
+                ugrpUserNFTTokenName = user1NFTTokenName,
+                ugrpUserNFTTxOutRef = user1NFTTxOutRef,
+                ugrpClaim  = 4_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 20
 
             TraceEmulator.callEndpoint @"userGetRewards" activateContractWalletUser1 $ T.UserGetRewardsParams{  
-                T.pugrPoolParam = pParams,
-                T.pugrUserNFTTokenName = user1NFTTokenName,
-                T.pugrUserNFTTxOutRef = user1NFTTxOutRef,
-                T.pugrClaim  = 5_000_000
+                ugrpPoolParam = pParams,
+                ugrpUserNFTTokenName = user1NFTTokenName,
+                ugrpUserNFTTxOutRef = user1NFTTxOutRef,
+                ugrpClaim  = 5_000_000
             }
 
             Monad.void $ TraceEmulator.waitNSlots 2
 
     -- TraceEmulator.callEndpoint @"masterFundPool" activateContractWalletMaster2 $ T.MasterFundPoolParams{  
-    --         T.pmfpPoolParam = pParams, 
+    --         mspPoolParam = pParams, 
     --         mspPoolNFTTokenName = poolNFTTokenName,
     --         mspPoolNFTTxOutRef = poolNFTTxOutRef,
-    --         T.pmfpFund   = 50_000_000
+    --         mspFund   = 50_000_000
     --     }
 
     -- Monad.void $ TraceEmulator.waitNSlots 2
 
 
     -- -- TraceEmulator.callEndpoint @"masterCreatePool" activateContractWalletMaster1 $ T.MasterCreatePoolParams{  
-    -- --         T.pmcpPoolParam = pParams, 
-    -- --         --T.pmcpPoolNFTTokenName = poolNFTTokenNameString,
-    -- --         T.pmcpPoolNFTTokenName = poolNFTTokenName,
-    -- --         T.pmcpPoolNFTTxOutRef = poolNFTTxOutRef,
-    -- --         T.pmcpFund   = 200_000_000
+    -- --         mcpPoolParam = pParams, 
+    -- --         --mcpPoolNFTTokenName = poolNFTTokenNameString,
+    -- --         mcpPoolNFTTokenName = poolNFTTokenName,
+    -- --         mcpPoolNFTTxOutRef = poolNFTTxOutRef,
+    -- --         mcpFund   = 200_000_000
     -- --     }
 
     -- -- Monad.void $ TraceEmulator.waitNSlots 1
 
 
     -- -- TraceEmulator.callEndpoint @"masterFundPool" activateContractWalletUser1 $ T.MasterFundPoolParams{  
-    -- --         T.pmfpPoolParam = pParams, 
-    -- --         T.pmfpFund   = 70_000_000
+    -- --         mspPoolParam = pParams, 
+    -- --         mspFund   = 70_000_000
     -- --     }
 
     -- -- Monad.void $ TraceEmulator.waitNSlots 1
 
 
     -- TraceEmulator.callEndpoint @"userInvest" activateContractWalletUser1 $ T.UserInvestParams{  
-    --     T.puiPoolParam = pParams,
-    --     T.puiUserNFTTokenName = user1NFTTokenName,
-    --     T.puiUserNFTTxOutRef = user1NFTTxOutRef,
-    --     T.puiDeadline = deadlineInvest,
-    --     T.puiInvest   = 6_000_000
+    --     uipPoolParam = pParams,
+    --     uiUserNFTTokenName = user1NFTTokenName,
+    --     uiUserNFTTxOutRef = user1NFTTxOutRef,
+    --     uipDeadline = deadlineInvest,
+    --     uipInvest   = 6_000_000
     -- }
 
     -- Monad.void $ TraceEmulator.waitNSlots 2
 
     -- -- TraceEmulator.callEndpoint @"userInvest" activateContractWalletUser1 $ T.UserInvestParams{  
-    -- --     T.puiPoolParam = pParams,
-    -- --     T.puiUserNFTTokenName = user1NFTTokenNameString,
-    -- --     T.puiUserNFTTxOutRef = user1NFTTxOutRef,
-    -- --     T.puiDeadline = deadlineInvest,
-    -- --     T.puiInvest   = 4_000_000
+    -- --     uipPoolParam = pParams,
+    -- --     uiUserNFTTokenName = user1NFTTokenNameString,
+    -- --     uiUserNFTTxOutRef = user1NFTTxOutRef,
+    -- --     uipDeadline = deadlineInvest,
+    -- --     uipInvest   = 4_000_000
     -- -- }
 
     -- -- Monad.void $ TraceEmulator.waitNSlots 1
@@ -309,40 +308,40 @@ myTrace opcion = do
     
 
     -- TraceEmulator.callEndpoint @"masterGetBackFund" activateContractWalletMaster $ T.MasterGetBackFundParams{  
-    --         T.pmgbfPoolParam = pParams
+    --         mgpPoolParam = pParams
     --    }
 
     -- Monad.void $ TraceEmulator.waitNSlots 15
 
     -- TraceEmulator.callEndpoint @"masterGetBackFund" activateContractWalletUser $ T.MasterGetBackFundParams{  
-    --         T.pmgbfPoolParam = pParams
+    --         mgpPoolParam = pParams
     --     }
     -- Monad.void $ TraceEmulator.waitNSlots 1
 
     -- TraceEmulator.callEndpoint @"userInvest" activateContractWalletUser $ T.UserInvestParams{  
-    --         T.puiPoolParam = pParams,
-    --         T.puiDeadline = deadlineInvest,
-    --         T.puiInvest   = 6_000_000
+    --         uipPoolParam = pParams,
+    --         uipDeadline = deadlineInvest,
+    --         uipInvest   = 6_000_000
     --     }
 
     -- Monad.void $ TraceEmulator.waitNSlots 10
 
     -- TraceEmulator.callEndpoint @"userGetBackInvest" activateContractWalletUser $ T.UserGetBackInvestParams{  
-    --         T.pugbiPoolParam = pParams,
-    --         T.pugbiDeadline = deadlineInvest
+    --         ugipPoolParam = pParams,
+    --         ugipDeadline = deadlineInvest
     --     }
 
     -- Monad.void $ TraceEmulator.waitNSlots 1
 
     -- TraceEmulator.callEndpoint @"userGetRewards" activateContractWalletUser $ T.UserGetRewardsParams{  
-    --         T.pugrPoolParam = pParams
+    --         ugrpPoolParam = pParams
     --     }
 
     -- Monad.void $ TraceEmulator.waitNSlots 1
 
     -- TraceEmulator.callEndpoint @"userInvestRewards" activateContractWalletUser $ T.UserInvestRewardsParams{  
-    --         T.puirPoolParam = pParams,
-    --         T.puirDeadline = deadlineReInvest
+    --         uirpPoolParam = pParams,
+    --         uirpDeadline = deadlineReInvest
     --     }
     
     -- Monad.void $ TraceEmulator.waitNSlots 1
