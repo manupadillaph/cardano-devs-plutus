@@ -40,6 +40,18 @@ import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
 import qualified PlutusTx
 import           PlutusTx.Prelude                    hiding (unless)
 
+
+    --solo debe haber dos entradas y dos salidas
+    --la entrada con el NFT desde el contrato
+    --la entrada con el pago desde la wallet del comprador
+    --la salida con el NFT para el comprador
+    --la salida con el pago para el vendedor
+    -- TODO:
+    -- deberia permitir cuatas entradas quiera
+    -- solo que por cada datum que vaya a consumir, ver datum de este parametro,
+    -- que haya una salida que vaya a la payment address que dice el datum con el monto que dice el datum
+
+
 --Import Internos:
 
 import qualified Validators.MarketNFTV1.Typos           as T (ValidatorDatum (..), ValidatorRedeemer (..))
@@ -68,18 +80,6 @@ mkValidator _ _ _ =
 validateBuyerBuyNFT :: T.ValidatorDatum -> LedgerContextsV1.ScriptContext -> Bool
 validateBuyerBuyNFT datum ctx  =
 
-    --solo debe haber dos entradas y dos salidas
-    --la entrada con el NFT desde el contrato
-    --la entrada con el pago desde la wallet del comprador
-    --la salida con el NFT para el comprador
-    --la salida con el pago para el vendedor
-
-    -- esta mal...
-
-    -- deberia permitir cuatas entradas quiera
-    -- solo que por cada datum que vaya a consumir, ver datum de este parametro,
-    -- que haya una salida que vaya a la payment address que dice el datum con el monto que dice el datum
-
     traceIfFalse "ALDEA Market NFT: Monto de pago incorrecto" checkPaymentInOutputToSeller
 
   where
@@ -106,13 +106,6 @@ validateSellerGetBack datum  ctx  =
 
     signedBySeller :: Bool
     signedBySeller = LedgerContextsV1.txSignedBy info $ Ledger.unPaymentPubKeyHash $ T.dSeller datum
-
- 
-
-
-
-
-
 
 
 typedValidator :: UtilsTypedScriptsValidatorsV1.TypedValidator ValidatorScriptV1

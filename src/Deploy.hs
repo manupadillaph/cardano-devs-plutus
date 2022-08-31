@@ -19,48 +19,7 @@
 {-# LANGUAGE AllowAmbiguousTypes        #-}
 {-# LANGUAGE NumericUnderscores         #-}
 
-module Deploy
-    ( 
-        writeUnit,
-
-        writeValidatorLockerV1Redeemer,
-        writeValidatorLockerV1Datum,
-        writeValidatorLockerV1Hash,
-        writeValidatorLockerV1,
-
-        writeValidatorAlwaysTrueV1Hash,
-        writeValidatorAlwaysTrueV1,
-        writeValidatorAlwaysFalseV1Hash,
-        writeValidatorAlwaysFalseV1,
-        writeValidatorBeneficiaryV1Hash,
-        writeValidatorBeneficiaryV1,
-        writeValidatorDeadlineV1Hash,
-        writeValidatorDeadlineV1,
-        writeValidatorRedeemerV1Hash,
-        writeValidatorRedeemerV1,
-
-        writeValidatorMarketNFTV1Redeemer,
-        writeValidatorMarketNFTV1Datum,
-        writeValidatorMarketNFTV1Hash,
-        writeValidatorMarketNFTV1,
-
-        writeValidatorStakeSimpleV1Redeemer,
-        writeValidatorStakeSimpleV1Datum,
-        writeValidatorStakeSimpleV1Hash,
-        writeValidatorStakeSimpleV1,
-
-        writeValidatorStakePlusV1Redeemer,
-        writeValidatorStakePlusV1Datum,
-        writeValidatorStakePlusV1Hash,
-        writeValidatorStakePlusV1,
-
-        writeMintingPolicyFreeV1,
-        writeMintingPolicyNFTV1,
-        writeMintingPolicySignedV1Addr,
-        writeMintingPolicySignedV1Pkh,
-        writeMintingPolicyTokensV1
-
-    ) where
+module Deploy where
 
 --Import Externos
 
@@ -95,8 +54,10 @@ import qualified Validators.StakeSimpleV1
 
 import qualified MintingPolicies.FreeV1              (policy)
 import qualified MintingPolicies.NFTV1               (policy)
+import qualified MintingPolicies.NFTSignedV1         (policy)
 import qualified MintingPolicies.SignedV1            (policy)
 import qualified MintingPolicies.TokensV1            (policy)
+import qualified MintingPolicies.TokensSignedV1      (policy)
 
 import qualified Utils                               (unsafeReadTxOutRef, unsafeReadAddress, unsafePaymentPubKeyHash, pkhFromStr)
 
@@ -395,6 +356,14 @@ writeMintingPolicyNFTV1 path file oref' tn' = do
         p    = MintingPolicies.NFTV1.policy oref tn
     writeMintingPolicyV1 path (file ++ ".plutus") p 
 
+writeMintingPolicyNFTSignedV1 :: P.String -> P.String -> P.String ->  P.String ->  P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicyNFTSignedV1 path file addr' oref' tn' = do
+    let pkh  = Utils.unsafePaymentPubKeyHash $ Utils.unsafeReadAddress addr'
+        oref = Utils.unsafeReadTxOutRef oref'
+        tn   = DataString.fromString tn'
+        p    = MintingPolicies.NFTSignedV1.policy pkh oref tn
+    writeMintingPolicyV1 path (file ++ ".plutus") p 
+
 writeMintingPolicySignedV1Addr ::  P.String -> P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
 writeMintingPolicySignedV1Addr path file addr' = do
     let pkh  = Utils.unsafePaymentPubKeyHash $ Utils.unsafeReadAddress addr'
@@ -413,5 +382,14 @@ writeMintingPolicyTokensV1 path file oref' tn' amt' = do
         tn   = DataString.fromString tn'
         amt  = P.read amt'
         p    = MintingPolicies.TokensV1.policy oref tn amt
+    writeMintingPolicyV1 path (file ++ ".plutus") p 
+
+writeMintingPolicyTokensSignedV1 :: P.String -> P.String -> P.String -> P.String -> P.String -> P.String -> P.IO (P.Either (CardanoApi.FileError ()) ())
+writeMintingPolicyTokensSignedV1 path file addr' oref' tn' amt' = do
+    let pkh  = Utils.unsafePaymentPubKeyHash $ Utils.unsafeReadAddress addr'
+        oref = Utils.unsafeReadTxOutRef oref'
+        tn   = DataString.fromString tn'
+        amt  = P.read amt'
+        p    = MintingPolicies.TokensSignedV1.policy pkh oref tn amt
     writeMintingPolicyV1 path (file ++ ".plutus") p 
 

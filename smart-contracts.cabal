@@ -98,9 +98,11 @@ library
                      
                      , MintingPolicies.FreeV1
                      , MintingPolicies.NFTV1
+                     , MintingPolicies.NFTSignedV1
                      , MintingPolicies.SignedV1
                      , MintingPolicies.TokensV1
-
+                     , MintingPolicies.TokensSignedV1
+                     
                      , Utils
 
   --------------------

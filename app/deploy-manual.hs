@@ -55,10 +55,12 @@ main = do
   putStrLn "143: write Validator Stake Plus V1 cbor"
   putStrLn "144: write Validator Stake Plus V1 hash"
 
-  putStrLn "15: write Minting Policy Free V1"
-  putStrLn "16: write Minting Policy NFT V1"
-  putStrLn "17: write Minting Policy Tokens V1"
-  putStrLn "18: write Minting Policy Signed V1"
+  putStrLn "15:  write Minting Policy Free V1"
+  putStrLn "16:  write Minting Policy NFT V1"
+  putStrLn "161: write Minting Policy NFT Signed V1"
+  putStrLn "17:  write Minting Policy Tokens V1"
+  putStrLn "171: write Minting Policy Tokens Signed V1"
+  putStrLn "18:  write Minting Policy Signed V1"
 
   opcion <- getLine
 
@@ -322,6 +324,23 @@ main = do
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
+
+    161 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      putStrLn "Ingrese Wallet Addr para calcular PKH:"
+      addr' <- getLine
+      putStrLn "Ingrese TxOutRef:"
+      oref' <- getLine
+      putStrLn "Ingrese Token Name:"
+      tn' <- getLine
+      e <- Deploy.writeMintingPolicyNFTSignedV1 path file addr' oref' tn' 
+      case e of
+        Left err -> throwIO $ userError $ show err
+        Right () -> putStrLn "Minting Policy File Hecho"
+
     17 -> do
       putStrLn "Ingrese path:"
       path <- getLine
@@ -337,6 +356,25 @@ main = do
       case e of
         Left err -> throwIO $ userError $ show err
         Right () -> putStrLn "Minting Policy File Hecho"
+
+    171 -> do
+      putStrLn "Ingrese path:"
+      path <- getLine
+      putStrLn "Ingrese nombre del script:"
+      file <- getLine
+      putStrLn "Ingrese Wallet Addr para calcular PKH:"
+      addr' <- getLine
+      putStrLn "Ingrese TxOutRef:"
+      oref' <- getLine
+      putStrLn "Ingrese Token Name:"
+      tn' <- getLine
+      putStrLn "Ingrese Amount:"
+      amt' <- getLine
+      e <- Deploy.writeMintingPolicyTokensSignedV1 path file addr' oref' tn' amt'
+      case e of
+        Left err -> throwIO $ userError $ show err
+        Right () -> putStrLn "Minting Policy File Hecho"
+
     18 -> do
       putStrLn "Ingrese path:"
       path <- getLine

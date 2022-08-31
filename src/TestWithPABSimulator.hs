@@ -19,13 +19,7 @@
 {-# LANGUAGE AllowAmbiguousTypes        #-}
 {-# LANGUAGE NumericUnderscores         #-}
 
-module TestWithPABSimulator
-    ( 
-        testValidatorMarketNFTV1WithPABSimulator,
-        testValidatorStakeSimpleV1WithPABSimulator,
-        testValidatorStakePlusV1WithPABSimulator
-
-    ) where
+module TestWithPABSimulator  where
   
 import qualified Prelude                             as P
 

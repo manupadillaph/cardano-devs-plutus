@@ -19,26 +19,7 @@
 {-# LANGUAGE AllowAmbiguousTypes        #-}
 {-# LANGUAGE NumericUnderscores         #-}
 
-module TestWithTraceEmulator
-    ( 
-        testValidatorLockerV1WithTraceEmulator,
-        testValidatorAlwaysTrueV1WithTraceEmulator,
-        testValidatorAlwaysFalseV1WithTraceEmulator,
-        testValidatorBeneficiaryV1WithTraceEmulator,
-        testValidatorDeadlineV1WithTraceEmulator,
-        testValidatorRedeemerV1WithTraceEmulator,
-
-        --testValidatorMarketNFTV1WithTraceEmulator,
-
-        -- testValidatorStakeSimpleV1WithTraceEmulator,
-        -- testValidatorStakePlusV1WithTraceEmulator,
-
-        testMintingPolicyFreeV1WithTraceEmulator,
-        testMintingPolicyNFTV1WithTraceEmulator,
-        testMintingPolicySignedV1WithTraceEmulator,
-        testMintingPolicyTokensV1WithTraceEmulator,
-
-    ) where
+module TestWithTraceEmulator where
   
 import qualified Prelude                             as P
 
@@ -57,10 +38,11 @@ import qualified Validators.StakePlusV1
 import qualified Validators.StakeSimpleV1
 
 import qualified MintingPolicies.FreeV1              
-import qualified MintingPolicies.NFTV1               
-import qualified MintingPolicies.SignedV1            
+import qualified MintingPolicies.NFTV1      
+import qualified MintingPolicies.NFTSignedV1                
+import qualified MintingPolicies.SignedV1         
 import qualified MintingPolicies.TokensV1            
-
+import qualified MintingPolicies.TokensSignedV1   
 --Modulo:
 
 testValidatorLockerV1WithTraceEmulator :: P.IO ()
@@ -117,6 +99,10 @@ testMintingPolicyNFTV1WithTraceEmulator  = MintingPolicies.NFTV1.testWithTraceEm
 
 ---------------------------
 
+testMintingPolicyNFTSignedV1WithTraceEmulator  :: P.IO ()
+testMintingPolicyNFTSignedV1WithTraceEmulator  = MintingPolicies.NFTSignedV1.testWithTraceEmulator
+
+---------------------------
 testMintingPolicySignedV1WithTraceEmulator  :: P.IO ()
 testMintingPolicySignedV1WithTraceEmulator  = MintingPolicies.SignedV1.testWithTraceEmulator
 
@@ -125,3 +111,7 @@ testMintingPolicySignedV1WithTraceEmulator  = MintingPolicies.SignedV1.testWithT
 testMintingPolicyTokensV1WithTraceEmulator  :: P.IO ()
 testMintingPolicyTokensV1WithTraceEmulator  = MintingPolicies.TokensV1.testWithTraceEmulator
 
+---------------------------
+
+testMintingPolicyTokensSignedV1WithTraceEmulator  :: P.IO ()
+testMintingPolicyTokensSignedV1WithTraceEmulator  = MintingPolicies.TokensSignedV1.testWithTraceEmulator
