@@ -40,8 +40,8 @@ main = do
   -- putStrLn "133: write Validator Stake Simple V1 cbor"
   -- putStrLn "134: write Validator Stake Simple V1 hash"
 
-  -- putStrLn "141: write Validator Stake Plus V1 datum"
-  -- putStrLn "142: write Validator Stake Plus V1 redeemer"
+  -- putStrLn "141: write Validator Stake Plus V1 PoolDatum"
+  -- putStrLn "142: write Validator Stake Plus V1 Redeemer MasterFund"
   -- putStrLn "143: write Validator Stake Plus V1 cbor"
   -- putStrLn "144: write Validator Stake Plus V1 hash"
 
@@ -255,27 +255,25 @@ main = do
     141 -> do
       --putStrLn "Ingrese path:"
       path <- getLine
-      --putStrLn "Ingrese nombre para el archivo Datum:"
+      --putStrLn "Ingrese nombre para el archivo PoolDatum:"
       filename <- getLine
-      --putStrLn "Ingrese creator:"
-      creator <- getLine
-      --putStrLn "Ingrese deadline:"
-      deadline <- getLine
-      --putStrLn "Ingrese name:"
-      name <- getLine
-      --putStrLn "Ingrese qty:"
-      qty <- getLine
-      Deploy.writeValidatorStakePlusV1Datum path filename creator (read deadline) (read name) (read qty)
+      --putStrLn "Ingrese master:"
+      master <- getLine
+      --putStrLn "Ingrese Funds:"
+      funds <- getLine
+      Deploy.writeValidatorStakePlusV1Datum path filename master (read funds)
       putStrLn "Datum File Hecho en:"
       putStrLn filename
     142 -> do
       --putStrLn "Ingrese path:"
       path <- getLine
-      --putStrLn "Ingrese nombre para el archivo Redeemer:"
+      --putStrLn "Ingrese nombre para el archivo Redeemer MasterFund"
       filename <- getLine
-      --putStrLn "Ingrese redeemer (1 o 2):"
-      opcion <- getLine
-      Deploy.writeValidatorStakePlusV1Redeemer path filename (read opcion)
+      --putStrLn "Ingrese master:"
+      master <- getLine
+      --putStrLn "Ingrese Funds:"
+      funds <- getLine
+      Deploy.writeValidatorStakePlusV1Redeemer path filename master (read funds)
       putStrLn "Redeemer File Hecho en:"
       putStrLn filename  
     143 -> do

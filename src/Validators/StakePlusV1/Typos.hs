@@ -184,7 +184,6 @@ mkPoolState :: PoolNFT -> [MasterFunder] -> [UserNFT] -> Proffit -> Integer -> V
 mkPoolState  poolNFT masterFunders userNFTs cashedout countTotalUtxoWithPoolState = PoolState $ mkPoolStateTypo  poolNFT masterFunders userNFTs cashedout countTotalUtxoWithPoolState
 
 
-
 mkUserStateTypo :: User -> UserNFT -> Invest -> LedgerApiV1.POSIXTime -> Deadline -> Proffit -> Proffit -> Maybe LedgerApiV1.POSIXTime   -> UserStateTypo
 mkUserStateTypo user userNFT invest createdat deadline cashedout rewardsNotClaimed  lastClaim = UserStateTypo { usUser = user, usUserNFT = userNFT , usInvest = invest ,usCreatedAt = createdat , usDeadline = deadline , usRewardsNotClaimed = rewardsNotClaimed , usChashedOut = cashedout, usLastClaimAt = lastClaim }
 
@@ -597,6 +596,7 @@ examplePoolParams = PoolParams
         ppValidTimeRange  = examplePOSIXTime,
         ppMinimunClaim  = 1
     }
+
 
 exampleMasterCreatePoolParams :: MasterCreatePoolParams
 exampleMasterCreatePoolParams = MasterCreatePoolParams

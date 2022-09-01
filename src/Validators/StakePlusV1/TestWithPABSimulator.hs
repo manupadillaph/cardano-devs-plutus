@@ -320,12 +320,27 @@ crearPool walletNro pParams shutdown = do
 
             fund <- getAda
 
-            cMasterCreatePool_Master  <- PABSimulator.activateContract (getWallet  walletNro) (PAB.MasterCreatePool T.MasterCreatePoolParams{
+            let 
+
+                masterCreatePoolParams = T.MasterCreatePoolParams{
                         T.pmcpPoolParam = pParams,
                         T.pmcpPoolNFTTokenName = poolNFTTokenName,
                         T.pmcpPoolNFTTxOutRef = poolNFTTxOutRef,
                         T.pmcpFund   = fund * 1_000_000
-                    })
+                    }
+
+            cMasterCreatePool_Master  <- PABSimulator.activateContract (getWallet  walletNro) (PAB.MasterCreatePool masterCreatePoolParams)
+
+            basePathFilesMaybe <- MonadIOClass.liftIO $ SystemEnvironment.lookupEnv "PLUTUS_DEVS_SCRIPTS_FILES" 
+
+            let 
+                basePathFiles = case basePathFilesMaybe of
+                    Nothing -> "files/stakePlus"
+                    Just path -> path SystemFilePathPosix.</> "stakePlus"  
+            
+            MonadIOClass.liftIO $ SystemDirectory.createDirectoryIfMissing True basePathFiles --SystemFilePathPosix.</> v1dir
+
+            MonadIOClass.liftIO $ writeJSON (basePathFiles SystemFilePathPosix.</> "masterCreatePoolParams.json" ) (DataAeson.encode masterCreatePoolParams)
 
             PABSimulator.waitUntilFinished  cMasterCreatePool_Master
 

@@ -17,8 +17,9 @@ import qualified Validators.AlwaysFalseV1.PAB        (ValidatorContracts )
 import qualified Validators.BeneficiaryV1.PAB        (ValidatorContracts )
 import qualified Validators.DeadlineV1.PAB           (ValidatorContracts )
 import qualified Validators.RedeemerV1.PAB           (ValidatorContracts )
--- import qualified Validators.StakePlusV1.PAB         (ValidatorContracts )
--- import qualified Validators.StakeSimpleV1.PAB       (ValidatorContracts )
+import qualified Validators.MarketNFTV1.PAB          (ValidatorContracts )
+import qualified Validators.StakeSimpleV1.PAB        (ValidatorContracts )
+import qualified Validators.StakePlusV1.PAB          (ValidatorContracts )
 
 --Modulo: 
 
@@ -27,13 +28,15 @@ main = do
 
     -- putStrLn "Iniciar PAB API server de Validador:"
 
-    -- putStrLn "1: Locker"
-    -- putStrLn "2: AlwaysTrue"
+    -- putStrLn "1: LockerV1"
+    -- putStrLn "2: AlwaysTrueV1"
     -- putStrLn "3: AlwaysFalseV1"
-    -- putStrLn "4: Beneficiary"
-    -- putStrLn "5: Deadline"
-    -- putStrLn "6: Redeemer"
-    -- putStrLn "7: Stake Simple"
+    -- putStrLn "4: BeneficiaryV1"
+    -- putStrLn "5: DeadlineV1"
+    -- putStrLn "6: RedeemerV1"
+    -- putStrLn "7: MarketNFTV1"
+    -- putStrLn "8: StakeSimpleV1"
+    -- putStrLn "9: StakePlusV1"
 
     opcion <- getLine
 
@@ -50,8 +53,12 @@ main = do
             runWith (Builtin.handleBuiltin @Validators.DeadlineV1.PAB.ValidatorContracts)
         6 -> do
             runWith (Builtin.handleBuiltin @Validators.RedeemerV1.PAB.ValidatorContracts)
-        -- 7 -> do
-        --     runWith (Builtin.handleBuiltin @Validators.StakeSimpleV1.PAB.ValidatorContracts)
+        7 -> do
+            runWith (Builtin.handleBuiltin @Validators.MarketNFTV1.PAB.ValidatorContracts)
+        8 -> do
+            runWith (Builtin.handleBuiltin @Validators.StakeSimpleV1.PAB.ValidatorContracts)
+        9 -> do
+            runWith (Builtin.handleBuiltin @Validators.StakePlusV1.PAB.ValidatorContracts)
         _ -> main 
 
 

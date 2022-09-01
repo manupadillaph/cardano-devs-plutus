@@ -32,6 +32,7 @@ import qualified Data.ByteString.Short               as SBS
 import qualified Data.String                         as DataString (IsString(fromString))
 --import qualified Data.Map                            as DataMap
 import qualified Ledger                              (PaymentPubKeyHash(..))
+import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
 import qualified Plutus.V1.Ledger.Scripts            as LedgerScriptsV1
 import qualified PlutusTx
 import           PlutusTx.Prelude                    hiding (unless)
@@ -312,33 +313,29 @@ writeValidatorStakePlusV1Hash path file = do
 -- -- writeValidatorStakePlusV1Address path file = do
 -- --     writeJSON  (path SystemFilePathPosix.</> file ++ ".addr") (Validators.StakePlusV1.addressValidator)
 
-writeValidatorStakePlusV1Redeemer :: P.String -> P.String -> Integer -> P.IO ()
-writeValidatorStakePlusV1Redeemer path file opcion = do
-    return ()
-    -- let 
-    --     redeemer = Validators.StakePlusV1.ValidatorRedeemer { 
-    --         Validators.StakePlusV1.rTipo = opcion
-    --     }
-    --     opcionStr = P.show opcion
-    -- writeJSON (path SystemFilePathPosix.</> file ++ ".json") redeemer
+writeValidatorStakePlusV1Redeemer :: P.String -> P.String -> P.String -> Integer -> P.IO ()
+writeValidatorStakePlusV1Redeemer path file master' fund = do
 
+    let 
+        master = Ledger.PaymentPubKeyHash $ Utils.pkhFromStr master'
+        pParams = Validators.StakePlusV1.examplePoolParams
+        redeemer = LedgerApiV1.Redeemer $ PlutusTx.toBuiltinData (Validators.StakePlusV1.mkRedeemMasterFundPool (Validators.StakePlusV1.ppPoolNFT pParams) master fund Validators.StakePlusV1.exampleTxOutRef)
 
-writeValidatorStakePlusV1Datum:: P.String -> P.String -> P.String -> Integer -> Integer -> Integer-> P.IO ()
-writeValidatorStakePlusV1Datum path file creator deadline name qty = do
-    return ()
-    -- let 
-    --     pkh = Utils.pkhFromStr creator
-    
-    --     datum = Validators.StakePlusV1.ValidatorDatum {
-    --         Validators.StakePlusV1.dData = Validators.StakePlusV1.ValidatorData{
-    --                 Validators.StakePlusV1.aCreator =  Ledger.PaymentPubKeyHash pkh,
-    --                 Validators.StakePlusV1.aDeadline    = fromInteger  deadline,
-    --                 Validators.StakePlusV1.aName = name,
-    --                 Validators.StakePlusV1.aAdaQty  = qty 
-    --             }
-    --         }
+    writeJSON (path SystemFilePathPosix.</> file ++ ".json") redeemer
 
-    -- writeJSON (path SystemFilePathPosix.</> file ++ ".json") datum
+writeValidatorStakePlusV1Datum:: P.String -> P.String -> P.String -> Integer -> P.IO ()
+writeValidatorStakePlusV1Datum path file master' fund = do
+    let 
+        pParams = Validators.StakePlusV1.examplePoolParams
+        master = Ledger.PaymentPubKeyHash $ Utils.pkhFromStr master'
+        masterFundersNew = Validators.StakePlusV1.mkMasterFunder master fund
+        masterFunders = [masterFundersNew]
+        userNFTs = []
+        cashedOut = 0
+        countPoolState = 1
+        datum = Validators.StakePlusV1.mkPoolState (Validators.StakePlusV1.ppPoolNFT pParams) masterFunders userNFTs cashedOut countPoolState
+
+    writeJSON (path SystemFilePathPosix.</> file ++ ".json") datum
 
 ---------------------------
 
