@@ -185,6 +185,14 @@ executable deploy-auto
       filepath
   default-language: Haskell2010
 
+executable utils-consByteString
+  main-is: utils-consByteString.hs
+  hs-source-dirs:      app
+  ghc-options:         -Wall
+  build-depends:       base ^>= 4.14.1.0
+                     , text
+                     , bytestring
+                     , smart-contracts
 
 executable utils-token-name
   main-is: utils-token-name.hs

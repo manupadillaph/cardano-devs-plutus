@@ -209,7 +209,7 @@ crearPoolParams walletNro pParams shutdown = do
                 indexTxOut = LedgerApiV1.txOutRefIdx  poolNFTTxOutRef
 
                 poolNFTTokenName =  
-                    LedgerValueV1.TokenName (indexTxOut `consByteString`  LedgerApiV1.getTxId  idTxOut  )
+                    LedgerValueV1.TokenName (indexTxOut `consByteString` LedgerApiV1.getTxId  idTxOut  )
                 poolNFTCurrencySymbol = Helpers.curSymbol OnChainNFT.mintingNFTPolicy
 
                 poolNFT = LedgerValueV1.assetClass poolNFTCurrencySymbol  poolNFTTokenName

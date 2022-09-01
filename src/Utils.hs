@@ -27,7 +27,8 @@ module Utils
     -- contractActivationArgs,
     getCredentials, unsafePaymentPubKeyHash, unsafeStakePubKeyHash, pkhFromStr,
     cidToString,
-    unsafeTokenNameToHex
+    unsafeTokenNameToHex--,
+    --myConsByteString
   ) where
 
 --Import Externos
@@ -44,7 +45,7 @@ import qualified Data.Aeson                          as DataAeson (decode, encod
 import qualified Data.ByteString.Char8               as DataByteStringChar8
 import qualified Data.Maybe                          as DataMaybe (fromJust, fromMaybe)
 import qualified Data.String                         as DataString (IsString (fromString))
-import qualified Data.Text                           as DataText (pack) --Text, 
+import qualified Data.Text                           as DataText (pack, Text) --, 
 import qualified Ledger  
 import qualified Ledger.Bytes                        as LedgerBytes (LedgerBytes(LedgerBytes), fromHex)
 import qualified Plutus.V1.Ledger.Api                as LedgerApiV1
@@ -140,7 +141,13 @@ pkhFromStr s =
         Right (LedgerBytes.LedgerBytes bytes) ->  LedgerApiV1.PubKeyHash bytes 
         Left msg -> P.error $ "Could not convert from hex to bytes: " ++ P.show msg
 
-
+-- myConsByteString :: DataText.Text -> Integer -> DataText.Text
+-- myConsByteString text int = do
+--     let
+--       builtByteString = PlutusTx.Prelude.encodeUtf8  $ PlutusTx.Prelude.toBuiltin text
+--       res = int `PlutusTx.Prelude.consByteString` builtByteString
+--       --res1 = PlutusTx.Prelude.decodeUtf8 res
+--     PlutusTx.Prelude.fromBuiltin res
 
 -- pkhFromStr :: P.String ->  Maybe PubKeyHash   
 -- pkhFromStr s =  do
