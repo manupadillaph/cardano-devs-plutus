@@ -1,7 +1,7 @@
 
 *******************************************  
 
-## **Haskell Validator and Polices Scripts**
+## **Plutus Scripts and Utils**
 
 
 ### **Cardano Developments Tools** 
